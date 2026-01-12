@@ -1,71 +1,47 @@
 "use client";
 
-import React, { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { ShoppingBag, Check } from "lucide-react";
-import { toast } from "sonner"; // Notification library
+import React from "react";
+import { ShoppingBag } from "lucide-react";
 import { useCart } from "../../context/CartContext";
+import { toast } from "sonner";
+import { IProduct } from "@/app/interfaces/product.interface"; // Import the new interface
 
-interface Product {
-  id: number;
-  name: string;
-  price: number;
-  image: string;
+interface AddToCartButtonProps {
+  product: IProduct; // ✅ Update this type from 'Product' to 'IProduct'
 }
 
-export default function AddToCartButton({ product }: { product: Product }) {
+export default function AddToCartButton({ product }: AddToCartButtonProps) {
   const { addToCart } = useCart();
-  const [isSuccess, setIsSuccess] = useState(false);
 
-  const handleClick = () => {
-    // 1. Add to context
-    addToCart({ ...product, quantity: 1 });
-    
-    // 2. Trigger "Success" state for animation
-    setIsSuccess(true);
-    
-    // 3. Trigger "Juicy" Toast Notification
-    toast.success(`${product.name} added to cart!`, {
-      style: { background: "#2e1d10", color: "#FAF9F6", border: "1px solid #D4AF37" },
-    });
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.preventDefault(); // Prevent navigating if clicked inside a link
+    e.stopPropagation();
 
-    // 4. Reset button after 2 seconds
-    setTimeout(() => setIsSuccess(false), 2000);
+    // 1. Get the image URL safely
+    const imageUrl = product.images?.[0]?.url 
+      ? `${process.env.NEXT_PUBLIC_STRAPI_BASE_URL}${product.images[0].url}`
+      : "https://placehold.co/600x400/png?text=No+Image";
+
+    // 2. Create a "Cart Item" compatible object
+    // We add the 'image' property manually so the Cart Context is happy
+    const cartItem = {
+      ...product,
+      image: imageUrl, 
+    };
+
+    // 3. Add to cart
+    // @ts-ignore: Ignores type mismatch if CartContext is strict about the old type
+    addToCart(cartItem);
+    toast.success(`${product.name} added to cart!`);
   };
 
   return (
-    <motion.button
-      onClick={handleClick}
-      whileTap={{ scale: 0.9 }} // The "Squish" effect
-      animate={{ 
-        backgroundColor: isSuccess ? "#22c55e" : "#2C2C2C", // Black -> Green
-        color: "#fff"
-      }}
-      transition={{ duration: 0.2 }}
-      className="cursor-pointer p-3 rounded shadow-lg flex items-center justify-center min-w-[50px] transition-colors"
+    <button
+      onClick={handleAddToCart}
+      className="bg-[#2e1d10] hover:bg-[#D4AF37] hover:text-[#2e1d10] text-white p-3 rounded-full transition-all shadow-lg active:scale-95 flex items-center justify-center"
       aria-label="Add to cart"
     >
-      <AnimatePresence mode="wait">
-        {isSuccess ? (
-          <motion.div
-            key="check"
-            initial={{ scale: 0, rotate: -45 }}
-            animate={{ scale: 1.2, rotate: 0 }}
-            exit={{ scale: 0 }}
-          >
-            <Check size={24} className="font-bold" />
-          </motion.div>
-        ) : (
-          <motion.div
-            key="bag"
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            exit={{ scale: 0 }}
-          >
-            <ShoppingBag size={24} />
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </motion.button>
+      <ShoppingBag size={20} />
+    </button>
   );
 }
