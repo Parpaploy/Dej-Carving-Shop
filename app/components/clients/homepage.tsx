@@ -1,14 +1,14 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import axios from "axios"; // 1. Import Axios
-import { ShoppingBag, Truck, ShieldCheck, Phone } from "lucide-react";
+import axios from "axios";
+import { ShoppingBag, Truck, ShieldCheck, Phone, MapPin } from "lucide-react";
 import { useCart } from "../../context/CartContext"; 
 import AddToCartButton from "../ui/AddToCartButton";
 import { toast } from "sonner"; 
 import { IProduct } from "@/app/interfaces/product.interface"; 
 
-// Static Categories (Since you don't have a Category API yet)
+// Static Categories
 const CATEGORIES = [
   { id: 1, name: "Furniture", image: "https://placehold.co/400x400/png?text=Furniture" },
   { id: 2, name: "Carvings", image: "https://placehold.co/400x400/png?text=Carvings" },
@@ -17,19 +17,14 @@ const CATEGORIES = [
 
 export default function HomepageClient() {
   const [user, setUser] = useState<any>(null);
-  const [products, setProducts] = useState<IProduct[]>([]); // 3. State for Products
+  const [products, setProducts] = useState<IProduct[]>([]);
   const [loading, setLoading] = useState(true);
   const { addToCart } = useCart();
 
-  // --- 1. Fetch User & Products on Load ---
   useEffect(() => {
-    // A. Check User
     const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
+    if (storedUser) setUser(JSON.parse(storedUser));
 
-    // B. Fetch Products from Strapi
     const fetchProducts = async () => {
       try {
         const res = await axios.get(`${process.env.NEXT_PUBLIC_STRAPI_BASE_URL}/api/products?populate=*`);
@@ -44,16 +39,10 @@ export default function HomepageClient() {
     fetchProducts();
   }, []);
 
-  // --- Helper to get Image URL ---
   const getImageUrl = (item: IProduct) => {
-    // Check if images exist and have a URL
     const img = item.images?.[0]?.url;
-    if (!img) return "https://placehold.co/600x400/png?text=No+Image"; // Fallback
-    
-    // If it's already a full URL (e.g. Cloudinary), return it
+    if (!img) return "https://placehold.co/600x400/png?text=No+Image";
     if (img.startsWith("http")) return img;
-    
-    // Otherwise, prepend Strapi Base URL
     return `${process.env.NEXT_PUBLIC_STRAPI_BASE_URL}${img}`;
   };
 
@@ -68,7 +57,7 @@ export default function HomepageClient() {
              <div className="animate-fade-in">
                <p className="text-[#D4AF37] text-xl font-bold mb-2 uppercase tracking-widest">Welcome Back</p>
                <h1 className="text-4xl md:text-6xl font-serif text-[#F5F5DC] mb-6 tracking-wide drop-shadow-md">
-                 Khun {user.username}
+                  {user.username}
                </h1>
                <p className="text-xl md:text-2xl text-gray-200 mb-8 font-light">
                  We found some new antiques you might like.
@@ -111,23 +100,18 @@ export default function HomepageClient() {
         </div>
       </section>
 
-      {/* --- CATEGORIES (Fixed map error) --- */}
+      {/* --- CATEGORIES --- */}
       <section className="py-20 max-w-7xl mx-auto px-6">
         <div className="text-center mb-12">
           <h2 className="text-4xl font-serif text-[#4B3621] mb-2">Browse by Category</h2>
           <div className="h-1 w-24 bg-[#D4AF37] mx-auto"></div>
         </div>
-
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
           {CATEGORIES.map((cat) => (
             <div key={cat.id} className="cursor-pointer group">
               <div className="bg-white p-3 shadow-lg border border-gray-200 rounded-sm transform transition duration-300 group-hover:-translate-y-2">
                 <div className="aspect-square overflow-hidden bg-gray-200">
-                  <img 
-                    src={cat.image} 
-                    alt={cat.name} 
-                    className="w-full h-full object-cover"
-                  />
+                  <img src={cat.image} alt={cat.name} className="w-full h-full object-cover" />
                 </div>
               </div>
               <h3 className="text-center mt-4 text-2xl font-serif text-[#4B3621] group-hover:text-[#D4AF37] transition-colors">
@@ -138,7 +122,7 @@ export default function HomepageClient() {
         </div>
       </section>
 
-      {/* --- NEW ARRIVALS (Now fetching Real Data) --- */}
+      {/* --- NEW ARRIVALS --- */}
       <section className="py-20 bg-[#4B3621] text-[#FAF9F6]">
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex flex-col md:flex-row justify-between items-center mb-12">
@@ -154,21 +138,13 @@ export default function HomepageClient() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
               {products.map((item) => (
                 <div key={item.id} className="bg-[#FAF9F6] rounded-lg overflow-hidden shadow-xl text-[#2C2C2C] flex flex-col">
-                  {/* Image */}
                   <div className="aspect-[4/3] bg-gray-300 relative">
-                     <img 
-                       src={getImageUrl(item)} 
-                       alt={item.name} 
-                       className="w-full h-full object-cover"
-                     />
+                     <img src={getImageUrl(item)} alt={item.name} className="w-full h-full object-cover" />
                   </div>
-                  {/* Content */}
                   <div className="p-5 flex flex-col flex-grow">
                     <h4 className="text-xl font-serif font-bold mb-2 line-clamp-2">{item.name}</h4>
                     <div className="mt-auto pt-4 flex items-center justify-between border-t border-gray-200">
-                      <span className="text-2xl font-bold text-[#8B0000]">
-                        ฿{item.price.toLocaleString()}
-                      </span>
+                      <span className="text-2xl font-bold text-[#8B0000]">฿{item.price.toLocaleString()}</span>
                       <AddToCartButton product={item} />
                     </div>
                   </div>
@@ -179,16 +155,35 @@ export default function HomepageClient() {
         </div>
       </section>
 
-      {/* --- FOOTER --- */}
+      {/* --- FOOTER / MAP SECTION --- */}
       <section className="py-16 bg-[#D4AF37] text-center px-4">
-        <h2 className="text-3xl font-serif text-[#2e1d10] mb-4">Visit Our Shop in Person</h2>
-        <p className="text-xl text-[#2e1d10] mb-8">We have many more unlisted items in our showroom.</p>
-        <button 
-          className="cursor-pointer bg-[#2e1d10] text-white text-lg font-bold py-3 px-8 rounded hover:bg-black transition-colors" 
-          onClick={() => window.open("https://maps.app.goo.gl/SFvUEiisuZ27QvQo8", "_blank")}
-        >
-          Get Directions
-        </button>
+        <div className="max-w-5xl mx-auto">
+            <div className="mb-8">
+                <h2 className="text-3xl font-serif text-[#2e1d10] mb-4">Visit Our Showroom</h2>
+                <div className="flex items-center justify-center gap-2 text-[#2e1d10] text-lg">
+                    <MapPin />
+                    <p>Ban Tawai Wood Carving Village, Chiang Mai</p>
+                </div>
+                <p className="text-[#2e1d10]/80 mt-2">Open Daily: 9:00 AM - 6:00 PM</p>
+            </div>
+            
+            {/* GOOGLE MAPS EMBED */}
+            <div className="w-full h-[400px] bg-gray-200 rounded-lg shadow-xl overflow-hidden border-4 border-[#2e1d10]">
+                {/* 👇👇👇 PASTE YOUR NEW LINK BELOW 👇👇👇 
+                   It should look like: https://www.google.com/maps/embed?pb=!1m18!1m12...
+                */}
+                <iframe 
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3779.424808573954!2d98.9436499759203!3d18.689789982436906!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x30da3114739e5ed7%3A0x80588edbe66d9927!2sDej%20Carving%20Shop!5e0!3m2!1sen!2sth!4v1768211258487!5m2!1sen!2sth" 
+                    width="100%" 
+                    height="100%" 
+                    style={{ border: 0 }} 
+                    allowFullScreen={true} 
+                    loading="lazy" 
+                    referrerPolicy="no-referrer-when-downgrade"
+                    title="Shop Location"
+                ></iframe>
+            </div>
+        </div>
       </section>
 
     </main>

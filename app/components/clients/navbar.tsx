@@ -9,10 +9,7 @@ import { useAuth } from "../../context/AuthContext";
 
 export default function Navbar() {
   const { cartCount } = useCart();
-  
-
   const { user, logout } = useAuth(); 
-
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
 
@@ -22,7 +19,7 @@ export default function Navbar() {
   };
 
   return (
-    <header className="w-full shadow-md z-50 relative">
+    <header className="w-full shadow-md z-50 relative sticky top-0">
       
       {/* --- TOP BAR --- */}
       <div className="bg-[#D4AF37] text-[#2e1d10] py-2 px-6 text-sm md:text-base font-semibold text-center md:text-right">
@@ -35,9 +32,12 @@ export default function Navbar() {
       <nav className="bg-[#2e1d10] text-[#FAF9F6] px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           
-          {/* LOGO */}
-          <Link href="/" className="text-2xl md:text-3xl font-serif font-bold tracking-wide hover:text-[#D4AF37] transition-colors">
-            Dej Carving
+          {/* ✅ LOGO WITH PATTAYA FONT */}
+          <Link 
+            href="/" 
+            className="text-3xl md:text-4xl font-pattaya tracking-wide text-[#F5F5DC] hover:text-[#D4AF37] transition-colors"
+          >
+            Dej Carving Shop
           </Link>
 
           {/* DESKTOP LINKS */}
@@ -60,7 +60,6 @@ export default function Navbar() {
                   className="flex items-center gap-2 hover:text-[#D4AF37] transition-colors focus:outline-none"
                 >
                   <div className="w-10 h-10 bg-[#D4AF37] rounded-full flex items-center justify-center text-[#2e1d10] font-bold text-lg">
-                    {/* Safety check in case username is missing */}
                     {user.username ? user.username.charAt(0).toUpperCase() : "U"}
                   </div>
                   <span className="text-lg font-medium max-w-[150px] truncate">
@@ -130,12 +129,16 @@ export default function Navbar() {
           <div className="md:hidden mt-4 pb-4 border-t border-gray-700 flex flex-col gap-4 text-center">
             <MobileLink href="/" onClick={() => setIsMobileMenuOpen(false)}>Home</MobileLink>
             <MobileLink href="/products" onClick={() => setIsMobileMenuOpen(false)}>Shop Items</MobileLink>
-            {user && (
-               <MobileLink href="/profile" onClick={() => setIsMobileMenuOpen(false)}>My Profile</MobileLink>
-            )}
+            <MobileLink href="/about" onClick={() => setIsMobileMenuOpen(false)}>Our Story</MobileLink>
+            <MobileLink href="/contact" onClick={() => setIsMobileMenuOpen(false)}>Contact</MobileLink>
+            
             <div className="h-[1px] bg-gray-700 my-2"></div>
+            
             {user ? (
-               <button onClick={handleLogoutClick} className="text-xl py-2 text-red-400 block w-full">Log Out</button>
+               <>
+                 <MobileLink href="/profile" onClick={() => setIsMobileMenuOpen(false)}>My Profile ({user.username})</MobileLink>
+                 <button onClick={handleLogoutClick} className="text-xl py-2 text-red-400 block w-full hover:bg-white/10 rounded">Log Out</button>
+               </>
             ) : (
                <MobileLink href="/login" onClick={() => setIsMobileMenuOpen(false)}>Log In</MobileLink>
             )}
