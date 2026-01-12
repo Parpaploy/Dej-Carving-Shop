@@ -2,18 +2,16 @@
 
 import React from "react";
 import Link from "next/link";
-import { IProduct } from "@/app/interfaces/product.interface"; // Ensure this path is correct
+import { IProduct } from "@/app/interfaces/product.interface"; 
 import { BlocksRenderer } from "@strapi/blocks-react-renderer";
 import AddToCartButton from "../ui/AddToCartButton"; 
 import { ArrowLeft, Filter } from "lucide-react";
-
 
 const getImageUrl = (url: string | undefined) => {
   if (!url) return "https://placehold.co/400x400/png?text=No+Image";
   if (url.startsWith("http")) return url;
   return `${process.env.NEXT_PUBLIC_STRAPI_BASE_URL}${url}`;
 };
-
 
 export default function ProductsClient({ products }: { products: IProduct[] }) {
   
@@ -42,12 +40,11 @@ export default function ProductsClient({ products }: { products: IProduct[] }) {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
           {products.map((product) => {
             
-            // FIX: Access the first image from the array (based on your IProduct interface)
+            // Access the first image safely for the card display
             const firstImage = product.images && product.images.length > 0 ? product.images[0].url : "";
             const imageUrl = getImageUrl(firstImage);
 
-            // FIX: Use documentId if available, otherwise fall back to id for the link
-            // (Adjust based on your Strapi version)
+            // Use documentId if available (Strapi v5), otherwise id
             const linkId = (product as any).documentId || product.id;
 
             return (
@@ -74,6 +71,7 @@ export default function ProductsClient({ products }: { products: IProduct[] }) {
                     </h2>
                   </div>
 
+                  {/* Limit description height */}
                   <div className="text-gray-600 text-base mb-6 line-clamp-3 prose prose-sm prose-headings:hidden">
                     <BlocksRenderer content={product.description} />
                   </div>
@@ -84,14 +82,8 @@ export default function ProductsClient({ products }: { products: IProduct[] }) {
                       ฿ {product.price.toLocaleString()}
                     </span>
 
-                    <AddToCartButton 
-                       product={{
-                         id: product.id,
-                         name: product.name,
-                         price: product.price,
-                         image: imageUrl
-                       }} 
-                    />
+                    {/* ✅ FIX: Pass the WHOLE product object. The button handles the image logic. */}
+                    <AddToCartButton product={product} />
                   </div>
                 </div>
               </div>
