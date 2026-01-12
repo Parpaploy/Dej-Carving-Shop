@@ -79,7 +79,7 @@ export default function ProductDetailClient({ product }: { product: IProduct }) 
               {product.name}
             </h1>
 
-            {/* Price Card */}
+                      {/* Price Card */}
             <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 mb-8 flex flex-col gap-4">
               <div className="flex justify-between items-center border-b border-gray-100 pb-4">
                 <span className="text-gray-500 text-lg">Price</span>
@@ -90,14 +90,10 @@ export default function ProductDetailClient({ product }: { product: IProduct }) 
               
               {/* Juicy Add to Cart Button */}
               <div className="flex flex-col gap-2">
-                <AddToCartButton 
-                  product={{
-                    id: product.id,
-                    name: product.name,
-                    price: product.price,
-                    image: activeImage
-                  }} 
-                />
+                {/* ✅ FIX: Pass the full 'product' object directly. 
+                  It already contains the correct 'images' array. */}
+                <AddToCartButton product={product} />
+                
                 <p className="text-center text-sm text-gray-500 mt-2">
                   <span className="text-green-600 font-bold">In Stock</span> & ready to ship.
                 </p>
