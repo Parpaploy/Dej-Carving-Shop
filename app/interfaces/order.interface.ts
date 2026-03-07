@@ -9,7 +9,12 @@ export interface IOrder {
   orderNumber: string;
   orderDate: string;
   totalAmount: number;
-  users: IUser;
+  status?: string;
+  recipientName: string;
+  phone: string;
+  shippingAddress: string;
+  paymentMethod: "bank_transfer" | "promptpay";
+  user: IUser;
   products: IProduct[];
   tracking: ITracking;
 }

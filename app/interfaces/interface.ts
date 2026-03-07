@@ -10,15 +10,3 @@ export interface Image {
   url: string;
   formats?: ImageFormat;
 }
-
-
-// --- Types ---
-interface Product {
-  id: number;
-  attributes: {
-    title: string;
-    price: number;
-    description: string;
-    slug: string;
-  };
-}

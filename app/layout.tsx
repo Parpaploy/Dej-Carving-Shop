@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
-import { Playfair_Display, Lato, Pattaya } from "next/font/google";
+import { Playfair_Display, Sarabun, Pattaya } from "next/font/google";
 import "./globals.css";
-// 1. Import your Providers and UI components
 import { CartProvider } from "./context/CartContext";
 import { AuthProvider } from "./context/AuthContext";
 import Navbar from "./components/clients/navbar";
-import { Toaster } from "sonner"; // For the pop-up notifications
+import Footer from "./components/clients/footer";
+import FloatingContact from "./components/ui/FloatingContact";
+import { Toaster } from "sonner";
 
 const playfair = Playfair_Display({
   subsets: ["latin"],
@@ -13,10 +14,10 @@ const playfair = Playfair_Display({
   display: "swap",
 });
 
-const lato = Lato({
-  subsets: ["latin"],
-  weight: ["400", "700"],
-  variable: "--font-lato",
+const sarabun = Sarabun({
+  subsets: ["latin", "thai"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-sarabun",
   display: "swap",
 });
 
@@ -28,8 +29,8 @@ const pattaya = Pattaya({
 });
 
 export const metadata: Metadata = {
-  title: "Dej Carving Shop",
-  description: "Timeless Wood & Collectibles",
+  title: "ร้านเดชแกะสลัก | Dej Carving Shop",
+  description: "งานแกะสลักไม้สักแท้ จากบ้านถวาย เชียงใหม่ — Authentic teak wood carvings from Ban Tawai, Chiang Mai",
 };
 
 export default function RootLayout({
@@ -38,20 +39,26 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={`${playfair.variable} ${lato.variable} ${pattaya.variable} antialiased`}>
-        {/* 2. Wrap everything with Providers */}
+    <html lang="th">
+      <body className={`${playfair.variable} ${sarabun.variable} ${pattaya.variable} antialiased`}>
         <AuthProvider>
           <CartProvider>
-            
-            {/* Navbar is here so it appears on every page */}
-            <Navbar /> 
-            
-            {children}
-            
-            {/* Toaster for notifications */}
-            <Toaster position="bottom-right" /> 
-
+            <Navbar />
+            <main>{children}</main>
+            <Footer />
+            <FloatingContact />
+            <Toaster
+              position="bottom-left"
+              toastOptions={{
+                style: {
+                  fontSize: "1rem",
+                  padding: "1rem 1.25rem",
+                  background: "#FEFCF8",
+                  border: "1px solid #C4A265",
+                  color: "#2C1810",
+                },
+              }}
+            />
           </CartProvider>
         </AuthProvider>
       </body>

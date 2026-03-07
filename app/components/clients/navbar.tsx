@@ -1,112 +1,133 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import React, { useState } from "react"; 
+import React, { useState } from "react";
 import Link from "next/link";
 import { ShoppingCart, Menu, X, Phone, User, LogOut, Settings } from "lucide-react";
-import { useCart } from "../../context/CartContext"; 
-import { useAuth } from "../../context/AuthContext"; 
+import { useCart } from "../../context/CartContext";
+import { useAuth } from "../../context/AuthContext";
 
 export default function Navbar() {
   const { cartCount } = useCart();
-  const { user, logout } = useAuth(); 
+  const { user, logout } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const dropdownRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setIsUserMenuOpen(false);
+      }
+    };
+    if (isUserMenuOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [isUserMenuOpen]);
 
   const handleLogoutClick = () => {
-    setIsUserMenuOpen(false); 
-    logout(); 
+    setIsUserMenuOpen(false);
+    setIsMobileMenuOpen(false);
+    logout();
   };
 
   return (
-    <header className="w-full shadow-md z-50 relative sticky top-0">
-      
-      {/* --- TOP BAR --- */}
-      <div className="bg-[#D4AF37] text-[#2e1d10] py-2 px-6 text-sm md:text-base font-semibold text-center md:text-right">
-        <span className="flex items-center justify-center md:justify-end gap-2">
-          <Phone size={16} /> Need help? Call us: 08X-XXX-XXXX
-        </span>
-      </div>
-
-      {/* --- MAIN NAVIGATION --- */}
-      <nav className="bg-[#2e1d10] text-[#FAF9F6] px-6 py-4">
+    <header className="w-full shadow-lg z-50 sticky top-0">
+      <nav className="bg-teak text-cream px-6 py-3">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          
-          {/* ✅ LOGO WITH PATTAYA FONT */}
-          <Link 
-            href="/" 
-            className="text-3xl md:text-4xl font-pattaya tracking-wide text-[#F5F5DC] hover:text-[#D4AF37] transition-colors"
+
+          {/* LOGO */}
+          <Link
+            href="/"
+            className="font-pattaya text-2xl md:text-3xl tracking-wide text-cream hover:text-gold-soft transition-colors"
           >
-            Dej Carving Shop
+            ร้านเดชแกะสลัก
           </Link>
 
-          {/* DESKTOP LINKS */}
+          {/* DESKTOP NAV */}
           <div className="hidden md:flex items-center gap-8">
-            <NavLink href="/">Home</NavLink>
-            <NavLink href="/products">Shop Items</NavLink>
-            <NavLink href="/about">Our Story</NavLink>
-            <NavLink href="/contact">Contact</NavLink>
+            <NavLink href="/">หน้าแรก</NavLink>
+            <NavLink href="/products">สินค้า</NavLink>
+            <NavLink href="/about">เกี่ยวกับ</NavLink>
+            <NavLink href="/contact">ติดต่อ</NavLink>
           </div>
 
-          {/* UTILITY ICONS */}
-          <div className="hidden md:flex items-center gap-6">
-            
-            {/* --- USER PROFILE SECTION --- */}
+          {/* DESKTOP UTILITIES */}
+          <div className="hidden md:flex items-center gap-4">
+            {/* Phone */}
+            <a
+              href="tel:08XXXXXXXX"
+              className="flex items-center gap-2 text-cream/80 hover:text-gold-soft transition-colors"
+            >
+              <Phone size={20} />
+              <span className="text-sm hidden lg:inline">08X-XXX-XXXX</span>
+            </a>
+
+            <div className="w-px h-8 bg-cream/30" />
+
+            {/* User */}
             {user ? (
-              <div className="relative">
-                {/* User Button */}
-                <button 
+              <div className="relative" ref={dropdownRef}>
+                <button
                   onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                  className="flex items-center gap-2 hover:text-[#D4AF37] transition-colors focus:outline-none"
+                  className="flex items-center gap-2 hover:text-gold-soft transition-colors focus:outline-none"
                 >
-                  <div className="w-10 h-10 bg-[#D4AF37] rounded-full flex items-center justify-center text-[#2e1d10] font-bold text-lg">
-                    {user.username ? user.username.charAt(0).toUpperCase() : "U"}
-                  </div>
-                  <span className="text-lg font-medium max-w-[150px] truncate">
+                  {user.profileImage ? (
+                    <img src={user.profileImage} alt={user.username} className="w-10 h-10 rounded-full object-cover border-2 border-gold" />
+                  ) : (
+                    <div className="w-10 h-10 bg-gold rounded-full flex items-center justify-center text-cream font-bold text-lg">
+                      {user.username ? user.username.charAt(0).toUpperCase() : "U"}
+                    </div>
+                  )}
+                  <span className="text-body font-medium max-w-[120px] truncate">
                     {user.username}
                   </span>
                 </button>
 
-                {/* Dropdown Menu */}
                 {isUserMenuOpen && (
-                  <div className="absolute right-0 mt-3 w-48 bg-white text-[#2e1d10] rounded-md shadow-xl py-2 border-t-4 border-[#D4AF37] animate-fade-in z-50">
-                    <Link 
-                      href="/profile" 
+                  <div className="absolute right-0 mt-3 w-52 bg-card text-text-main rounded-lg shadow-xl py-2 border border-gold-soft/40 z-50">
+                    <Link
+                      href="/profile"
                       onClick={() => setIsUserMenuOpen(false)}
-                      className="flex items-center gap-2 px-4 py-3 hover:bg-[#FAF9F6] text-lg font-medium"
+                      className="flex items-center gap-3 px-4 py-3 hover:bg-cream text-body font-medium transition-colors"
                     >
-                      <Settings size={20} /> My Profile
+                      <Settings size={20} /> โปรไฟล์
                     </Link>
-                    <button 
+                    <button
                       onClick={handleLogoutClick}
-                      className="w-full flex items-center gap-2 px-4 py-3 hover:bg-red-50 text-red-700 text-lg font-medium text-left border-t border-gray-100"
+                      className="w-full flex items-center gap-3 px-4 py-3 hover:bg-red-50 text-price text-body font-medium text-left border-t border-cream-alt"
                     >
-                      <LogOut size={20} /> Log Out
+                      <LogOut size={20} /> ออกจากระบบ
                     </button>
                   </div>
                 )}
               </div>
             ) : (
-              // IF NOT LOGGED IN
-              <Link href="/login" className="flex items-center gap-2 hover:text-[#D4AF37] transition-colors">
+              <Link
+                href="/login"
+                className="flex items-center gap-2 hover:text-gold-soft transition-colors"
+              >
                 <User size={24} />
-                <span className="text-lg font-medium">Log In</span>
+                <span className="text-body font-medium">เข้าสู่ระบบ</span>
               </Link>
             )}
-            
-            {/* Cart Button */}
-            <Link href="/cart" className="flex items-center gap-2 bg-[#FAF9F6] text-[#2e1d10] px-4 py-2 rounded hover:bg-[#D4AF37] transition-colors relative">
-              <ShoppingCart size={24} />
-              <span className="text-lg font-bold">Cart</span>
-              
+
+            {/* Cart */}
+            <Link
+              href="/cart"
+              className="flex items-center gap-2 bg-gold text-cream px-5 py-2.5 rounded-lg hover:bg-gold-hover transition-colors relative font-semibold"
+            >
+              <ShoppingCart size={22} />
+              <span className="text-body">ตะกร้า</span>
               <AnimatePresence>
                 {cartCount > 0 && (
                   <motion.span
                     key={cartCount}
-                    initial={{ scale: 0, y: -10 }}
-                    animate={{ scale: 1, y: 0 }}
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
                     exit={{ scale: 0 }}
-                    className="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold w-6 h-6 flex items-center justify-center rounded-full border-2 border-white shadow-sm"
+                    className="absolute -top-2 -right-2 bg-price text-white text-xs font-bold w-6 h-6 flex items-center justify-center rounded-full border-2 border-teak shadow-sm"
                   >
                     {cartCount}
                   </motion.span>
@@ -115,44 +136,93 @@ export default function Navbar() {
             </Link>
           </div>
 
-          {/* MOBILE HAMBURGER */}
-          <button 
-            className="md:hidden text-[#FAF9F6]"
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          >
-            {isMobileMenuOpen ? <X size={32} /> : <Menu size={32} />}
-          </button>
+          {/* MOBILE: Cart + Hamburger */}
+          <div className="flex md:hidden items-center gap-3">
+            <Link href="/cart" className="relative p-2" aria-label="Shopping cart">
+              <ShoppingCart size={28} className="text-cream" />
+              {cartCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-price text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full">
+                  {cartCount}
+                </span>
+              )}
+            </Link>
+            <button
+              className="text-cream p-2"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
+            >
+              {isMobileMenuOpen ? <X size={32} /> : <Menu size={32} />}
+            </button>
+          </div>
         </div>
 
-        {/* MOBILE DROPDOWN */}
-        {isMobileMenuOpen && (
-          <div className="md:hidden mt-4 pb-4 border-t border-gray-700 flex flex-col gap-4 text-center">
-            <MobileLink href="/" onClick={() => setIsMobileMenuOpen(false)}>Home</MobileLink>
-            <MobileLink href="/products" onClick={() => setIsMobileMenuOpen(false)}>Shop Items</MobileLink>
-            <MobileLink href="/about" onClick={() => setIsMobileMenuOpen(false)}>Our Story</MobileLink>
-            <MobileLink href="/contact" onClick={() => setIsMobileMenuOpen(false)}>Contact</MobileLink>
-            
-            <div className="h-[1px] bg-gray-700 my-2"></div>
-            
-            {user ? (
-               <>
-                 <MobileLink href="/profile" onClick={() => setIsMobileMenuOpen(false)}>My Profile ({user.username})</MobileLink>
-                 <button onClick={handleLogoutClick} className="text-xl py-2 text-red-400 block w-full hover:bg-white/10 rounded">Log Out</button>
-               </>
-            ) : (
-               <MobileLink href="/login" onClick={() => setIsMobileMenuOpen(false)}>Log In</MobileLink>
-            )}
-          </div>
-        )}
+        {/* MOBILE MENU */}
+        <AnimatePresence>
+          {isMobileMenuOpen && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              className="md:hidden mt-4 pb-4 border-t border-cream/20 overflow-hidden"
+            >
+              <div className="flex flex-col gap-1 pt-4">
+                <MobileLink href="/" onClick={() => setIsMobileMenuOpen(false)}>
+                  หน้าแรก / Home
+                </MobileLink>
+                <MobileLink href="/products" onClick={() => setIsMobileMenuOpen(false)}>
+                  สินค้า / Shop
+                </MobileLink>
+                <MobileLink href="/about" onClick={() => setIsMobileMenuOpen(false)}>
+                  เกี่ยวกับ / About
+                </MobileLink>
+                <MobileLink href="/contact" onClick={() => setIsMobileMenuOpen(false)}>
+                  ติดต่อ / Contact
+                </MobileLink>
+
+                <div className="h-px bg-cream/20 my-3" />
+
+                {/* Phone */}
+                <a
+                  href="tel:08XXXXXXXX"
+                  className="flex items-center gap-3 text-xl py-3 px-4 text-gold-soft hover:bg-cream/10 rounded-lg"
+                >
+                  <Phone size={22} /> 08X-XXX-XXXX
+                </a>
+
+                <div className="h-px bg-cream/20 my-3" />
+
+                {user ? (
+                  <>
+                    <MobileLink href="/profile" onClick={() => setIsMobileMenuOpen(false)}>
+                      โปรไฟล์ ({user.username})
+                    </MobileLink>
+                    <button
+                      onClick={handleLogoutClick}
+                      className="text-xl py-3 px-4 text-red-400 text-left hover:bg-cream/10 rounded-lg w-full"
+                    >
+                      ออกจากระบบ / Log Out
+                    </button>
+                  </>
+                ) : (
+                  <MobileLink href="/login" onClick={() => setIsMobileMenuOpen(false)}>
+                    เข้าสู่ระบบ / Log In
+                  </MobileLink>
+                )}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </nav>
     </header>
   );
 }
 
-// Helpers
 function NavLink({ href, children }: { href: string; children: React.ReactNode }) {
   return (
-    <Link href={href} className="text-lg font-medium hover:text-[#D4AF37] hover:underline underline-offset-4 transition-all">
+    <Link
+      href={href}
+      className="text-body-lg font-medium text-cream/90 hover:text-gold-soft hover:underline underline-offset-4 transition-all"
+    >
       {children}
     </Link>
   );
@@ -160,7 +230,11 @@ function NavLink({ href, children }: { href: string; children: React.ReactNode }
 
 function MobileLink({ href, children, onClick }: { href: string; children: React.ReactNode; onClick: () => void }) {
   return (
-    <Link href={href} onClick={onClick} className="text-xl py-2 hover:bg-white/10 rounded block">
+    <Link
+      href={href}
+      onClick={onClick}
+      className="text-xl py-3 px-4 hover:bg-cream/10 rounded-lg block"
+    >
       {children}
     </Link>
   );

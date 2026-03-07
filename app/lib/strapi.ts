@@ -1,7 +1,7 @@
 // src/lib/strapi.ts
 
 // 1. Get the URL from .env (fallback to localhost if missing)
-const STRAPI_URL = process.env.NEXT_PUBLIC_STRAPI_URL || "http://localhost:1337";
+const STRAPI_URL = process.env.NEXT_PUBLIC_STRAPI_BASE_URL || "http://localhost:1337";
 
 // 2. Helper to get the full image URL
 // Strapi returns images as "/uploads/image.jpg", so we need to add the domain

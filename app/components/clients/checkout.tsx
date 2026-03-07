@@ -1,0 +1,387 @@
+"use client";
+
+import React, { useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import axios from "axios";
+import {
+  ArrowLeft,
+  CreditCard,
+  CheckCircle,
+  Truck,
+  Phone,
+  MapPin,
+  User,
+  Banknote,
+  QrCode,
+  Copy,
+} from "lucide-react";
+import { useCart } from "../../context/CartContext";
+import { useAuth } from "../../context/AuthContext";
+import { toast } from "sonner";
+
+export default function CheckoutClient() {
+  const router = useRouter();
+  const { cart, cartTotal, clearCart } = useCart();
+  const { user } = useAuth();
+
+  const [recipientName, setRecipientName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [shippingAddress, setShippingAddress] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState<"bank_transfer" | "promptpay">("bank_transfer");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [orderComplete, setOrderComplete] = useState(false);
+  const [orderNumber, setOrderNumber] = useState("");
+
+  // Redirect if not logged in
+  React.useEffect(() => {
+    const token = localStorage.getItem("jwt");
+    if (!token) {
+      toast.error("กรุณาเข้าสู่ระบบก่อนสั่งซื้อ / Please log in first");
+      router.push("/login");
+    }
+  }, [router]);
+
+  // Redirect if cart is empty (and not in order-complete state)
+  React.useEffect(() => {
+    if (cart.length === 0 && !orderComplete) {
+      router.push("/cart");
+    }
+  }, [cart, orderComplete, router]);
+
+  const generateOrderNumber = () => {
+    const now = new Date();
+    const y = now.getFullYear().toString().slice(-2);
+    const m = String(now.getMonth() + 1).padStart(2, "0");
+    const d = String(now.getDate()).padStart(2, "0");
+    const rand = Math.floor(1000 + Math.random() * 9000);
+    return `DEJ-${y}${m}${d}-${rand}`;
+  };
+
+  const handlePlaceOrder = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    const jwt = localStorage.getItem("jwt");
+    if (!jwt) {
+      toast.error("กรุณาเข้าสู่ระบบ / Please log in");
+      router.push("/login");
+      return;
+    }
+
+    const newOrderNumber = generateOrderNumber();
+
+    try {
+      await axios.post(
+        `${process.env.NEXT_PUBLIC_STRAPI_BASE_URL}/api/orders`,
+        {
+          data: {
+            orderNumber: newOrderNumber,
+            orderDate: new Date().toISOString(),
+            totalAmount: cartTotal,
+            status: "pending",
+            recipientName,
+            phone,
+            shippingAddress,
+            paymentMethod,
+            products: cart.map((item) => item.id),
+            user: user?.id,
+          },
+        },
+        {
+          headers: { Authorization: `Bearer ${jwt}` },
+        }
+      );
+
+      setOrderNumber(newOrderNumber);
+      setOrderComplete(true);
+      clearCart();
+      toast.success("สั่งซื้อสำเร็จ! / Order placed successfully!");
+    } catch (err) {
+      console.error("Order failed:", err);
+      toast.error("สั่งซื้อไม่สำเร็จ กรุณาลองอีกครั้ง / Order failed, please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    toast.success("คัดลอกแล้ว / Copied!");
+  };
+
+  // === ORDER COMPLETE STATE ===
+  if (orderComplete) {
+    return (
+      <main className="w-full min-h-screen bg-cream py-12 px-4">
+        <div className="max-w-2xl mx-auto">
+          <div className="bg-card rounded-xl shadow-lg p-8 border-t-4 border-[#2D6A4F] text-center">
+            <CheckCircle size={64} className="text-[#2D6A4F] mx-auto mb-4" />
+            <h1 className="text-h3 font-serif text-teak-dark font-bold mb-2">
+              สั่งซื้อสำเร็จ!
+            </h1>
+            <p className="text-body text-text-muted mb-6">Order Placed Successfully</p>
+
+            <div className="bg-cream rounded-lg p-4 mb-6">
+              <p className="text-sm text-text-muted mb-1">หมายเลขคำสั่งซื้อ / Order Number</p>
+              <div className="flex items-center justify-center gap-2">
+                <p className="text-h4 font-bold text-teak-dark">{orderNumber}</p>
+                <button onClick={() => copyToClipboard(orderNumber)} className="text-gold hover:text-gold-hover p-1" aria-label="Copy">
+                  <Copy size={18} />
+                </button>
+              </div>
+            </div>
+
+            {/* Payment Instructions */}
+            <div className="bg-cream-alt rounded-lg p-6 text-left mb-6">
+              <h3 className="text-body font-bold text-teak-dark mb-3">
+                {paymentMethod === "bank_transfer" ? "ข้อมูลโอนเงิน / Bank Transfer Details" : "PromptPay"}
+              </h3>
+
+              {paymentMethod === "bank_transfer" ? (
+                <div className="space-y-2 text-body text-text-main">
+                  <p><span className="text-text-muted">ธนาคาร:</span> กสิกรไทย (KBank)</p>
+                  <div className="flex items-center gap-2">
+                    <span className="text-text-muted">เลขบัญชี:</span>
+                    <span className="font-bold">XXX-X-XXXXX-X</span>
+                    <button onClick={() => copyToClipboard("XXX-X-XXXXX-X")} className="text-gold hover:text-gold-hover p-1"><Copy size={16} /></button>
+                  </div>
+                  <p><span className="text-text-muted">ชื่อบัญชี:</span> ร้านเดชแกะสลัก</p>
+                  <p className="font-bold text-price mt-2">ยอดโอน: ฿{cartTotal > 0 ? cartTotal.toLocaleString() : orderNumber ? "ดูในอีเมล" : "0"}</p>
+                </div>
+              ) : (
+                <div className="text-center">
+                  <div className="bg-white w-48 h-48 mx-auto rounded-lg border border-cream-alt flex items-center justify-center mb-3">
+                    <QrCode size={80} className="text-text-muted" />
+                  </div>
+                  <p className="text-sm text-text-muted">สแกน QR PromptPay เพื่อชำระเงิน</p>
+                </div>
+              )}
+
+              <p className="text-sm text-text-muted mt-4 border-t border-cream pt-3">
+                กรุณาโอนภายใน 24 ชม. แล้วแจ้งสลิปทาง LINE: @dejcarving
+              </p>
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-3">
+              <Link
+                href="/products"
+                className="flex-1 bg-gold text-cream py-3 rounded-lg font-bold text-center hover:bg-gold-hover transition-colors min-h-[48px] flex items-center justify-center"
+              >
+                เลือกซื้อต่อ / Continue Shopping
+              </Link>
+              <Link
+                href="/profile"
+                className="flex-1 border-2 border-teak text-teak py-3 rounded-lg font-bold text-center hover:bg-teak hover:text-cream transition-colors min-h-[48px] flex items-center justify-center"
+              >
+                ดูคำสั่งซื้อ / My Orders
+              </Link>
+            </div>
+          </div>
+        </div>
+      </main>
+    );
+  }
+
+  // === CHECKOUT FORM ===
+  return (
+    <main className="w-full min-h-screen bg-cream py-12 px-4">
+      <div className="max-w-4xl mx-auto">
+
+        {/* HEADER */}
+        <div className="flex items-center gap-4 mb-8">
+          <Link href="/cart" className="p-2 hover:bg-cream-alt rounded-full transition-colors" aria-label="กลับ">
+            <ArrowLeft size={28} className="text-teak-dark" />
+          </Link>
+          <div>
+            <h1 className="text-h3 font-serif text-teak-dark font-bold">ชำระเงิน</h1>
+            <p className="text-sm text-text-muted">Checkout</p>
+          </div>
+        </div>
+
+        <form onSubmit={handlePlaceOrder}>
+          <div className="flex flex-col lg:flex-row gap-8">
+
+            {/* LEFT: FORM */}
+            <div className="flex-grow space-y-6">
+
+              {/* SHIPPING INFO */}
+              <div className="bg-card rounded-xl shadow-md p-6 border border-gold-soft/20">
+                <h2 className="text-h5 font-serif text-teak-dark font-bold mb-1 flex items-center gap-2">
+                  <Truck size={22} className="text-gold" />
+                  ข้อมูลจัดส่ง
+                </h2>
+                <p className="text-sm text-text-muted mb-5">Shipping Information</p>
+
+                <div className="space-y-4">
+                  <div>
+                    <label htmlFor="recipientName" className="text-body font-bold text-teak-dark flex items-center gap-2 mb-1">
+                      <User size={18} className="text-gold" /> ชื่อผู้รับ / Recipient
+                    </label>
+                    <input
+                      id="recipientName"
+                      type="text"
+                      required
+                      value={recipientName}
+                      onChange={(e) => setRecipientName(e.target.value)}
+                      placeholder="ชื่อ-สกุล ผู้รับสินค้า"
+                      className="w-full py-3 px-4 text-body border-2 border-cream-alt rounded-lg focus:border-gold focus:ring-1 focus:ring-gold outline-none bg-cream text-text-main"
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="phone" className="text-body font-bold text-teak-dark flex items-center gap-2 mb-1">
+                      <Phone size={18} className="text-gold" /> เบอร์โทร / Phone
+                    </label>
+                    <input
+                      id="phone"
+                      type="tel"
+                      required
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      placeholder="08X-XXX-XXXX"
+                      className="w-full py-3 px-4 text-body border-2 border-cream-alt rounded-lg focus:border-gold focus:ring-1 focus:ring-gold outline-none bg-cream text-text-main"
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="address" className="text-body font-bold text-teak-dark flex items-center gap-2 mb-1">
+                      <MapPin size={18} className="text-gold" /> ที่อยู่จัดส่ง / Address
+                    </label>
+                    <textarea
+                      id="address"
+                      required
+                      rows={3}
+                      value={shippingAddress}
+                      onChange={(e) => setShippingAddress(e.target.value)}
+                      placeholder="บ้านเลขที่ ซอย ถนน ตำบล อำเภอ จังหวัด รหัสไปรษณีย์"
+                      className="w-full py-3 px-4 text-body border-2 border-cream-alt rounded-lg focus:border-gold focus:ring-1 focus:ring-gold outline-none bg-cream text-text-main"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* PAYMENT METHOD */}
+              <div className="bg-card rounded-xl shadow-md p-6 border border-gold-soft/20">
+                <h2 className="text-h5 font-serif text-teak-dark font-bold mb-1 flex items-center gap-2">
+                  <CreditCard size={22} className="text-gold" />
+                  วิธีชำระเงิน
+                </h2>
+                <p className="text-sm text-text-muted mb-5">Payment Method</p>
+
+                <div className="space-y-3">
+                  <label
+                    className={`flex items-center gap-4 p-4 rounded-lg border-2 cursor-pointer transition-all ${
+                      paymentMethod === "bank_transfer"
+                        ? "border-gold bg-gold/5"
+                        : "border-cream-alt hover:border-gold-soft"
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="payment"
+                      value="bank_transfer"
+                      checked={paymentMethod === "bank_transfer"}
+                      onChange={() => setPaymentMethod("bank_transfer")}
+                      className="w-5 h-5 accent-[#8B6914]"
+                    />
+                    <Banknote size={24} className="text-teak flex-shrink-0" />
+                    <div>
+                      <p className="font-bold text-teak-dark">โอนเงิน</p>
+                      <p className="text-sm text-text-muted">Bank Transfer</p>
+                    </div>
+                  </label>
+
+                  <label
+                    className={`flex items-center gap-4 p-4 rounded-lg border-2 cursor-pointer transition-all ${
+                      paymentMethod === "promptpay"
+                        ? "border-gold bg-gold/5"
+                        : "border-cream-alt hover:border-gold-soft"
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="payment"
+                      value="promptpay"
+                      checked={paymentMethod === "promptpay"}
+                      onChange={() => setPaymentMethod("promptpay")}
+                      className="w-5 h-5 accent-[#8B6914]"
+                    />
+                    <QrCode size={24} className="text-teak flex-shrink-0" />
+                    <div>
+                      <p className="font-bold text-teak-dark">พร้อมเพย์</p>
+                      <p className="text-sm text-text-muted">PromptPay QR</p>
+                    </div>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            {/* RIGHT: ORDER SUMMARY */}
+            <div className="lg:w-[360px] flex-shrink-0">
+              <div className="bg-card rounded-xl shadow-lg p-6 border-t-4 border-gold sticky top-24">
+                <h2 className="text-h5 font-serif text-teak-dark font-bold mb-4">สรุปคำสั่งซื้อ</h2>
+                <p className="text-sm text-text-muted mb-4">Order Summary</p>
+
+                {/* Items */}
+                <div className="space-y-3 mb-4 max-h-[300px] overflow-y-auto">
+                  {cart.map((item) => (
+                    <div key={item.id} className="flex gap-3 items-center">
+                      <div className="w-14 h-14 bg-cream-alt rounded-lg overflow-hidden flex-shrink-0 border border-gold-soft/20">
+                        <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                      </div>
+                      <div className="flex-grow min-w-0">
+                        <p className="text-sm font-semibold text-teak-dark truncate">{item.name}</p>
+                        <p className="text-sm text-text-muted">x{item.quantity}</p>
+                      </div>
+                      <p className="text-sm font-bold text-price flex-shrink-0">
+                        ฿{(item.price * item.quantity).toLocaleString()}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="border-t border-cream-alt pt-4 space-y-2 text-body">
+                  <div className="flex justify-between text-text-muted">
+                    <span>รวมสินค้า</span>
+                    <span className="text-text-main">฿{cartTotal.toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between text-text-muted">
+                    <span>ค่าส่ง</span>
+                    <span className="text-[#2D6A4F] font-bold">ฟรี</span>
+                  </div>
+                  <div className="h-px bg-cream-alt my-2" />
+                  <div className="flex justify-between text-h5 font-bold text-teak-dark">
+                    <span>รวมทั้งหมด</span>
+                    <span className="text-price">฿{cartTotal.toLocaleString()}</span>
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className={`w-full mt-6 text-cream text-body-lg font-bold py-4 rounded-lg shadow-xl flex items-center justify-center gap-2 transition-all active:scale-95 min-h-[56px] ${
+                    isSubmitting ? "bg-text-muted cursor-not-allowed" : "bg-teak hover:bg-teak-dark"
+                  }`}
+                >
+                  {isSubmitting ? (
+                    "กำลังสั่งซื้อ..."
+                  ) : (
+                    <>
+                      <CreditCard size={22} />
+                      ยืนยันสั่งซื้อ / Place Order
+                    </>
+                  )}
+                </button>
+
+                <p className="text-center text-xs text-text-muted mt-3">
+                  เมื่อกดสั่งซื้อ จะแสดงข้อมูลการชำระเงิน
+                </p>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </main>
+  );
+}

@@ -1,20 +1,24 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
-import { User, Mail, Calendar, MapPin, Package, LogOut, Plus, Edit2, Trash2, CheckCircle, Clock, Loader2 } from "lucide-react";
+import { User, Mail, Calendar, MapPin, Package, LogOut, Plus, Edit2, Trash2, CheckCircle, Clock, Loader2, Camera } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { toast } from "sonner";
 
+const API = process.env.NEXT_PUBLIC_STRAPI_BASE_URL;
+
 export default function ProfileClient() {
   const router = useRouter();
-  const { user, logout } = useAuth();
+  const { user, logout, updateUser } = useAuth();
   const [activeTab, setActiveTab] = useState<"info" | "orders" | "addresses">("info");
-  
+
   const [orders, setOrders] = useState<any[]>([]);
   const [addresses, setAddresses] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   useEffect(() => {
     const token = localStorage.getItem("jwt");
     if (!token || !localStorage.getItem("user")) {
@@ -22,32 +26,37 @@ export default function ProfileClient() {
       return;
     }
 
-    // Fetch Real Data
     const fetchData = async () => {
       setLoading(true);
       try {
         const config = { headers: { Authorization: `Bearer ${token}` } };
-        
-        // A. Fetch Orders (Filter by current user)
-        // Strapi automatically filters for the user if you used the 'owner' policy, 
-        // but explicit filtering is safer: filters[user][id][$eq]=USER_ID
+
+        // Fetch user profile with profileImage
+        const meRes = await axios.get(`${API}/api/users/me`, config);
+        const meData = meRes.data;
+        if (meData.profileImage) {
+          const imgUrl = meData.profileImage.startsWith("http")
+            ? meData.profileImage
+            : `${API}${meData.profileImage}`;
+          updateUser({ profileImage: imgUrl });
+        }
+
+        // Fetch Orders
         const ordersRes = await axios.get(
-          `${process.env.NEXT_PUBLIC_STRAPI_BASE_URL}/api/orders?filters[user][id][$eq]=${user?.id}&sort=createdAt:desc`, 
+          `${API}/api/orders?filters[user][id][$eq]=${user?.id}&sort=createdAt:desc`,
           config
         );
 
-        // B. Fetch Addresses
+        // Fetch Addresses
         const addressRes = await axios.get(
-          `${process.env.NEXT_PUBLIC_STRAPI_BASE_URL}/api/addresses?filters[user][id][$eq]=${user?.id}`,
+          `${API}/api/addresses?filters[user][id][$eq]=${user?.id}`,
           config
         );
 
         setOrders(ordersRes.data.data);
         setAddresses(addressRes.data.data);
-
       } catch (error) {
         console.error("Fetch error:", error);
-        toast.error("Could not load profile data.");
       } finally {
         setLoading(false);
       }
@@ -74,6 +83,45 @@ export default function ProfileClient() {
     }
   };
 
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please select an image file");
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Image must be under 5MB");
+      return;
+    }
+
+    setUploadingImage(true);
+    const token = localStorage.getItem("jwt");
+
+    try {
+      // Upload image via custom endpoint (handles upload + linking to user)
+      const formData = new FormData();
+      formData.append("image", file);
+      const res = await axios.post(`${API}/api/profile-image`, formData, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      const imgUrl = res.data.url.startsWith("http")
+        ? res.data.url
+        : `${API}${res.data.url}`;
+      updateUser({ profileImage: imgUrl });
+      toast.success("Profile image updated!");
+    } catch (err) {
+      console.error("Upload failed:", err);
+      toast.error("Failed to upload image");
+    } finally {
+      setUploadingImage(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
   if (!user) return null;
 
   // --- SUB-COMPONENT: ORDERS ---
@@ -88,30 +136,32 @@ export default function ProfileClient() {
           <div key={order.id} className="bg-[#FAF9F6] border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow">
             <div className="flex flex-col md:flex-row justify-between md:items-center mb-4">
               <div>
-                <span className="font-bold text-lg text-[#2e1d10]">Order #{order.id}</span>
+                <span className="font-bold text-lg text-[#2e1d10]">{order.orderNumber || `Order #${order.id}`}</span>
                 <p className="text-sm text-gray-500 flex items-center gap-1">
-                  <Calendar size={14}/> {new Date(order.attributes.createdAt).toLocaleDateString()}
+                  <Calendar size={14}/> {new Date(order.orderDate || order.createdAt).toLocaleDateString("th-TH")}
                 </p>
               </div>
               <div className={`px-4 py-1 rounded-full text-sm font-bold flex items-center gap-2 w-fit mt-2 md:mt-0 ${
-                order.attributes.status === "delivered" ? "bg-green-100 text-green-700" : "bg-blue-100 text-blue-700"
+                order.status === "delivered" ? "bg-green-100 text-green-700" :
+                order.status === "cancelled" ? "bg-red-100 text-red-700" :
+                order.status === "shipped" ? "bg-purple-100 text-purple-700" :
+                order.status === "paid" ? "bg-blue-100 text-blue-700" :
+                "bg-yellow-100 text-yellow-700"
               }`}>
-                {order.attributes.status === "delivered" ? <CheckCircle size={16}/> : <Clock size={16}/>}
-                <span className="capitalize">{order.attributes.status}</span>
+                {order.status === "delivered" ? <CheckCircle size={16}/> : <Clock size={16}/>}
+                <span className="capitalize">{order.status || "pending"}</span>
               </div>
             </div>
-            
-            {/* Order Items Snapshot */}
+
             <div className="border-t border-gray-200 pt-4">
                <div className="text-sm text-gray-600 mb-2">
-                 {/* Assuming order_items is stored as simple JSON text or object */}
-                 {/* Example: "Teak Chair x 1" */}
-                 {JSON.stringify(order.attributes.order_items)} 
+                 <p>{order.recipientName} &middot; {order.phone}</p>
+                 <p className="text-gray-400">{order.paymentMethod === "promptpay" ? "PromptPay" : "Bank Transfer"}</p>
                </div>
                <div className="text-right">
                 <p className="text-gray-600 text-sm">Total:</p>
                 <p className="text-2xl font-serif font-bold text-[#8B0000]">
-                  ฿{order.attributes.total_amount?.toLocaleString()}
+                  ฿{(order.totalAmount ?? 0).toLocaleString()}
                 </p>
               </div>
             </div>
@@ -143,27 +193,27 @@ export default function ProfileClient() {
           {addresses.map((addr) => (
             <div key={addr.id} className="bg-[#FAF9F6] border border-gray-200 rounded-lg p-6 relative group">
               <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                <button 
+                <button
                   onClick={() => handleDeleteAddress(addr.id)}
                   className="p-2 bg-white rounded shadow hover:text-red-600 text-gray-400"
                 >
                   <Trash2 size={16}/>
                 </button>
               </div>
-              
+
               <div className="flex items-center gap-3 mb-3">
                 <span className="bg-[#2e1d10] text-[#D4AF37] text-xs font-bold px-2 py-1 rounded uppercase tracking-wider">
-                  {addr.attributes.type}
+                  {addr.type || "Home"}
                 </span>
-                <h3 className="font-bold text-lg text-[#2e1d10]">{addr.attributes.recipient_name}</h3>
+                <h3 className="font-bold text-lg text-[#2e1d10]">{addr.recipient_name || addr.recipientName || "—"}</h3>
               </div>
-              
+
               <p className="text-gray-600 mb-1 flex items-start gap-2">
-                <MapPin size={18} className="mt-1 flex-shrink-0 text-[#D4AF37]" /> 
-                {addr.attributes.full_address}
+                <MapPin size={18} className="mt-1 flex-shrink-0 text-[#D4AF37]" />
+                {addr.full_address || addr.fullAddress || "—"}
               </p>
               <p className="text-gray-600 flex items-center gap-2 ml-7">
-                <span className="font-bold text-gray-400">Tel:</span> {addr.attributes.phone_number}
+                <span className="font-bold text-gray-400">Tel:</span> {addr.phone_number || addr.phoneNumber || "—"}
               </p>
             </div>
           ))}
@@ -178,6 +228,47 @@ export default function ProfileClient() {
   const InfoTab = () => (
     <div className="space-y-6">
       <h2 className="text-2xl font-serif text-[#4B3621] mb-6 border-b border-gray-200 pb-2">Personal Information</h2>
+
+      {/* Profile Image Section */}
+      <div className="flex flex-col items-center sm:flex-row sm:items-start gap-6 p-6 bg-[#FAF9F6] border border-gray-200 rounded-lg">
+        <div className="relative group flex-shrink-0">
+          {user.profileImage ? (
+            <img
+              src={user.profileImage}
+              alt={user.username}
+              className="w-28 h-28 rounded-full object-cover border-3 border-[#D4AF37]"
+            />
+          ) : (
+            <div className="w-28 h-28 bg-[#D4AF37] rounded-full flex items-center justify-center text-[#2e1d10] text-4xl font-bold">
+              {user.username.charAt(0).toUpperCase()}
+            </div>
+          )}
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            disabled={uploadingImage}
+            className="absolute inset-0 rounded-full bg-black/0 group-hover:bg-black/50 flex items-center justify-center transition-all cursor-pointer"
+          >
+            {uploadingImage ? (
+              <Loader2 size={28} className="text-white animate-spin" />
+            ) : (
+              <Camera size={28} className="text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+            )}
+          </button>
+        </div>
+        <div className="text-center sm:text-left">
+          <h3 className="text-xl font-bold text-[#2e1d10]">{user.username}</h3>
+          <p className="text-gray-500">{user.email}</p>
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            disabled={uploadingImage}
+            className="mt-3 flex items-center gap-2 px-4 py-2 bg-[#D4AF37] text-[#2e1d10] rounded-lg text-sm font-bold hover:bg-[#b5952f] transition-colors"
+          >
+            {uploadingImage ? <Loader2 size={16} className="animate-spin" /> : <Camera size={16} />}
+            {uploadingImage ? "Uploading..." : "Change Photo"}
+          </button>
+        </div>
+      </div>
+
       <div className="space-y-6">
         <div className="flex flex-col gap-2">
           <label className="text-lg font-bold text-[#2e1d10] flex items-center gap-2">
@@ -209,10 +300,40 @@ export default function ProfileClient() {
           <div className="md:col-span-1">
             <div className="bg-white rounded-lg shadow-lg overflow-hidden border-t-4 border-[#2e1d10]">
               <div className="p-6 bg-[#2e1d10] text-[#FAF9F6] text-center">
-                <div className="w-20 h-20 bg-[#D4AF37] rounded-full mx-auto flex items-center justify-center text-[#2e1d10] text-3xl font-bold mb-3">
-                  {user.username.charAt(0).toUpperCase()}
+                <div className="relative w-24 h-24 mx-auto mb-3 group">
+                  {user.profileImage ? (
+                    <img
+                      src={user.profileImage}
+                      alt={user.username}
+                      className="w-24 h-24 rounded-full object-cover border-3 border-[#D4AF37]"
+                    />
+                  ) : (
+                    <div className="w-24 h-24 bg-[#D4AF37] rounded-full flex items-center justify-center text-[#2e1d10] text-3xl font-bold">
+                      {user.username.charAt(0).toUpperCase()}
+                    </div>
+                  )}
+                  {/* Upload overlay */}
+                  <button
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={uploadingImage}
+                    className="absolute inset-0 rounded-full bg-black/0 group-hover:bg-black/50 flex items-center justify-center transition-all cursor-pointer"
+                  >
+                    {uploadingImage ? (
+                      <Loader2 size={24} className="text-white animate-spin" />
+                    ) : (
+                      <Camera size={24} className="text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                    )}
+                  </button>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    className="hidden"
+                  />
                 </div>
                 <h3 className="text-xl font-bold">{user.username}</h3>
+                <p className="text-xs text-[#D4AF37]/70 mt-1">Click photo to change</p>
               </div>
               <nav className="flex flex-col">
                 <button onClick={() => setActiveTab("info")} className={`flex items-center gap-3 px-6 py-4 text-lg font-medium transition-colors border-b border-gray-100 ${activeTab === "info" ? "bg-[#FAF9F6] border-l-4 border-l-[#D4AF37] text-[#4B3621] font-bold" : "text-gray-600 hover:bg-gray-50"}`}>

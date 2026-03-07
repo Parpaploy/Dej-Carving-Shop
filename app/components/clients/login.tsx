@@ -2,104 +2,133 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { User, Lock, Eye, EyeOff, ArrowRight } from "lucide-react";
+import axios from "axios";
+import { User, Lock, Eye, EyeOff, ArrowRight, AlertCircle } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
+
 export default function LoginClient() {
-  // State to toggle password visibility (Very helpful for older users)
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
   const { login } = useAuth();
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError("");
+
+    try {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_STRAPI_BASE_URL}/api/auth/local`,
+        { identifier: email, password }
+      );
+      const { jwt, user } = response.data;
+      login(user, jwt);
+      window.location.href = "/";
+    } catch (err: unknown) {
+      if (axios.isAxiosError(err)) {
+        const strapiError = err.response?.data?.error?.message;
+        if (strapiError === "Invalid identifier or password") {
+          setError("อีเมลหรือรหัสผ่านไม่ถูกต้อง / Incorrect email or password.");
+        } else {
+          setError(strapiError || "เข้าสู่ระบบไม่สำเร็จ / Login failed.");
+        }
+      } else {
+        setError("เข้าสู่ระบบไม่สำเร็จ กรุณาตรวจสอบการเชื่อมต่อ");
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
-    <main className="w-full min-h-screen flex items-center justify-center bg-[#FAF9F6] p-4 relative overflow-hidden">
-      
-      {/* Decorative Background Elements (Subtle Wood Feel) */}
-      <div className="absolute top-0 left-0 w-full h-1/2 bg-[#2e1d10] z-0"></div>
-      
-      {/* --- LOGIN CARD --- */}
-      <div className="relative z-10 w-full max-w-md bg-white rounded-lg shadow-2xl overflow-hidden border-t-8 border-[#D4AF37]">
-        
-        {/* Header Section */}
+    <main className="w-full min-h-screen flex items-center justify-center bg-cream p-4 relative overflow-hidden">
+      <div className="absolute top-0 left-0 w-full h-1/2 bg-teak-dark z-0" />
+
+      <div className="relative z-10 w-full max-w-md bg-card rounded-xl shadow-2xl overflow-hidden border-t-4 border-gold">
+        {/* Header */}
         <div className="p-8 pb-4 text-center">
-          <h1 className="text-3xl md:text-4xl font-serif text-[#4B3621] mb-2 font-bold">
-            Welcome Back
-          </h1>
-          <p className="text-lg text-gray-600">
-            Please enter your details to sign in.
-          </p>
+          <h1 className="text-h3 font-serif text-teak-dark mb-2 font-bold">ยินดีต้อนรับ</h1>
+          <p className="text-body text-text-muted">Welcome Back — กรุณาเข้าสู่ระบบ</p>
         </div>
 
-        {/* Form Section */}
+        {/* Form */}
         <div className="p-8 pt-2">
-          <form className="flex flex-col gap-6">
-            
-            {/* EMAIL INPUT */}
+          <form onSubmit={handleLogin} className="flex flex-col gap-6">
+            {error && (
+              <div className="bg-red-50 border-l-4 border-[#9B1B1B] p-4 flex items-center gap-3 rounded-r-lg">
+                <AlertCircle className="text-[#9B1B1B] flex-shrink-0" />
+                <p className="text-[#9B1B1B] font-medium text-body">{error}</p>
+              </div>
+            )}
+
             <div className="flex flex-col gap-2">
-              <label htmlFor="email" className="text-lg font-bold text-[#2e1d10]">
-                Email Address
-              </label>
+              <label htmlFor="email" className="text-body font-bold text-teak-dark">อีเมล / Email</label>
               <div className="relative group">
-                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#D4AF37]">
-                  <User size={24} />
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted group-focus-within:text-gold">
+                  <User size={22} />
                 </div>
-                <input 
+                <input
                   id="email"
-                  type="email" 
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   placeholder="name@example.com"
-                  className="w-full pl-12 pr-4 py-4 text-lg border-2 border-gray-300 rounded-md focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37] outline-none transition-all text-[#2e1d10]"
+                  className="w-full pl-12 pr-4 py-4 text-body border-2 border-cream-alt rounded-lg focus:border-gold focus:ring-1 focus:ring-gold outline-none transition-all text-text-main bg-cream"
                 />
               </div>
             </div>
 
-            {/* PASSWORD INPUT */}
             <div className="flex flex-col gap-2">
-              <div className="flex justify-between items-center">
-                <label htmlFor="password" className="text-lg font-bold text-[#2e1d10]">
-                  Password
-                </label>
-                <Link href="#" className="text-sm font-semibold text-[#8B4513] hover:underline underline-offset-4">
-                  Forgot Password?
-                </Link>
-              </div>
-              
+              <label htmlFor="password" className="text-body font-bold text-teak-dark">รหัสผ่าน / Password</label>
               <div className="relative group">
-                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#D4AF37]">
-                  <Lock size={24} />
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted group-focus-within:text-gold">
+                  <Lock size={22} />
                 </div>
-                <input 
+                <input
                   id="password"
-                  type={showPassword ? "text" : "password"} 
-                  placeholder="Enter your password"
-                  className="w-full pl-12 pr-14 py-4 text-lg border-2 border-gray-300 rounded-md focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37] outline-none transition-all text-[#2e1d10]"
+                  type={showPassword ? "text" : "password"}
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="กรอกรหัสผ่าน"
+                  className="w-full pl-12 pr-14 py-4 text-body border-2 border-cream-alt rounded-lg focus:border-gold focus:ring-1 focus:ring-gold outline-none transition-all text-text-main bg-cream"
                 />
-                
-                {/* Toggle Visibility Button */}
-                <button 
+                <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-[#4B3621] p-2"
-                  aria-label="Toggle password visibility"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-text-muted hover:text-teak-dark p-2"
+                  aria-label="Toggle password"
                 >
-                  {showPassword ? <EyeOff size={24} /> : <Eye size={24} />}
+                  {showPassword ? <EyeOff size={22} /> : <Eye size={22} />}
                 </button>
               </div>
             </div>
 
-            {/* LOGIN BUTTON */}
-            <button className="mt-4 w-full bg-[#4B3621] hover:bg-[#2e1d10] text-white text-xl font-bold py-4 rounded-md shadow-lg transform transition active:scale-95 flex items-center justify-center gap-2">
-              Sign In <ArrowRight size={24} />
+            <button
+              type="submit"
+              disabled={isLoading}
+              className={`mt-2 w-full text-cream text-body-lg font-bold py-4 rounded-lg shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2 min-h-[56px] ${
+                isLoading ? "bg-text-muted cursor-not-allowed" : "bg-teak hover:bg-teak-dark"
+              }`}
+            >
+              {isLoading ? "กำลังเข้าสู่ระบบ..." : <>เข้าสู่ระบบ / Sign In <ArrowRight size={22} /></>}
             </button>
           </form>
         </div>
 
-        {/* --- REGISTER LINK (Distinct Section) --- */}
-        <div className="bg-[#FAF9F6] p-6 text-center border-t border-gray-200">
-          <p className="text-lg text-gray-700 mb-3">
-            Don't have an account yet?
-          </p>
-          <Link href="/register" className="inline-block border-2 border-[#4B3621] text-[#4B3621] text-lg font-bold py-2 px-6 rounded hover:bg-[#4B3621] hover:text-white transition-colors">
-            Create New Account
+        <div className="bg-cream p-6 text-center border-t border-cream-alt">
+          <p className="text-body text-text-muted mb-3">ยังไม่มีบัญชี? / New here?</p>
+          <Link
+            href="/register"
+            className="inline-block border-2 border-teak text-teak text-body font-bold py-2 px-6 rounded-lg hover:bg-teak hover:text-cream transition-colors"
+          >
+            สมัครสมาชิก / Create Account
           </Link>
         </div>
-
       </div>
     </main>
   );

@@ -4,44 +4,45 @@ import React from "react";
 import { ShoppingBag } from "lucide-react";
 import { useCart } from "../../context/CartContext";
 import { toast } from "sonner";
-import { IProduct } from "@/app/interfaces/product.interface"; // Import the new interface
+import { IProduct } from "@/app/interfaces/product.interface";
 
 interface AddToCartButtonProps {
-  product: IProduct; // ✅ Update this type from 'Product' to 'IProduct'
+  product: IProduct;
 }
 
 export default function AddToCartButton({ product }: AddToCartButtonProps) {
   const { addToCart } = useCart();
 
   const handleAddToCart = (e: React.MouseEvent) => {
-    e.preventDefault(); // Prevent navigating if clicked inside a link
+    e.preventDefault();
     e.stopPropagation();
 
-    // 1. Get the image URL safely
-    const imageUrl = product.images?.[0]?.url 
-      ? `${process.env.NEXT_PUBLIC_STRAPI_BASE_URL}${product.images[0].url}`
-      : "https://placehold.co/600x400/png?text=No+Image";
+    const rawUrl = product.images?.[0]?.url;
+    const imageUrl = !rawUrl
+      ? "https://placehold.co/600x400/png?text=No+Image"
+      : rawUrl.startsWith("http") ? rawUrl
+      : `${process.env.NEXT_PUBLIC_STRAPI_BASE_URL}${rawUrl}`;
 
-    // 2. Create a "Cart Item" compatible object
-    // We add the 'image' property manually so the Cart Context is happy
     const cartItem = {
-      ...product,
-      image: imageUrl, 
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      image: imageUrl,
+      quantity: 1,
     };
 
-    // 3. Add to cart
-    // @ts-ignore: Ignores type mismatch if CartContext is strict about the old type
     addToCart(cartItem);
-    toast.success(`${product.name} added to cart!`);
+    toast.success(`เพิ่ม ${product.name} ลงตะกร้าแล้ว`);
   };
 
   return (
     <button
       onClick={handleAddToCart}
-      className="bg-[#2e1d10] hover:bg-[#D4AF37] hover:text-[#2e1d10] text-white p-3 rounded-full transition-all shadow-lg active:scale-95 flex items-center justify-center"
-      aria-label="Add to cart"
+      className="bg-gold hover:bg-gold-hover text-cream px-5 py-3 rounded-lg transition-all shadow-lg active:scale-95 flex items-center justify-center gap-2 font-semibold text-body min-h-[48px]"
+      aria-label={`เพิ่ม ${product.name} ลงตะกร้า`}
     >
-      <ShoppingBag size={20} />
+      <ShoppingBag size={22} />
+      <span>ใส่ตะกร้า</span>
     </button>
   );
 }

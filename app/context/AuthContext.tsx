@@ -7,13 +7,14 @@ interface User {
   id: number;
   username: string;
   email: string;
-  // Add other fields if needed
+  profileImage?: string | null;
 }
 
 interface AuthContextType {
   user: User | null;
   login: (userData: User, token: string) => void;
   logout: () => void;
+  updateUser: (updates: Partial<User>) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -24,9 +25,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // 1. Check if user is logged in when the app starts
   useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
+    try {
+      const storedUser = localStorage.getItem("user");
+      if (storedUser) {
+        setUser(JSON.parse(storedUser));
+      }
+    } catch {
+      localStorage.removeItem("user");
+      localStorage.removeItem("jwt");
     }
   }, []);
 
@@ -43,11 +49,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     localStorage.removeItem("user");
     localStorage.removeItem("jwt");
     router.push("/login");
-    router.refresh(); // Optional: Refresh to clear any server-cached data
+    router.refresh();
+  };
+
+  // 4. Update User (partial update to state + localStorage)
+  const updateUser = (updates: Partial<User>) => {
+    setUser((prev) => {
+      if (!prev) return prev;
+      const updated = { ...prev, ...updates };
+      localStorage.setItem("user", JSON.stringify(updated));
+      return updated;
+    });
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, login, logout, updateUser }}>
       {children}
     </AuthContext.Provider>
   );
