@@ -5,6 +5,7 @@ import Link from "next/link";
 import axios from "axios";
 import { User, Lock, Eye, EyeOff, ArrowRight, AlertCircle } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
+import { useLocale } from "@/app/context/LocaleContext";
 
 export default function LoginClient() {
   const [email, setEmail] = useState("");
@@ -13,6 +14,7 @@ export default function LoginClient() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const { login } = useAuth();
+  const { t } = useLocale();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,12 +33,12 @@ export default function LoginClient() {
       if (axios.isAxiosError(err)) {
         const strapiError = err.response?.data?.error?.message;
         if (strapiError === "Invalid identifier or password") {
-          setError("อีเมลหรือรหัสผ่านไม่ถูกต้อง / Incorrect email or password.");
+          setError(t("login.invalidCredentials"));
         } else {
-          setError(strapiError || "เข้าสู่ระบบไม่สำเร็จ / Login failed.");
+          setError(strapiError || t("login.failed"));
         }
       } else {
-        setError("เข้าสู่ระบบไม่สำเร็จ กรุณาตรวจสอบการเชื่อมต่อ");
+        setError(t("login.failedConnection"));
       }
     } finally {
       setIsLoading(false);
@@ -50,8 +52,8 @@ export default function LoginClient() {
       <div className="relative z-10 w-full max-w-md bg-card rounded-xl shadow-2xl overflow-hidden border-t-4 border-gold">
         {/* Header */}
         <div className="p-8 pb-4 text-center">
-          <h1 className="text-h3 font-serif text-teak-dark mb-2 font-bold">ยินดีต้อนรับ</h1>
-          <p className="text-body text-text-muted">Welcome Back — กรุณาเข้าสู่ระบบ</p>
+          <h1 className="text-h3 font-serif text-teak-dark mb-2 font-bold">{t("login.title")}</h1>
+          <p className="text-body text-text-muted">{t("login.subtitle")}</p>
         </div>
 
         {/* Form */}
@@ -65,7 +67,7 @@ export default function LoginClient() {
             )}
 
             <div className="flex flex-col gap-2">
-              <label htmlFor="email" className="text-body font-bold text-teak-dark">อีเมล / Email</label>
+              <label htmlFor="email" className="text-body font-bold text-teak-dark">{t("login.email")}</label>
               <div className="relative group">
                 <div className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted group-focus-within:text-gold">
                   <User size={22} />
@@ -83,7 +85,7 @@ export default function LoginClient() {
             </div>
 
             <div className="flex flex-col gap-2">
-              <label htmlFor="password" className="text-body font-bold text-teak-dark">รหัสผ่าน / Password</label>
+              <label htmlFor="password" className="text-body font-bold text-teak-dark">{t("login.password")}</label>
               <div className="relative group">
                 <div className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted group-focus-within:text-gold">
                   <Lock size={22} />
@@ -94,7 +96,7 @@ export default function LoginClient() {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="กรอกรหัสผ่าน"
+                  placeholder={t("login.passwordPlaceholder")}
                   className="w-full pl-12 pr-14 py-4 text-body border-2 border-cream-alt rounded-lg focus:border-gold focus:ring-1 focus:ring-gold outline-none transition-all text-text-main bg-cream"
                 />
                 <button
@@ -115,18 +117,18 @@ export default function LoginClient() {
                 isLoading ? "bg-text-muted cursor-not-allowed" : "bg-teak hover:bg-teak-dark"
               }`}
             >
-              {isLoading ? "กำลังเข้าสู่ระบบ..." : <>เข้าสู่ระบบ / Sign In <ArrowRight size={22} /></>}
+              {isLoading ? t("login.submitting") : <>{t("login.submit")} <ArrowRight size={22} /></>}
             </button>
           </form>
         </div>
 
         <div className="bg-cream p-6 text-center border-t border-cream-alt">
-          <p className="text-body text-text-muted mb-3">ยังไม่มีบัญชี? / New here?</p>
+          <p className="text-body text-text-muted mb-3">{t("login.noAccount")}</p>
           <Link
             href="/register"
             className="inline-block border-2 border-teak text-teak text-body font-bold py-2 px-6 rounded-lg hover:bg-teak hover:text-cream transition-colors"
           >
-            สมัครสมาชิก / Create Account
+            {t("login.createAccount")}
           </Link>
         </div>
       </div>

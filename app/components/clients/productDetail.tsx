@@ -6,6 +6,7 @@ import { BlocksRenderer } from "@strapi/blocks-react-renderer";
 import { IProduct } from "@/app/interfaces/product.interface";
 import AddToCartButton from "../ui/AddToCartButton";
 import { ArrowLeft, Truck, ShieldCheck, Phone } from "lucide-react";
+import { useLocale } from "@/app/context/LocaleContext";
 
 const getImageUrl = (url: string | undefined) => {
   if (!url) return "https://placehold.co/600x600/png?text=No+Image";
@@ -14,6 +15,7 @@ const getImageUrl = (url: string | undefined) => {
 };
 
 export default function ProductDetailClient({ product }: { product: IProduct }) {
+  const { t } = useLocale();
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
   useEffect(() => { setSelectedImageIndex(0); }, [product.id]);
@@ -34,7 +36,7 @@ export default function ProductDetailClient({ product }: { product: IProduct }) 
           href="/products"
           className="inline-flex items-center gap-2 text-text-muted hover:text-gold mb-8 font-medium transition-colors text-body"
         >
-          <ArrowLeft size={20} /> กลับไปหน้าสินค้า / Back to Shop
+          <ArrowLeft size={20} /> {t("product.backToShop")}
         </Link>
 
         <div className="grid grid-cols-1 md:grid-cols-5 gap-10">
@@ -81,7 +83,7 @@ export default function ProductDetailClient({ product }: { product: IProduct }) 
             {/* PRICE CARD */}
             <div className="bg-card p-6 rounded-xl shadow-md border border-gold-soft/20 mb-6">
               <div className="flex justify-between items-center border-b border-cream-alt pb-4 mb-4">
-                <span className="text-body text-text-muted">ราคา / Price</span>
+                <span className="text-body text-text-muted">{t("product.price")}</span>
                 <span className="text-h3 font-bold text-price">
                   ฿ {(product.price ?? 0).toLocaleString()}
                 </span>
@@ -90,29 +92,29 @@ export default function ProductDetailClient({ product }: { product: IProduct }) 
               <AddToCartButton product={product} />
 
               <p className="text-center text-sm text-text-muted mt-3">
-                <span className="text-[#2D6A4F] font-bold">มีสินค้า</span> — In Stock & Ready to Ship
+                {t("product.inStock")}
               </p>
             </div>
 
             {/* CALL US */}
             <a
-              href="tel:08XXXXXXXX"
+              href="tel:092-3640013"
               className="flex items-center justify-center gap-3 bg-gold text-cream py-4 rounded-lg font-bold text-body hover:bg-gold-hover transition-colors mb-6 min-h-[56px]"
             >
               <Phone size={22} />
-              สนใจสินค้า โทรสอบถาม
+              {t("product.callToInquire")}
             </a>
 
             {/* DESCRIPTION */}
             <div className="prose prose-lg max-w-none mb-8">
               <h3 className="text-h4 font-serif text-teak-dark mb-2 border-b-2 border-gold inline-block pb-1">
-                รายละเอียด / Details
+                {t("product.details")}
               </h3>
               <div className="mt-4 leading-relaxed text-body text-text-main">
                 {product.description ? (
                   <BlocksRenderer content={product.description} />
                 ) : (
-                  <p className="text-text-muted">ยังไม่มีรายละเอียด / No description available.</p>
+                  <p className="text-text-muted">{t("product.noDescription")}</p>
                 )}
               </div>
             </div>
@@ -122,15 +124,15 @@ export default function ProductDetailClient({ product }: { product: IProduct }) 
               <div className="flex items-center gap-3 bg-cream-alt p-4 rounded-lg text-teak-dark">
                 <ShieldCheck size={28} className="text-gold flex-shrink-0" />
                 <div>
-                  <p className="font-bold text-sm">ไม้สักแท้</p>
-                  <p className="text-xs text-text-muted">Genuine Teak</p>
+                  <p className="font-bold text-sm">{t("product.genuineTeak")}</p>
+                  <p className="text-xs text-text-muted">{t("product.genuineTeakSub")}</p>
                 </div>
               </div>
               <div className="flex items-center gap-3 bg-cream-alt p-4 rounded-lg text-teak-dark">
                 <Truck size={28} className="text-gold flex-shrink-0" />
                 <div>
-                  <p className="font-bold text-sm">จัดส่งปลอดภัย</p>
-                  <p className="text-xs text-text-muted">Safe Shipping</p>
+                  <p className="font-bold text-sm">{t("product.safeShipping")}</p>
+                  <p className="text-xs text-text-muted">{t("product.safeShippingSub")}</p>
                 </div>
               </div>
             </div>

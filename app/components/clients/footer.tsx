@@ -2,8 +2,10 @@
 
 import Link from "next/link";
 import { Phone, Mail, Clock, MapPin } from "lucide-react";
+import { useLocale } from "@/app/context/LocaleContext";
 
 export default function Footer() {
+  const { t } = useLocale();
   return (
     <footer className="bg-teak-dark text-cream">
       <div className="max-w-7xl mx-auto px-6 py-12">
@@ -11,54 +13,51 @@ export default function Footer() {
 
           {/* Column 1: Shop Info */}
           <div>
-            <h3 className="font-pattaya text-3xl text-gold-soft mb-4">
-              ร้านเดชแกะสลัก
+            <h3 className="font-castoro text-3xl text-gold-soft mb-4">
+              {t("common.shopName")}
             </h3>
             <p className="text-cream/80 text-body leading-relaxed">
-              งานแกะสลักไม้สักแท้ จากบ้านถวาย เชียงใหม่
-            </p>
-            <p className="text-cream/60 text-sm mt-2">
-              Authentic teak wood carvings from Ban Tawai, Chiang Mai
+              {t("common.shopTagline")}
             </p>
           </div>
 
           {/* Column 2: Quick Links */}
           <div>
             <h4 className="font-serif text-xl text-gold-soft mb-4">
-              เมนู / Menu
+              {t("footer.menu")}
             </h4>
             <nav className="flex flex-col gap-3">
-              <FooterLink href="/">หน้าแรก / Home</FooterLink>
-              <FooterLink href="/products">สินค้า / Shop</FooterLink>
-              <FooterLink href="/about">เกี่ยวกับ / About</FooterLink>
-              <FooterLink href="/contact">ติดต่อ / Contact</FooterLink>
+              <FooterLink href="/">{t("nav.home")}</FooterLink>
+              <FooterLink href="/products">{t("nav.products")}</FooterLink>
+              <FooterLink href="/about">{t("nav.about")}</FooterLink>
+              <FooterLink href="/contact">{t("nav.contact")}</FooterLink>
             </nav>
           </div>
 
           {/* Column 3: Contact */}
           <div>
             <h4 className="font-serif text-xl text-gold-soft mb-4">
-              ติดต่อเรา / Contact Us
+              {t("footer.contactUs")}
             </h4>
             <div className="flex flex-col gap-3 text-body">
               <a
-                href="tel:08XXXXXXXX"
+                href="tel:092-3640013"
                 className="flex items-center gap-3 text-cream/80 hover:text-gold-soft transition-colors"
               >
                 <Phone size={20} className="flex-shrink-0" />
-                <span>08X-XXX-XXXX</span>
+                <span>{t("common.phone")}</span>
               </a>
               <div className="flex items-center gap-3 text-cream/80">
                 <Mail size={20} className="flex-shrink-0" />
-                <span>dej.carving@email.com</span>
+                <span>{t("common.email")}</span>
               </div>
               <div className="flex items-center gap-3 text-cream/80">
                 <MapPin size={20} className="flex-shrink-0" />
-                <span>บ้านถวาย เชียงใหม่</span>
+                <span>{t("common.banTawai")}</span>
               </div>
               <div className="flex items-center gap-3 text-cream/80">
                 <Clock size={20} className="flex-shrink-0" />
-                <span>เปิดทุกวัน 08:00 - 18:00</span>
+                <span>{t("common.openHours")}</span>
               </div>
             </div>
           </div>
@@ -67,7 +66,7 @@ export default function Footer() {
         {/* Google Maps */}
         <div className="mt-10 rounded-lg overflow-hidden border border-gold-soft/30">
           <iframe
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3778.123!2d98.932!3d18.728!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTjCsDQzJzQxLjAiTiA5OMKwNTUnNTUuMiJF!5e0!3m2!1sen!2sth!4v1"
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1889.7124041400114!2d98.9449374385011!3d18.689789995609264!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x30da3114739e5ed7%3A0x80588edbe66d9927!2sDej%20Carving%20Shop!5e0!3m2!1sth!2sth!4v1768209226485!5m2!1sth!2sth"
             width="100%"
             height="250"
             style={{ border: 0 }}
@@ -80,7 +79,7 @@ export default function Footer() {
 
         {/* Bottom Bar */}
         <div className="mt-10 pt-6 border-t border-cream/20 text-center text-cream/50 text-sm">
-          <p>&copy; {new Date().getFullYear()} ร้านเดชแกะสลัก — Dej Carving Shop. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} {t("common.shopName")}. {t("footer.copyright")}</p>
         </div>
       </div>
     </footer>

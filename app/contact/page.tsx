@@ -3,8 +3,10 @@
 import React, { useState } from "react";
 import { Mail, Phone, MapPin, Clock, Send, MessageCircle, Facebook } from "lucide-react";
 import { toast } from "sonner";
+import { useLocale } from "@/app/context/LocaleContext";
 
 export default function ContactPage() {
+  const { t } = useLocale();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
@@ -17,7 +19,7 @@ export default function ContactPage() {
     e.preventDefault();
     setLoading(true);
     await new Promise((resolve) => setTimeout(resolve, 1500));
-    toast.success("ส่งข้อความแล้ว! เราจะตอบกลับเร็วๆนี้ / Message sent!");
+    toast.success(t("contact.sent"));
     setFormData({ name: "", email: "", subject: "", message: "" });
     setLoading(false);
   };
@@ -31,9 +33,9 @@ export default function ContactPage() {
 
       {/* HERO */}
       <section className="bg-teak-dark text-cream py-16 text-center">
-        <h1 className="text-h1 md:text-display font-serif font-bold mb-4">ติดต่อเรา</h1>
+        <h1 className="text-h1 md:text-display font-serif font-bold mb-4">{t("contact.heroTitle")}</h1>
         <p className="text-body-lg text-cream/80 max-w-2xl mx-auto px-4">
-          Contact Us — สอบถามเกี่ยวกับสินค้า หรือต้องการงานสั่งทำพิเศษ
+          {t("contact.heroSub")}
         </p>
       </section>
 
@@ -44,11 +46,11 @@ export default function ContactPage() {
           {/* LEFT: Contact Info */}
           <div className="space-y-8">
             <div>
-              <h2 className="text-h3 font-serif text-teak-dark mb-4">ข้อมูลการติดต่อ</h2>
-              <p className="text-body text-text-muted mb-1">Contact Information</p>
+              <h2 className="text-h3 font-serif text-teak-dark mb-4">{t("contact.infoTitle")}</h2>
+              <p className="text-body text-text-muted mb-1">{t("contact.infoSub")}</p>
               <div className="h-1 w-20 bg-gold mb-6" />
               <p className="text-body text-text-muted leading-relaxed">
-                เรายินดีต้อนรับทุกท่าน ทั้งนัดหมายล่วงหน้าหรือ walk-in ที่บ้านถวาย
+                {t("contact.welcomeMsg")}
               </p>
             </div>
 
@@ -58,10 +60,10 @@ export default function ContactPage() {
                   <MapPin size={24} />
                 </div>
                 <div>
-                  <h3 className="font-bold text-body text-teak-dark">โชว์รูม / Showroom</h3>
+                  <h3 className="font-bold text-body text-teak-dark">{t("contact.showroom")}</h3>
                   <p className="text-text-muted">
-                    หมู่บ้านถวาย อ.หางดง เชียงใหม่ 50230<br />
-                    Ban Tawai, Hang Dong, Chiang Mai
+                    {t("contact.showroomAddress")}<br />
+                    {t("contact.showroomAddressEn")}
                   </p>
                 </div>
               </div>
@@ -71,9 +73,9 @@ export default function ContactPage() {
                   <Phone size={24} />
                 </div>
                 <div>
-                  <h3 className="font-bold text-body text-teak-dark">โทรศัพท์ / Phone</h3>
-                  <a href="tel:08XXXXXXXX" className="text-text-muted hover:text-gold transition-colors">
-                    08X-XXX-XXXX (คุณเดช)
+                  <h3 className="font-bold text-body text-teak-dark">{t("contact.phoneTitle")}</h3>
+                  <a href="tel:092-3640013" className="text-text-muted hover:text-gold transition-colors">
+                    {t("common.phone")} (คุณเดช)
                   </a>
                   <div className="flex items-center gap-2 mt-2 text-[#06C755] font-bold">
                     <MessageCircle size={20} />
@@ -87,8 +89,8 @@ export default function ContactPage() {
                   <Mail size={24} />
                 </div>
                 <div>
-                  <h3 className="font-bold text-body text-teak-dark">อีเมล / Email</h3>
-                  <p className="text-text-muted">dej.carving@email.com</p>
+                  <h3 className="font-bold text-body text-teak-dark">{t("contact.emailTitle")}</h3>
+                  <p className="text-text-muted">{t("common.email")}</p>
                 </div>
               </div>
 
@@ -97,16 +99,16 @@ export default function ContactPage() {
                   <Clock size={24} />
                 </div>
                 <div>
-                  <h3 className="font-bold text-body text-teak-dark">เวลาเปิด-ปิด / Hours</h3>
-                  <p className="text-text-muted">เปิดทุกวัน 08:00 - 18:00</p>
-                  <p className="text-text-muted text-sm">Open Daily</p>
+                  <h3 className="font-bold text-body text-teak-dark">{t("contact.hoursTitle")}</h3>
+                  <p className="text-text-muted">{t("common.openHours")}</p>
+                  <p className="text-text-muted text-sm">{t("common.openHoursSub")}</p>
                 </div>
               </div>
             </div>
 
             {/* Social */}
             <div className="pt-6 border-t border-cream-alt">
-              <p className="font-bold text-teak-dark mb-4">ติดตามเรา / Follow Us</p>
+              <p className="font-bold text-teak-dark mb-4">{t("contact.followUs")}</p>
               <div className="flex gap-4">
                 <a href="#" className="bg-teak text-cream p-3 rounded-lg hover:bg-gold transition-colors" aria-label="Facebook">
                   <Facebook size={20} />
@@ -117,13 +119,13 @@ export default function ContactPage() {
 
           {/* RIGHT: Contact Form */}
           <div className="bg-card p-8 rounded-xl shadow-xl border border-gold-soft/20">
-            <h2 className="text-h4 font-serif text-teak-dark mb-6">ส่งข้อความถึงเรา</h2>
-            <p className="text-sm text-text-muted mb-6">Send us a Message</p>
+            <h2 className="text-h4 font-serif text-teak-dark mb-6">{t("contact.formTitle")}</h2>
+            <p className="text-sm text-text-muted mb-6">{t("contact.formSub")}</p>
 
             <form onSubmit={handleSubmit} className="space-y-5">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div className="space-y-2">
-                  <label className="text-body font-bold text-teak-dark">ชื่อ / Name</label>
+                  <label className="text-body font-bold text-teak-dark">{t("contact.nameLabel")}</label>
                   <input
                     name="name"
                     required
@@ -131,11 +133,11 @@ export default function ContactPage() {
                     onChange={handleChange}
                     type="text"
                     className="w-full p-4 bg-cream border border-cream-alt rounded-lg focus:ring-2 focus:ring-gold focus:outline-none transition-all text-body"
-                    placeholder="คุณสมชาย"
+                    placeholder={t("contact.namePlaceholder")}
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-body font-bold text-teak-dark">อีเมล / Email</label>
+                  <label className="text-body font-bold text-teak-dark">{t("contact.emailLabel")}</label>
                   <input
                     name="email"
                     required
@@ -149,7 +151,7 @@ export default function ContactPage() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-body font-bold text-teak-dark">เรื่อง / Subject</label>
+                <label className="text-body font-bold text-teak-dark">{t("contact.subjectLabel")}</label>
                 <input
                   name="subject"
                   required
@@ -157,12 +159,12 @@ export default function ContactPage() {
                   value={formData.subject}
                   onChange={handleChange}
                   className="w-full p-4 bg-cream border border-cream-alt rounded-lg focus:ring-2 focus:ring-gold focus:outline-none transition-all text-body"
-                  placeholder="สอบถามเกี่ยวกับตู้ไม้สัก..."
+                  placeholder={t("contact.subjectPlaceholder")}
                 />
               </div>
 
               <div className="space-y-2">
-                <label className="text-body font-bold text-teak-dark">ข้อความ / Message</label>
+                <label className="text-body font-bold text-teak-dark">{t("contact.messageLabel")}</label>
                 <textarea
                   name="message"
                   required
@@ -170,7 +172,7 @@ export default function ContactPage() {
                   value={formData.message}
                   onChange={handleChange}
                   className="w-full p-4 bg-cream border border-cream-alt rounded-lg focus:ring-2 focus:ring-gold focus:outline-none transition-all text-body"
-                  placeholder="สนใจสินค้าชิ้นไหน? มีอะไรให้ช่วยครับ?"
+                  placeholder={t("contact.messagePlaceholder")}
                 />
               </div>
 
@@ -179,8 +181,8 @@ export default function ContactPage() {
                 disabled={loading}
                 className="w-full bg-teak text-cream font-bold py-4 rounded-lg hover:bg-teak-dark transition-all flex items-center justify-center gap-2 disabled:opacity-70 text-body-lg min-h-[56px]"
               >
-                {loading ? "กำลังส่ง..." : (
-                  <>ส่งข้อความ / Send <Send size={18} /></>
+                {loading ? t("contact.sending") : (
+                  <>{t("contact.send")} <Send size={18} /></>
                 )}
               </button>
             </form>
@@ -204,21 +206,21 @@ export default function ContactPage() {
       {/* FAQ */}
       <section className="py-20 bg-cream-alt">
         <div className="max-w-4xl mx-auto px-6">
-          <h2 className="text-h2 font-serif text-center text-teak-dark mb-4">คำถามที่พบบ่อย</h2>
-          <p className="text-body text-text-muted text-center mb-12">Frequently Asked Questions</p>
+          <h2 className="text-h2 font-serif text-center text-teak-dark mb-4">{t("contact.faqTitle")}</h2>
+          <p className="text-body text-text-muted text-center mb-12">{t("contact.faqSub")}</p>
 
           <div className="space-y-4">
             <FaqItem
-              question="จัดส่งต่างประเทศได้ไหม? / Do you ship internationally?"
-              answer="ได้ครับ เรามีพาร์ทเนอร์จัดส่งสำหรับสินค้าขนาดใหญ่ไปทั่วโลก ค่าส่งขึ้นอยู่กับน้ำหนักและขนาด / Yes, we work with specialized logistics partners for safe international shipping."
+              question={t("contact.faq1q")}
+              answer={t("contact.faq1a")}
             />
             <FaqItem
-              question="สินค้าเป็นของแท้ไหม? / Are items authentic?"
-              answer="เราขายทั้งของเก่าแท้และงานจำลองจากไม้เก่าคุณภาพสูง ทุกรายการระบุอายุและแหล่งที่มาชัดเจน / Each listing explicitly states its age and origin."
+              question={t("contact.faq2q")}
+              answer={t("contact.faq2a")}
             />
             <FaqItem
-              question="รับสั่งทำพิเศษไหม? / Custom carvings?"
-              answer="ได้ครับ ช่างแกะสลักของเราสามารถสร้างงานตามแบบของคุณได้ ใช้เวลาประมาณ 4-8 สัปดาห์ / Custom orders typically take 4-8 weeks."
+              question={t("contact.faq3q")}
+              answer={t("contact.faq3a")}
             />
           </div>
         </div>

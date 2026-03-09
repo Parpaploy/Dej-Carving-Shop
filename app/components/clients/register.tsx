@@ -6,10 +6,12 @@ import { useRouter } from "next/navigation";
 import axios from "axios";
 import { User, Mail, Lock, Eye, EyeOff, CheckCircle, AlertCircle } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
+import { useLocale } from "@/app/context/LocaleContext";
 
 export default function RegisterClient() {
   const router = useRouter();
   const { login } = useAuth();
+  const { t } = useLocale();
 
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
@@ -26,12 +28,12 @@ export default function RegisterClient() {
     setError("");
 
     if (password.length < 6) {
-      setError("รหัสผ่านต้องมีอย่างน้อย 6 ตัว / Password must be at least 6 characters.");
+      setError(t("register.passwordTooShort"));
       setIsLoading(false);
       return;
     }
     if (password !== confirmPassword) {
-      setError("รหัสผ่านไม่ตรงกัน / Passwords do not match.");
+      setError(t("register.passwordMismatch"));
       setIsLoading(false);
       return;
     }
@@ -48,12 +50,12 @@ export default function RegisterClient() {
       if (axios.isAxiosError(err)) {
         const strapiError = err.response?.data?.error?.message;
         if (strapiError === "Email or Username are already taken") {
-          setError("อีเมลนี้มีผู้ใช้แล้ว / This email is already registered.");
+          setError(t("register.emailTaken"));
         } else {
-          setError(strapiError || "สมัครไม่สำเร็จ / Registration failed.");
+          setError(strapiError || t("register.failed"));
         }
       } else {
-        setError("สมัครไม่สำเร็จ กรุณาตรวจสอบการเชื่อมต่อ");
+        setError(t("register.failedConnection"));
       }
     } finally {
       setIsLoading(false);
@@ -66,8 +68,8 @@ export default function RegisterClient() {
 
       <div className="relative z-10 w-full max-w-lg bg-card rounded-xl shadow-2xl overflow-hidden border-t-4 border-gold">
         <div className="p-8 pb-2 text-center">
-          <h1 className="text-h3 font-serif text-teak-dark mb-2 font-bold">สมัครสมาชิก</h1>
-          <p className="text-body text-text-muted">Create Account — เริ่มสะสมไม้สักกับเรา</p>
+          <h1 className="text-h3 font-serif text-teak-dark mb-2 font-bold">{t("register.title")}</h1>
+          <p className="text-body text-text-muted">{t("register.subtitle")}</p>
         </div>
 
         <div className="p-8 pt-4">
@@ -80,15 +82,15 @@ export default function RegisterClient() {
             )}
 
             <div className="flex flex-col gap-2">
-              <label htmlFor="fullname" className="text-body font-bold text-teak-dark">ชื่อ-สกุล / Full Name</label>
+              <label htmlFor="fullname" className="text-body font-bold text-teak-dark">{t("register.fullName")}</label>
               <div className="relative group">
                 <div className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted group-focus-within:text-gold"><User size={22} /></div>
-                <input id="fullname" type="text" required value={username} onChange={(e) => setUsername(e.target.value)} placeholder="เช่น สมชาย ใจดี" className="w-full pl-12 pr-4 py-4 text-body border-2 border-cream-alt rounded-lg focus:border-gold focus:ring-1 focus:ring-gold outline-none transition-all text-text-main bg-cream" />
+                <input id="fullname" type="text" required value={username} onChange={(e) => setUsername(e.target.value)} placeholder={t("register.fullNamePlaceholder")} className="w-full pl-12 pr-4 py-4 text-body border-2 border-cream-alt rounded-lg focus:border-gold focus:ring-1 focus:ring-gold outline-none transition-all text-text-main bg-cream" />
               </div>
             </div>
 
             <div className="flex flex-col gap-2">
-              <label htmlFor="email" className="text-body font-bold text-teak-dark">อีเมล / Email</label>
+              <label htmlFor="email" className="text-body font-bold text-teak-dark">{t("register.email")}</label>
               <div className="relative group">
                 <div className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted group-focus-within:text-gold"><Mail size={22} /></div>
                 <input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="name@example.com" className="w-full pl-12 pr-4 py-4 text-body border-2 border-cream-alt rounded-lg focus:border-gold focus:ring-1 focus:ring-gold outline-none transition-all text-text-main bg-cream" />
@@ -96,10 +98,10 @@ export default function RegisterClient() {
             </div>
 
             <div className="flex flex-col gap-2">
-              <label htmlFor="password" className="text-body font-bold text-teak-dark">สร้างรหัสผ่าน / Password</label>
+              <label htmlFor="password" className="text-body font-bold text-teak-dark">{t("register.password")}</label>
               <div className="relative group">
                 <div className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted group-focus-within:text-gold"><Lock size={22} /></div>
-                <input id="password" type={showPassword ? "text" : "password"} required value={password} onChange={(e) => setPassword(e.target.value)} placeholder="อย่างน้อย 6 ตัวอักษร" className="w-full pl-12 pr-14 py-4 text-body border-2 border-cream-alt rounded-lg focus:border-gold focus:ring-1 focus:ring-gold outline-none transition-all text-text-main bg-cream" />
+                <input id="password" type={showPassword ? "text" : "password"} required value={password} onChange={(e) => setPassword(e.target.value)} placeholder={t("register.passwordPlaceholder")} className="w-full pl-12 pr-14 py-4 text-body border-2 border-cream-alt rounded-lg focus:border-gold focus:ring-1 focus:ring-gold outline-none transition-all text-text-main bg-cream" />
                 <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-text-muted hover:text-teak-dark p-2" aria-label="Toggle password">
                   {showPassword ? <EyeOff size={22} /> : <Eye size={22} />}
                 </button>
@@ -107,10 +109,10 @@ export default function RegisterClient() {
             </div>
 
             <div className="flex flex-col gap-2">
-              <label htmlFor="confirmPassword" className="text-body font-bold text-teak-dark">ยืนยันรหัสผ่าน / Confirm</label>
+              <label htmlFor="confirmPassword" className="text-body font-bold text-teak-dark">{t("register.confirmPassword")}</label>
               <div className="relative group">
                 <div className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted group-focus-within:text-gold"><CheckCircle size={22} /></div>
-                <input id="confirmPassword" type={showConfirmPassword ? "text" : "password"} required value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} placeholder="กรอกรหัสผ่านอีกครั้ง" className="w-full pl-12 pr-14 py-4 text-body border-2 border-cream-alt rounded-lg focus:border-gold focus:ring-1 focus:ring-gold outline-none transition-all text-text-main bg-cream" />
+                <input id="confirmPassword" type={showConfirmPassword ? "text" : "password"} required value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} placeholder={t("register.confirmPlaceholder")} className="w-full pl-12 pr-14 py-4 text-body border-2 border-cream-alt rounded-lg focus:border-gold focus:ring-1 focus:ring-gold outline-none transition-all text-text-main bg-cream" />
                 <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-text-muted hover:text-teak-dark p-2" aria-label="Toggle confirm">
                   {showConfirmPassword ? <EyeOff size={22} /> : <Eye size={22} />}
                 </button>
@@ -124,15 +126,15 @@ export default function RegisterClient() {
                 isLoading ? "bg-text-muted text-cream cursor-not-allowed" : "bg-gold hover:bg-gold-hover text-cream"
               }`}
             >
-              {isLoading ? "กำลังสร้างบัญชี..." : "สมัครสมาชิก / Create Account"}
+              {isLoading ? t("register.submitting") : t("register.submit")}
             </button>
           </form>
         </div>
 
         <div className="bg-cream p-6 text-center border-t border-cream-alt">
-          <p className="text-body text-text-muted mb-2">มีบัญชีอยู่แล้ว? / Already a member?</p>
+          <p className="text-body text-text-muted mb-2">{t("register.hasAccount")}</p>
           <Link href="/login" className="text-body-lg font-bold text-teak border-b-2 border-teak hover:text-gold hover:border-gold transition-colors">
-            เข้าสู่ระบบ / Log In
+            {t("register.login")}
           </Link>
         </div>
       </div>

@@ -46,7 +46,7 @@ html {
 body {
   background-color: var(--cream);
   color: var(--text);
-  font-family: var(--font-sarabun), sans-serif;
+  font-family: var(--font-ibm-plex), sans-serif;
   line-height: 1.7;
   -webkit-font-smoothing: antialiased;
 }
@@ -54,7 +54,7 @@ body {
 /* === TYPOGRAPHY === */
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-playfair), serif;
+  font-family: var(--font-castoro), serif;
   line-height: 1.2;
   color: var(--teak-dark);
 }

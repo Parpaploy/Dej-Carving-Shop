@@ -6,10 +6,13 @@ import Link from "next/link";
 import { ShoppingCart, Menu, X, Phone, User, LogOut, Settings } from "lucide-react";
 import { useCart } from "../../context/CartContext";
 import { useAuth } from "../../context/AuthContext";
+import { useLocale } from "@/app/context/LocaleContext";
+
 
 export default function Navbar() {
   const { cartCount } = useCart();
   const { user, logout } = useAuth();
+  const { t } = useLocale();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const dropdownRef = React.useRef<HTMLDivElement>(null);
@@ -40,28 +43,28 @@ export default function Navbar() {
           {/* LOGO */}
           <Link
             href="/"
-            className="font-pattaya text-2xl md:text-3xl tracking-wide text-cream hover:text-gold-soft transition-colors"
+            className="font-castoro text-2xl md:text-3xl tracking-wide text-cream hover:text-gold-soft transition-colors"
           >
-            ร้านเดชแกะสลัก
+            {t("common.shopName")}
           </Link>
 
           {/* DESKTOP NAV */}
           <div className="hidden md:flex items-center gap-8">
-            <NavLink href="/">หน้าแรก</NavLink>
-            <NavLink href="/products">สินค้า</NavLink>
-            <NavLink href="/about">เกี่ยวกับ</NavLink>
-            <NavLink href="/contact">ติดต่อ</NavLink>
+            <NavLink href="/">{t("nav.home")}</NavLink>
+            <NavLink href="/products">{t("nav.products")}</NavLink>
+            <NavLink href="/about">{t("nav.about")}</NavLink>
+            <NavLink href="/contact">{t("nav.contact")}</NavLink>
           </div>
 
           {/* DESKTOP UTILITIES */}
-          <div className="hidden md:flex items-center gap-4">
+          <div className="hidden md:flex items-center gap-8">
             {/* Phone */}
             <a
-              href="tel:08XXXXXXXX"
+              href="tel:092-3640013"
               className="flex items-center gap-2 text-cream/80 hover:text-gold-soft transition-colors"
             >
               <Phone size={20} />
-              <span className="text-sm hidden lg:inline">08X-XXX-XXXX</span>
+              <span className="text-sm hidden lg:inline">{t("common.phone")}</span>
             </a>
 
             <div className="w-px h-8 bg-cream/30" />
@@ -92,13 +95,13 @@ export default function Navbar() {
                       onClick={() => setIsUserMenuOpen(false)}
                       className="flex items-center gap-3 px-4 py-3 hover:bg-cream text-body font-medium transition-colors"
                     >
-                      <Settings size={20} /> โปรไฟล์
+                      <Settings size={20} /> {t("nav.profile")}
                     </Link>
                     <button
                       onClick={handleLogoutClick}
                       className="w-full flex items-center gap-3 px-4 py-3 hover:bg-red-50 text-price text-body font-medium text-left border-t border-cream-alt"
                     >
-                      <LogOut size={20} /> ออกจากระบบ
+                      <LogOut size={20} /> {t("nav.logout")}
                     </button>
                   </div>
                 )}
@@ -109,7 +112,7 @@ export default function Navbar() {
                 className="flex items-center gap-2 hover:text-gold-soft transition-colors"
               >
                 <User size={24} />
-                <span className="text-body font-medium">เข้าสู่ระบบ</span>
+                <span className="text-body font-medium">{t("nav.login")}</span>
               </Link>
             )}
 
@@ -119,7 +122,7 @@ export default function Navbar() {
               className="flex items-center gap-2 bg-gold text-cream px-5 py-2.5 rounded-lg hover:bg-gold-hover transition-colors relative font-semibold"
             >
               <ShoppingCart size={22} />
-              <span className="text-body">ตะกร้า</span>
+              <span className="text-body">{t("nav.cart")}</span>
               <AnimatePresence>
                 {cartCount > 0 && (
                   <motion.span
@@ -167,26 +170,26 @@ export default function Navbar() {
             >
               <div className="flex flex-col gap-1 pt-4">
                 <MobileLink href="/" onClick={() => setIsMobileMenuOpen(false)}>
-                  หน้าแรก / Home
+                  {t("nav.home")}
                 </MobileLink>
                 <MobileLink href="/products" onClick={() => setIsMobileMenuOpen(false)}>
-                  สินค้า / Shop
+                  {t("nav.products")}
                 </MobileLink>
                 <MobileLink href="/about" onClick={() => setIsMobileMenuOpen(false)}>
-                  เกี่ยวกับ / About
+                  {t("nav.about")}
                 </MobileLink>
                 <MobileLink href="/contact" onClick={() => setIsMobileMenuOpen(false)}>
-                  ติดต่อ / Contact
+                  {t("nav.contact")}
                 </MobileLink>
 
                 <div className="h-px bg-cream/20 my-3" />
 
                 {/* Phone */}
                 <a
-                  href="tel:08XXXXXXXX"
+                  href="tel:092-3640013"
                   className="flex items-center gap-3 text-xl py-3 px-4 text-gold-soft hover:bg-cream/10 rounded-lg"
                 >
-                  <Phone size={22} /> 08X-XXX-XXXX
+                  <Phone size={22} /> {t("common.phone")}
                 </a>
 
                 <div className="h-px bg-cream/20 my-3" />
@@ -194,18 +197,18 @@ export default function Navbar() {
                 {user ? (
                   <>
                     <MobileLink href="/profile" onClick={() => setIsMobileMenuOpen(false)}>
-                      โปรไฟล์ ({user.username})
+                      {t("nav.profile")} ({user.username})
                     </MobileLink>
                     <button
                       onClick={handleLogoutClick}
                       className="text-xl py-3 px-4 text-red-400 text-left hover:bg-cream/10 rounded-lg w-full"
                     >
-                      ออกจากระบบ / Log Out
+                      {t("nav.logout")}
                     </button>
                   </>
                 ) : (
                   <MobileLink href="/login" onClick={() => setIsMobileMenuOpen(false)}>
-                    เข้าสู่ระบบ / Log In
+                    {t("nav.login")}
                   </MobileLink>
                 )}
               </div>

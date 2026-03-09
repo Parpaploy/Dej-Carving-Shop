@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import axios from "axios";
 import { User, Mail, Calendar, MapPin, Package, LogOut, Plus, Edit2, Trash2, CheckCircle, Clock, Loader2, Camera } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
+import { useLocale } from "@/app/context/LocaleContext";
 import { toast } from "sonner";
 
 const API = process.env.NEXT_PUBLIC_STRAPI_BASE_URL;
@@ -12,6 +13,7 @@ const API = process.env.NEXT_PUBLIC_STRAPI_BASE_URL;
 export default function ProfileClient() {
   const router = useRouter();
   const { user, logout, updateUser } = useAuth();
+  const { t } = useLocale();
   const [activeTab, setActiveTab] = useState<"info" | "orders" | "addresses">("info");
 
   const [orders, setOrders] = useState<any[]>([]);
@@ -38,7 +40,9 @@ export default function ProfileClient() {
           const imgUrl = meData.profileImage.startsWith("http")
             ? meData.profileImage
             : `${API}${meData.profileImage}`;
-          updateUser({ profileImage: imgUrl });
+          if (imgUrl !== user?.profileImage) {
+            updateUser({ profileImage: imgUrl });
+          }
         }
 
         // Fetch Orders
@@ -77,9 +81,9 @@ export default function ProfileClient() {
       );
       // Update UI immediately
       setAddresses(addresses.filter(a => a.id !== addressId));
-      toast.success("Address deleted.");
+      toast.success(t("toast.addressDeleted"));
     } catch (err) {
-      toast.error("Failed to delete address.");
+      toast.error(t("toast.addressDeleteFailed"));
     }
   };
 
@@ -89,11 +93,11 @@ export default function ProfileClient() {
 
     // Validate
     if (!file.type.startsWith("image/")) {
-      toast.error("Please select an image file");
+      toast.error(t("toast.selectImage"));
       return;
     }
     if (file.size > 5 * 1024 * 1024) {
-      toast.error("Image must be under 5MB");
+      toast.error(t("toast.imageSize"));
       return;
     }
 
@@ -112,10 +116,10 @@ export default function ProfileClient() {
         ? res.data.url
         : `${API}${res.data.url}`;
       updateUser({ profileImage: imgUrl });
-      toast.success("Profile image updated!");
+      toast.success(t("toast.profileImageUpdated"));
     } catch (err) {
       console.error("Upload failed:", err);
-      toast.error("Failed to upload image");
+      toast.error(t("toast.profileImageFailed"));
     } finally {
       setUploadingImage(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
@@ -127,7 +131,7 @@ export default function ProfileClient() {
   // --- SUB-COMPONENT: ORDERS ---
   const OrdersTab = () => (
     <div className="space-y-6">
-      <h2 className="text-2xl font-serif text-[#4B3621] border-b border-gray-200 pb-4">My Order History</h2>
+      <h2 className="text-2xl font-serif text-[#4B3621] border-b border-gray-200 pb-4">{t("profile.orderHistory")}</h2>
       
       {loading ? (
         <div className="flex justify-center p-10"><Loader2 className="animate-spin text-[#D4AF37]" /></div>
@@ -168,7 +172,7 @@ export default function ProfileClient() {
           </div>
         ))
       ) : (
-        <div className="text-center py-10 text-gray-500">No orders found.</div>
+        <div className="text-center py-10 text-gray-500">{t("profile.noOrders")}</div>
       )}
     </div>
   );
@@ -177,12 +181,12 @@ export default function ProfileClient() {
   const AddressesTab = () => (
     <div className="space-y-6">
       <div className="flex justify-between items-center border-b border-gray-200 pb-4">
-        <h2 className="text-2xl font-serif text-[#4B3621]">My Addresses</h2>
-        <button 
-          onClick={() => toast.info("Create Address Feature Coming Next!")} // Hook this up to a modal later
+        <h2 className="text-2xl font-serif text-[#4B3621]">{t("profile.myAddresses")}</h2>
+        <button
+          onClick={() => toast.info(t("profile.addAddressFeature"))}
           className="flex items-center gap-2 bg-[#D4AF37] text-[#2e1d10] px-4 py-2 rounded font-bold hover:bg-[#b5952f] text-sm"
         >
-          <Plus size={18} /> Add New
+          <Plus size={18} /> {t("profile.addNew")}
         </button>
       </div>
 
@@ -219,7 +223,7 @@ export default function ProfileClient() {
           ))}
         </div>
       ) : (
-         <div className="text-center py-10 text-gray-500">No addresses saved yet.</div>
+         <div className="text-center py-10 text-gray-500">{t("profile.noAddresses")}</div>
       )}
     </div>
   );
@@ -227,7 +231,7 @@ export default function ProfileClient() {
   // --- SUB-COMPONENT: INFO ---
   const InfoTab = () => (
     <div className="space-y-6">
-      <h2 className="text-2xl font-serif text-[#4B3621] mb-6 border-b border-gray-200 pb-2">Personal Information</h2>
+      <h2 className="text-2xl font-serif text-[#4B3621] mb-6 border-b border-gray-200 pb-2">{t("profile.personalInfo")}</h2>
 
       {/* Profile Image Section */}
       <div className="flex flex-col items-center sm:flex-row sm:items-start gap-6 p-6 bg-[#FAF9F6] border border-gray-200 rounded-lg">
@@ -264,7 +268,7 @@ export default function ProfileClient() {
             className="mt-3 flex items-center gap-2 px-4 py-2 bg-[#D4AF37] text-[#2e1d10] rounded-lg text-sm font-bold hover:bg-[#b5952f] transition-colors"
           >
             {uploadingImage ? <Loader2 size={16} className="animate-spin" /> : <Camera size={16} />}
-            {uploadingImage ? "Uploading..." : "Change Photo"}
+            {uploadingImage ? t("profile.uploading") : t("profile.changePhoto")}
           </button>
         </div>
       </div>
@@ -272,13 +276,13 @@ export default function ProfileClient() {
       <div className="space-y-6">
         <div className="flex flex-col gap-2">
           <label className="text-lg font-bold text-[#2e1d10] flex items-center gap-2">
-            <User size={20} className="text-[#D4AF37]" /> Username
+            <User size={20} className="text-[#D4AF37]" /> {t("profile.username")}
           </label>
           <div className="p-4 bg-[#FAF9F6] border border-gray-300 rounded text-xl text-gray-700">{user.username}</div>
         </div>
         <div className="flex flex-col gap-2">
           <label className="text-lg font-bold text-[#2e1d10] flex items-center gap-2">
-            <Mail size={20} className="text-[#D4AF37]" /> Email
+            <Mail size={20} className="text-[#D4AF37]" /> {t("profile.email")}
           </label>
           <div className="p-4 bg-[#FAF9F6] border border-gray-300 rounded text-xl text-gray-700">{user.email}</div>
         </div>
@@ -291,8 +295,8 @@ export default function ProfileClient() {
       <div className="max-w-5xl mx-auto">
         {/* Header */}
         <div className="mb-10 text-center md:text-left border-b-2 border-[#D4AF37] pb-6">
-          <h1 className="text-4xl font-serif text-[#4B3621] font-bold">My Account</h1>
-          <p className="text-xl text-gray-600 mt-2">Welcome back, {user.username}</p>
+          <h1 className="text-4xl font-serif text-[#4B3621] font-bold">{t("profile.title")}</h1>
+          <p className="text-xl text-gray-600 mt-2">{t("profile.welcome")}, {user.username}</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -333,20 +337,20 @@ export default function ProfileClient() {
                   />
                 </div>
                 <h3 className="text-xl font-bold">{user.username}</h3>
-                <p className="text-xs text-[#D4AF37]/70 mt-1">Click photo to change</p>
+                <p className="text-xs text-[#D4AF37]/70 mt-1">{t("profile.clickToChange")}</p>
               </div>
               <nav className="flex flex-col">
                 <button onClick={() => setActiveTab("info")} className={`flex items-center gap-3 px-6 py-4 text-lg font-medium transition-colors border-b border-gray-100 ${activeTab === "info" ? "bg-[#FAF9F6] border-l-4 border-l-[#D4AF37] text-[#4B3621] font-bold" : "text-gray-600 hover:bg-gray-50"}`}>
-                  <User size={20} /> Personal Info
+                  <User size={20} /> {t("profile.personalInfo")}
                 </button>
                 <button onClick={() => setActiveTab("orders")} className={`flex items-center gap-3 px-6 py-4 text-lg font-medium transition-colors border-b border-gray-100 ${activeTab === "orders" ? "bg-[#FAF9F6] border-l-4 border-l-[#D4AF37] text-[#4B3621] font-bold" : "text-gray-600 hover:bg-gray-50"}`}>
-                  <Package size={20} /> My Orders
+                  <Package size={20} /> {t("profile.orders")}
                 </button>
                 <button onClick={() => setActiveTab("addresses")} className={`flex items-center gap-3 px-6 py-4 text-lg font-medium transition-colors border-b border-gray-100 ${activeTab === "addresses" ? "bg-[#FAF9F6] border-l-4 border-l-[#D4AF37] text-[#4B3621] font-bold" : "text-gray-600 hover:bg-gray-50"}`}>
-                  <MapPin size={20} /> Addresses
+                  <MapPin size={20} /> {t("profile.addresses")}
                 </button>
                 <button onClick={logout} className="flex items-center gap-3 px-6 py-4 text-red-600 text-lg font-medium hover:bg-red-50 transition-colors">
-                  <LogOut size={20} /> Log Out
+                  <LogOut size={20} /> {t("nav.logout")}
                 </button>
               </nav>
             </div>

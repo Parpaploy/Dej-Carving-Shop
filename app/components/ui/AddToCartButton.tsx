@@ -3,6 +3,7 @@
 import React from "react";
 import { ShoppingBag } from "lucide-react";
 import { useCart } from "../../context/CartContext";
+import { useLocale } from "@/app/context/LocaleContext";
 import { toast } from "sonner";
 import { IProduct } from "@/app/interfaces/product.interface";
 
@@ -12,6 +13,7 @@ interface AddToCartButtonProps {
 
 export default function AddToCartButton({ product }: AddToCartButtonProps) {
   const { addToCart } = useCart();
+  const { t } = useLocale();
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -32,17 +34,17 @@ export default function AddToCartButton({ product }: AddToCartButtonProps) {
     };
 
     addToCart(cartItem);
-    toast.success(`เพิ่ม ${product.name} ลงตะกร้าแล้ว`);
+    toast.success(`${product.name} — ${t("toast.addedToCart")}`);
   };
 
   return (
     <button
       onClick={handleAddToCart}
       className="bg-gold hover:bg-gold-hover text-cream px-5 py-3 rounded-lg transition-all shadow-lg active:scale-95 flex items-center justify-center gap-2 font-semibold text-body min-h-[48px]"
-      aria-label={`เพิ่ม ${product.name} ลงตะกร้า`}
+      aria-label={`${t("product.addToCart")} ${product.name}`}
     >
       <ShoppingBag size={22} />
-      <span>ใส่ตะกร้า</span>
+      <span>{t("product.addToCart")}</span>
     </button>
   );
 }

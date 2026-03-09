@@ -1,8 +1,13 @@
+"use client";
+
 import React from "react";
 import Link from "next/link";
 import { Hammer, Heart, TreeDeciduous, Clock } from "lucide-react";
+import { useLocale } from "@/app/context/LocaleContext";
 
 export default function AboutPage() {
+  const { t } = useLocale();
+
   return (
     <main className="w-full min-h-screen bg-cream text-text-main">
 
@@ -16,13 +21,13 @@ export default function AboutPage() {
         />
         <div className="relative z-10 text-center px-6 max-w-4xl mx-auto py-16">
           <p className="text-gold-soft text-body font-semibold mb-3 tracking-[0.2em] uppercase">
-            ตั้งแต่ปี พ.ศ. 2538 / Since 1995
+            {t("about.since")}
           </p>
           <h1 className="text-h1 md:text-display font-serif text-cream mb-6">
-            เรื่องราวของเรา
+            {t("about.heroTitle")}
           </h1>
           <p className="text-body-lg text-cream/80 max-w-2xl mx-auto">
-            Our Story — เราไม่ได้แค่ขายเฟอร์นิเจอร์ เราอนุรักษ์เรื่องราวที่สลักไว้ในเนื้อไม้
+            {t("about.heroSub")}
           </p>
         </div>
       </section>
@@ -31,15 +36,11 @@ export default function AboutPage() {
       <section className="py-20 px-6 max-w-6xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
           <div>
-            <h2 className="text-h2 font-serif text-teak-dark mb-6">มากกว่าแค่ไม้สัก</h2>
-            <p className="text-body text-text-muted mb-2">More Than Just Wood</p>
+            <h2 className="text-h2 font-serif text-teak-dark mb-6">{t("about.missionTitle")}</h2>
+            <p className="text-body text-text-muted mb-2">{t("about.missionSub")}</p>
             <div className="h-1 w-20 bg-gold mb-8" />
-            <p className="text-body text-text-main leading-relaxed mb-6">
-              ที่ <span className="font-bold text-teak-dark">ร้านเดชแกะสลัก</span> เราเชื่อว่าไม้ทุกชิ้นมีจิตวิญญาณ ไม่ว่าจะเป็นตู้ไม้สักเก่า หรืองานแกะสลักด้วยมือ แต่ละชิ้นล้วนบอกเล่าเรื่องราวของช่างฝีมือที่สร้างสรรค์มันขึ้นมา
-            </p>
-            <p className="text-body text-text-main leading-relaxed">
-              At <span className="font-bold text-teak-dark">Dej Carving Shop</span>, we believe every piece of timber has a soul. Based in Chiang Mai&#39;s artisanal community, our mission is to find hidden treasures, restore them, and find them a new home.
-            </p>
+            <p className="text-body text-text-main leading-relaxed mb-6">{t("about.missionP1")}</p>
+            <p className="text-body text-text-main leading-relaxed">{t("about.missionP2")}</p>
           </div>
           <div className="grid grid-cols-2 gap-4">
             <img
@@ -60,16 +61,16 @@ export default function AboutPage() {
       <section className="py-20 bg-teak-dark text-cream">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
-            <h2 className="text-h2 font-serif text-gold-soft">ทำไมเราถึงรักงานนี้</h2>
-            <p className="text-body text-cream/60 mt-2">Why We Do What We Do</p>
+            <h2 className="text-h2 font-serif text-gold-soft">{t("about.valuesTitle")}</h2>
+            <p className="text-body text-cream/60 mt-2">{t("about.valuesSub")}</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 text-center">
             {[
-              { icon: <Hammer size={32} />, title: "ฝีมือช่าง", sub: "Craftsmanship", desc: "สืบสานทักษะช่างล้านนาดั้งเดิม" },
-              { icon: <Clock size={32} />, title: "ความเป็นอมตะ", sub: "Timelessness", desc: "คุณภาพที่ทนทานผ่านกาลเวลา" },
-              { icon: <TreeDeciduous size={32} />, title: "ยั่งยืน", sub: "Sustainability", desc: "ให้ชีวิตใหม่แก่ไม้เก่าอันทรงคุณค่า" },
-              { icon: <Heart size={32} />, title: "ความหลงใหล", sub: "Passion", desc: "ทุกชิ้นคัดสรรมาด้วยใจรัก" },
+              { icon: <Hammer size={32} />, title: t("about.craftsmanship"), sub: t("about.craftsmanshipSub"), desc: t("about.craftsmanshipDesc") },
+              { icon: <Clock size={32} />, title: t("about.timelessness"), sub: t("about.timelessnessSub"), desc: t("about.timelessnessDesc") },
+              { icon: <TreeDeciduous size={32} />, title: t("about.sustainability"), sub: t("about.sustainabilitySub"), desc: t("about.sustainabilityDesc") },
+              { icon: <Heart size={32} />, title: t("about.passion"), sub: t("about.passionSub"), desc: t("about.passionDesc") },
             ].map((v) => (
               <div key={v.sub} className="p-6 border border-gold-soft/20 rounded-xl bg-teak-light/20 hover:bg-teak-light/30 transition-colors">
                 <div className="w-16 h-16 bg-gold/10 rounded-full flex items-center justify-center mx-auto mb-4 text-gold-soft">
@@ -88,10 +89,10 @@ export default function AboutPage() {
       <section className="py-20 border-b border-gold-soft/20">
         <div className="max-w-6xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
           {[
-            { num: "30+", label: "ปีประสบการณ์ / Years" },
-            { num: "500+", label: "ชิ้นงาน / Items Crafted" },
-            { num: "100%", label: "ไม้สักแท้ / Authentic" },
-            { num: "เชียงใหม่", label: "บ้านถวาย / Ban Tawai" },
+            { num: "30+", label: t("about.statYears") },
+            { num: "500+", label: t("about.statItems") },
+            { num: "100%", label: t("about.statAuthentic") },
+            { num: t("common.banTawai"), label: t("about.statLocation") },
           ].map((s) => (
             <div key={s.label}>
               <h3 className="text-h2 font-serif font-bold text-teak-dark mb-2">{s.num}</h3>
@@ -103,18 +104,18 @@ export default function AboutPage() {
 
       {/* CTA */}
       <section className="py-20 text-center px-6 bg-cream-alt">
-        <h2 className="text-h2 font-serif text-teak-dark mb-6">ค้นหาชิ้นงานที่ใช่</h2>
+        <h2 className="text-h2 font-serif text-teak-dark mb-6">{t("about.ctaTitle")}</h2>
         <p className="text-body-lg text-text-muted mb-8 max-w-2xl mx-auto">
-          สินค้าของเราเปลี่ยนทุกสัปดาห์ แวะมาเยี่ยมชมที่บ้านถวาย หรือดูออนไลน์ได้เลย
+          {t("about.ctaP1")}
         </p>
         <p className="text-body text-text-muted mb-8">
-          Our collection changes weekly — visit us at Ban Tawai or browse online.
+          {t("about.ctaP2")}
         </p>
         <Link
           href="/products"
           className="inline-block bg-gold hover:bg-gold-hover text-cream text-body-lg font-bold py-4 px-10 rounded-lg shadow-xl transition-all active:scale-95 min-h-[56px]"
         >
-          ดูสินค้าทั้งหมด / Browse Collection
+          {t("home.browseCollection")}
         </Link>
       </section>
     </main>

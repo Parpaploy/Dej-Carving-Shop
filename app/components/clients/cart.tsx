@@ -3,10 +3,12 @@
 import React from "react";
 import Link from "next/link";
 import { useCart } from "../../context/CartContext";
+import { useLocale } from "@/app/context/LocaleContext";
 import { Trash2, Plus, Minus, ArrowLeft, CreditCard, ShoppingBag } from "lucide-react";
 
 export default function CartClient() {
   const { cart, updateQuantity, removeFromCart, cartTotal } = useCart();
+  const { t } = useLocale();
 
   if (cart.length === 0) {
     return (
@@ -14,16 +16,15 @@ export default function CartClient() {
         <div className="bg-cream-alt p-8 rounded-full mb-6">
           <ShoppingBag size={64} className="text-text-muted" />
         </div>
-        <h1 className="text-h2 font-serif text-teak-dark mb-4 font-bold">ตะกร้าว่างเปล่า</h1>
-        <p className="text-body-lg text-text-muted mb-2">Your Cart is Empty</p>
+        <h1 className="text-h2 font-serif text-teak-dark mb-4 font-bold">{t("cart.empty")}</h1>
         <p className="text-body text-text-muted mb-8 max-w-md">
-          ยังไม่มีสินค้าในตะกร้า เลือกซื้อสินค้าได้เลย
+          {t("cart.emptyMessage")}
         </p>
         <Link
           href="/products"
           className="bg-gold text-cream text-body-lg font-bold py-4 px-10 rounded-lg shadow-lg hover:bg-gold-hover transition-colors min-h-[56px]"
         >
-          เลือกซื้อสินค้า / Start Shopping
+          {t("cart.startShopping")}
         </Link>
       </main>
     );
@@ -39,8 +40,8 @@ export default function CartClient() {
             <ArrowLeft size={32} className="text-teak-dark" />
           </Link>
           <div>
-            <h1 className="text-h2 font-serif text-teak-dark font-bold">ตะกร้าสินค้า</h1>
-            <p className="text-body text-text-muted">Shopping Cart — {cart.length} รายการ</p>
+            <h1 className="text-h2 font-serif text-teak-dark font-bold">{t("cart.title")}</h1>
+            <p className="text-body text-text-muted">{t("cart.subtitle")} — {cart.length} {t("common.items")}</p>
           </div>
         </div>
 
@@ -65,7 +66,7 @@ export default function CartClient() {
                   <button
                     onClick={() => updateQuantity(item.id, item.quantity - 1)}
                     className="w-12 h-12 flex items-center justify-center bg-card rounded-lg shadow text-teak-dark hover:bg-gold hover:text-cream active:scale-95 transition-all"
-                    aria-label="ลดจำนวน"
+                    aria-label={t("cart.decreaseQty")}
                   >
                     <Minus size={22} />
                   </button>
@@ -73,7 +74,7 @@ export default function CartClient() {
                   <button
                     onClick={() => updateQuantity(item.id, item.quantity + 1)}
                     className="w-12 h-12 flex items-center justify-center bg-card rounded-lg shadow text-teak-dark hover:bg-gold hover:text-cream active:scale-95 transition-all"
-                    aria-label="เพิ่มจำนวน"
+                    aria-label={t("cart.increaseQty")}
                   >
                     <Plus size={22} />
                   </button>
@@ -83,10 +84,10 @@ export default function CartClient() {
                 <button
                   onClick={() => removeFromCart(item.id)}
                   className="flex items-center gap-2 text-price hover:bg-red-50 px-4 py-2 rounded-lg transition-colors font-semibold"
-                  aria-label={`ลบ ${item.name}`}
+                  aria-label={`${t("cart.remove")} ${item.name}`}
                 >
                   <Trash2 size={22} />
-                  <span className="text-body">ลบ</span>
+                  <span className="text-body">{t("cart.remove")}</span>
                 </button>
               </div>
             ))}
@@ -95,21 +96,20 @@ export default function CartClient() {
           {/* ORDER SUMMARY */}
           <div className="lg:w-[380px] flex-shrink-0">
             <div className="bg-card p-6 rounded-xl shadow-lg border-t-4 border-gold sticky top-24">
-              <h2 className="text-h4 font-serif text-teak-dark font-bold mb-6">สรุปคำสั่งซื้อ</h2>
-              <p className="text-sm text-text-muted mb-4">Order Summary</p>
+              <h2 className="text-h4 font-serif text-teak-dark font-bold mb-6">{t("cart.orderSummary")}</h2>
 
               <div className="space-y-3 text-body text-text-muted">
                 <div className="flex justify-between">
-                  <span>รวมสินค้า / Subtotal</span>
+                  <span>{t("cart.subtotal")}</span>
                   <span className="text-text-main font-semibold">฿{cartTotal.toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>ค่าส่ง / Shipping</span>
-                  <span className="text-[#2D6A4F] font-bold">ฟรี / Free</span>
+                  <span>{t("cart.shipping")}</span>
+                  <span className="text-[#2D6A4F] font-bold">{t("common.free")}</span>
                 </div>
                 <div className="h-px bg-cream-alt my-4" />
                 <div className="flex justify-between text-h4 font-bold text-teak-dark">
-                  <span>รวมทั้งหมด</span>
+                  <span>{t("cart.total")}</span>
                   <span className="text-price">฿{cartTotal.toLocaleString()}</span>
                 </div>
               </div>
@@ -119,9 +119,8 @@ export default function CartClient() {
                 className="w-full mt-8 bg-teak text-cream text-body-lg font-bold py-4 rounded-lg hover:bg-teak-dark shadow-xl flex items-center justify-center gap-3 transition-all active:scale-95 min-h-[56px]"
               >
                 <CreditCard size={24} />
-                ดำเนินการสั่งซื้อ
+                {t("cart.checkout")}
               </Link>
-              <p className="text-center text-sm text-text-muted mt-2">Proceed to Checkout</p>
             </div>
           </div>
         </div>

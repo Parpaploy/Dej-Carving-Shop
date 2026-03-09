@@ -5,6 +5,7 @@ import Link from "next/link";
 import { IProduct } from "@/app/interfaces/product.interface";
 import AddToCartButton from "../ui/AddToCartButton";
 import { ArrowLeft } from "lucide-react";
+import { useLocale } from "@/app/context/LocaleContext";
 
 const getImageUrl = (url: string | undefined) => {
   if (!url) return "https://placehold.co/400x400/png?text=No+Image";
@@ -13,6 +14,8 @@ const getImageUrl = (url: string | undefined) => {
 };
 
 export default function ProductsClient({ products }: { products: IProduct[] }) {
+  const { t } = useLocale();
+
   return (
     <main className="w-full min-h-screen bg-cream py-12 px-4">
       <div className="max-w-7xl mx-auto">
@@ -20,15 +23,15 @@ export default function ProductsClient({ products }: { products: IProduct[] }) {
         {/* PAGE HEADER */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12 border-b border-gold-soft/30 pb-6">
           <div className="flex items-center gap-4">
-            <Link href="/" className="p-2 hover:bg-cream-alt rounded-full transition-colors" aria-label="กลับหน้าแรก">
+            <Link href="/" className="p-2 hover:bg-cream-alt rounded-full transition-colors" aria-label={t("products.backToHome")}>
               <ArrowLeft size={32} className="text-teak-dark" />
             </Link>
             <div>
-              <h1 className="text-h2 font-serif text-teak-dark font-bold">สินค้าทั้งหมด</h1>
-              <p className="text-text-muted mt-1 text-body">All Products — Browse our collection</p>
+              <h1 className="text-h2 font-serif text-teak-dark font-bold">{t("products.title")}</h1>
+              <p className="text-text-muted mt-1 text-body">{t("products.subtitle")}</p>
             </div>
           </div>
-          <p className="text-body text-text-muted">{products.length} รายการ</p>
+          <p className="text-body text-text-muted">{products.length} {t("common.items")}</p>
         </div>
 
         {/* PRODUCTS GRID */}

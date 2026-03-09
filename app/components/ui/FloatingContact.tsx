@@ -3,9 +3,11 @@
 import { useState } from "react";
 import { Phone, MessageCircle, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useLocale } from "@/app/context/LocaleContext";
 
 export default function FloatingContact() {
   const [isOpen, setIsOpen] = useState(false);
+  const { t } = useLocale();
 
   return (
     <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3">
@@ -18,20 +20,20 @@ export default function FloatingContact() {
             className="bg-card rounded-xl shadow-2xl border border-gold-soft/40 p-5 mb-2 w-64"
           >
             <p className="font-serif text-lg text-teak-dark font-bold mb-3">
-              ติดต่อเรา / Contact
+              {t("float.contactTitle")}
             </p>
 
             {/* Phone */}
             <a
-              href="tel:08XXXXXXXX"
+              href="tel:092-3640013"
               className="flex items-center gap-3 text-text-main hover:text-gold transition-colors py-2"
             >
               <div className="w-10 h-10 bg-gold/10 rounded-full flex items-center justify-center flex-shrink-0">
                 <Phone size={20} className="text-gold" />
               </div>
               <div>
-                <p className="font-semibold">โทรหาเรา</p>
-                <p className="text-sm text-text-muted">08X-XXX-XXXX</p>
+                <p className="font-semibold">{t("float.callUs")}</p>
+                <p className="text-sm text-text-muted">{t("common.phone")}</p>
               </div>
             </a>
 

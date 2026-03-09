@@ -27,9 +27,9 @@ const config: Config = {
         price: "#8B2500",
       },
       fontFamily: {
-        serif: ["var(--font-playfair)", "serif"],
-        sans: ["var(--font-sarabun)", "sans-serif"],
-        pattaya: ["var(--font-pattaya)", "sans-serif"],
+        serif: ["var(--font-castoro)", "serif"],
+        sans: ["var(--font-ibm-plex)", "sans-serif"],
+        castoro: ["var(--font-castoro)", "serif"],
       },
       fontSize: {
         // Accessible size scale

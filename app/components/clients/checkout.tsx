@@ -18,12 +18,14 @@ import {
 } from "lucide-react";
 import { useCart } from "../../context/CartContext";
 import { useAuth } from "../../context/AuthContext";
+import { useLocale } from "@/app/context/LocaleContext";
 import { toast } from "sonner";
 
 export default function CheckoutClient() {
   const router = useRouter();
   const { cart, cartTotal, clearCart } = useCart();
   const { user } = useAuth();
+  const { t } = useLocale();
 
   const [recipientName, setRecipientName] = useState("");
   const [phone, setPhone] = useState("");
@@ -37,7 +39,7 @@ export default function CheckoutClient() {
   React.useEffect(() => {
     const token = localStorage.getItem("jwt");
     if (!token) {
-      toast.error("กรุณาเข้าสู่ระบบก่อนสั่งซื้อ / Please log in first");
+      toast.error(t("toast.pleaseLogin"));
       router.push("/login");
     }
   }, [router]);
@@ -64,7 +66,7 @@ export default function CheckoutClient() {
 
     const jwt = localStorage.getItem("jwt");
     if (!jwt) {
-      toast.error("กรุณาเข้าสู่ระบบ / Please log in");
+      toast.error(t("toast.pleaseLogin"));
       router.push("/login");
       return;
     }
@@ -96,10 +98,10 @@ export default function CheckoutClient() {
       setOrderNumber(newOrderNumber);
       setOrderComplete(true);
       clearCart();
-      toast.success("สั่งซื้อสำเร็จ! / Order placed successfully!");
+      toast.success(t("toast.orderSuccess"));
     } catch (err) {
       console.error("Order failed:", err);
-      toast.error("สั่งซื้อไม่สำเร็จ กรุณาลองอีกครั้ง / Order failed, please try again.");
+      toast.error(t("toast.orderFailed"));
     } finally {
       setIsSubmitting(false);
     }
@@ -107,7 +109,7 @@ export default function CheckoutClient() {
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
-    toast.success("คัดลอกแล้ว / Copied!");
+    toast.success(t("toast.copied"));
   };
 
   // === ORDER COMPLETE STATE ===
@@ -118,12 +120,11 @@ export default function CheckoutClient() {
           <div className="bg-card rounded-xl shadow-lg p-8 border-t-4 border-[#2D6A4F] text-center">
             <CheckCircle size={64} className="text-[#2D6A4F] mx-auto mb-4" />
             <h1 className="text-h3 font-serif text-teak-dark font-bold mb-2">
-              สั่งซื้อสำเร็จ!
+              {t("checkout.success")}
             </h1>
-            <p className="text-body text-text-muted mb-6">Order Placed Successfully</p>
 
             <div className="bg-cream rounded-lg p-4 mb-6">
-              <p className="text-sm text-text-muted mb-1">หมายเลขคำสั่งซื้อ / Order Number</p>
+              <p className="text-sm text-text-muted mb-1">{t("checkout.orderNumber")}</p>
               <div className="flex items-center justify-center gap-2">
                 <p className="text-h4 font-bold text-teak-dark">{orderNumber}</p>
                 <button onClick={() => copyToClipboard(orderNumber)} className="text-gold hover:text-gold-hover p-1" aria-label="Copy">
@@ -135,31 +136,31 @@ export default function CheckoutClient() {
             {/* Payment Instructions */}
             <div className="bg-cream-alt rounded-lg p-6 text-left mb-6">
               <h3 className="text-body font-bold text-teak-dark mb-3">
-                {paymentMethod === "bank_transfer" ? "ข้อมูลโอนเงิน / Bank Transfer Details" : "PromptPay"}
+                {paymentMethod === "bank_transfer" ? t("checkout.bankDetails") : "PromptPay"}
               </h3>
 
               {paymentMethod === "bank_transfer" ? (
                 <div className="space-y-2 text-body text-text-main">
-                  <p><span className="text-text-muted">ธนาคาร:</span> กสิกรไทย (KBank)</p>
+                  <p><span className="text-text-muted">{t("checkout.bankLabel")}</span> {t("checkout.bankName")}</p>
                   <div className="flex items-center gap-2">
-                    <span className="text-text-muted">เลขบัญชี:</span>
+                    <span className="text-text-muted">{t("checkout.accountNumberLabel")}</span>
                     <span className="font-bold">XXX-X-XXXXX-X</span>
                     <button onClick={() => copyToClipboard("XXX-X-XXXXX-X")} className="text-gold hover:text-gold-hover p-1"><Copy size={16} /></button>
                   </div>
-                  <p><span className="text-text-muted">ชื่อบัญชี:</span> ร้านเดชแกะสลัก</p>
-                  <p className="font-bold text-price mt-2">ยอดโอน: ฿{cartTotal > 0 ? cartTotal.toLocaleString() : orderNumber ? "ดูในอีเมล" : "0"}</p>
+                  <p><span className="text-text-muted">{t("checkout.accountNameLabel")}</span> {t("common.shopName")}</p>
+                  <p className="font-bold text-price mt-2">{t("checkout.transferAmount")} ฿{cartTotal > 0 ? cartTotal.toLocaleString() : orderNumber ? t("checkout.seeEmail") : "0"}</p>
                 </div>
               ) : (
                 <div className="text-center">
                   <div className="bg-white w-48 h-48 mx-auto rounded-lg border border-cream-alt flex items-center justify-center mb-3">
                     <QrCode size={80} className="text-text-muted" />
                   </div>
-                  <p className="text-sm text-text-muted">สแกน QR PromptPay เพื่อชำระเงิน</p>
+                  <p className="text-sm text-text-muted">{t("checkout.scanPromptpay")}</p>
                 </div>
               )}
 
               <p className="text-sm text-text-muted mt-4 border-t border-cream pt-3">
-                กรุณาโอนภายใน 24 ชม. แล้วแจ้งสลิปทาง LINE: @dejcarving
+                {t("checkout.payWithin24h")}
               </p>
             </div>
 
@@ -168,13 +169,13 @@ export default function CheckoutClient() {
                 href="/products"
                 className="flex-1 bg-gold text-cream py-3 rounded-lg font-bold text-center hover:bg-gold-hover transition-colors min-h-[48px] flex items-center justify-center"
               >
-                เลือกซื้อต่อ / Continue Shopping
+                {t("checkout.continueShopping")}
               </Link>
               <Link
                 href="/profile"
                 className="flex-1 border-2 border-teak text-teak py-3 rounded-lg font-bold text-center hover:bg-teak hover:text-cream transition-colors min-h-[48px] flex items-center justify-center"
               >
-                ดูคำสั่งซื้อ / My Orders
+                {t("checkout.myOrders")}
               </Link>
             </div>
           </div>
@@ -190,12 +191,11 @@ export default function CheckoutClient() {
 
         {/* HEADER */}
         <div className="flex items-center gap-4 mb-8">
-          <Link href="/cart" className="p-2 hover:bg-cream-alt rounded-full transition-colors" aria-label="กลับ">
+          <Link href="/cart" className="p-2 hover:bg-cream-alt rounded-full transition-colors" aria-label={t("common.back")}>
             <ArrowLeft size={28} className="text-teak-dark" />
           </Link>
           <div>
-            <h1 className="text-h3 font-serif text-teak-dark font-bold">ชำระเงิน</h1>
-            <p className="text-sm text-text-muted">Checkout</p>
+            <h1 className="text-h3 font-serif text-teak-dark font-bold">{t("checkout.title")}</h1>
           </div>
         </div>
 
@@ -207,16 +207,15 @@ export default function CheckoutClient() {
 
               {/* SHIPPING INFO */}
               <div className="bg-card rounded-xl shadow-md p-6 border border-gold-soft/20">
-                <h2 className="text-h5 font-serif text-teak-dark font-bold mb-1 flex items-center gap-2">
+                <h2 className="text-h5 font-serif text-teak-dark font-bold mb-5 flex items-center gap-2">
                   <Truck size={22} className="text-gold" />
-                  ข้อมูลจัดส่ง
+                  {t("checkout.shippingInfo")}
                 </h2>
-                <p className="text-sm text-text-muted mb-5">Shipping Information</p>
 
                 <div className="space-y-4">
                   <div>
                     <label htmlFor="recipientName" className="text-body font-bold text-teak-dark flex items-center gap-2 mb-1">
-                      <User size={18} className="text-gold" /> ชื่อผู้รับ / Recipient
+                      <User size={18} className="text-gold" /> {t("checkout.recipientName")}
                     </label>
                     <input
                       id="recipientName"
@@ -224,14 +223,14 @@ export default function CheckoutClient() {
                       required
                       value={recipientName}
                       onChange={(e) => setRecipientName(e.target.value)}
-                      placeholder="ชื่อ-สกุล ผู้รับสินค้า"
+                      placeholder={t("checkout.recipientPlaceholder")}
                       className="w-full py-3 px-4 text-body border-2 border-cream-alt rounded-lg focus:border-gold focus:ring-1 focus:ring-gold outline-none bg-cream text-text-main"
                     />
                   </div>
 
                   <div>
                     <label htmlFor="phone" className="text-body font-bold text-teak-dark flex items-center gap-2 mb-1">
-                      <Phone size={18} className="text-gold" /> เบอร์โทร / Phone
+                      <Phone size={18} className="text-gold" /> {t("checkout.phone")}
                     </label>
                     <input
                       id="phone"
@@ -246,7 +245,7 @@ export default function CheckoutClient() {
 
                   <div>
                     <label htmlFor="address" className="text-body font-bold text-teak-dark flex items-center gap-2 mb-1">
-                      <MapPin size={18} className="text-gold" /> ที่อยู่จัดส่ง / Address
+                      <MapPin size={18} className="text-gold" /> {t("checkout.address")}
                     </label>
                     <textarea
                       id="address"
@@ -254,7 +253,7 @@ export default function CheckoutClient() {
                       rows={3}
                       value={shippingAddress}
                       onChange={(e) => setShippingAddress(e.target.value)}
-                      placeholder="บ้านเลขที่ ซอย ถนน ตำบล อำเภอ จังหวัด รหัสไปรษณีย์"
+                      placeholder={t("checkout.addressPlaceholder")}
                       className="w-full py-3 px-4 text-body border-2 border-cream-alt rounded-lg focus:border-gold focus:ring-1 focus:ring-gold outline-none bg-cream text-text-main"
                     />
                   </div>
@@ -263,11 +262,10 @@ export default function CheckoutClient() {
 
               {/* PAYMENT METHOD */}
               <div className="bg-card rounded-xl shadow-md p-6 border border-gold-soft/20">
-                <h2 className="text-h5 font-serif text-teak-dark font-bold mb-1 flex items-center gap-2">
+                <h2 className="text-h5 font-serif text-teak-dark font-bold mb-5 flex items-center gap-2">
                   <CreditCard size={22} className="text-gold" />
-                  วิธีชำระเงิน
+                  {t("checkout.paymentMethod")}
                 </h2>
-                <p className="text-sm text-text-muted mb-5">Payment Method</p>
 
                 <div className="space-y-3">
                   <label
@@ -287,8 +285,8 @@ export default function CheckoutClient() {
                     />
                     <Banknote size={24} className="text-teak flex-shrink-0" />
                     <div>
-                      <p className="font-bold text-teak-dark">โอนเงิน</p>
-                      <p className="text-sm text-text-muted">Bank Transfer</p>
+                      <p className="font-bold text-teak-dark">{t("checkout.bankTransfer")}</p>
+                      <p className="text-sm text-text-muted">{t("checkout.bankTransferSub")}</p>
                     </div>
                   </label>
 
@@ -309,8 +307,8 @@ export default function CheckoutClient() {
                     />
                     <QrCode size={24} className="text-teak flex-shrink-0" />
                     <div>
-                      <p className="font-bold text-teak-dark">พร้อมเพย์</p>
-                      <p className="text-sm text-text-muted">PromptPay QR</p>
+                      <p className="font-bold text-teak-dark">{t("checkout.promptpay")}</p>
+                      <p className="text-sm text-text-muted">{t("checkout.promptpaySub")}</p>
                     </div>
                   </label>
                 </div>
@@ -320,8 +318,7 @@ export default function CheckoutClient() {
             {/* RIGHT: ORDER SUMMARY */}
             <div className="lg:w-[360px] flex-shrink-0">
               <div className="bg-card rounded-xl shadow-lg p-6 border-t-4 border-gold sticky top-24">
-                <h2 className="text-h5 font-serif text-teak-dark font-bold mb-4">สรุปคำสั่งซื้อ</h2>
-                <p className="text-sm text-text-muted mb-4">Order Summary</p>
+                <h2 className="text-h5 font-serif text-teak-dark font-bold mb-4">{t("checkout.orderSummary")}</h2>
 
                 {/* Items */}
                 <div className="space-y-3 mb-4 max-h-[300px] overflow-y-auto">
@@ -343,16 +340,16 @@ export default function CheckoutClient() {
 
                 <div className="border-t border-cream-alt pt-4 space-y-2 text-body">
                   <div className="flex justify-between text-text-muted">
-                    <span>รวมสินค้า</span>
+                    <span>{t("checkout.subtotal")}</span>
                     <span className="text-text-main">฿{cartTotal.toLocaleString()}</span>
                   </div>
                   <div className="flex justify-between text-text-muted">
-                    <span>ค่าส่ง</span>
-                    <span className="text-[#2D6A4F] font-bold">ฟรี</span>
+                    <span>{t("checkout.shippingCost")}</span>
+                    <span className="text-[#2D6A4F] font-bold">{t("common.free")}</span>
                   </div>
                   <div className="h-px bg-cream-alt my-2" />
                   <div className="flex justify-between text-h5 font-bold text-teak-dark">
-                    <span>รวมทั้งหมด</span>
+                    <span>{t("checkout.total")}</span>
                     <span className="text-price">฿{cartTotal.toLocaleString()}</span>
                   </div>
                 </div>
@@ -365,17 +362,17 @@ export default function CheckoutClient() {
                   }`}
                 >
                   {isSubmitting ? (
-                    "กำลังสั่งซื้อ..."
+                    t("checkout.placing")
                   ) : (
                     <>
                       <CreditCard size={22} />
-                      ยืนยันสั่งซื้อ / Place Order
+                      {t("checkout.placeOrder")}
                     </>
                   )}
                 </button>
 
                 <p className="text-center text-xs text-text-muted mt-3">
-                  เมื่อกดสั่งซื้อ จะแสดงข้อมูลการชำระเงิน
+                  {t("checkout.orderNote")}
                 </p>
               </div>
             </div>
