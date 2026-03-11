@@ -85,6 +85,45 @@ export default function AboutPage() {
         </div>
       </section>
 
+      {/* CRAFTSMAN PROCESS */}
+      <section className="py-24 bg-[#FDFBF7]">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="text-center mb-16">
+            <h2 className="text-h2 font-serif text-teak-dark mb-4">{t("craftsman.title")}</h2>
+            <p className="text-body text-text-muted">{t("craftsman.subtitle")}</p>
+            <div className="h-1 w-20 bg-gold mx-auto mt-6 rounded-full" />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            {[
+              { step: 1, icon: "🪵", titleKey: "craftsman.step1.title" as const, descKey: "craftsman.step1.desc" as const },
+              { step: 2, icon: "✏️", titleKey: "craftsman.step2.title" as const, descKey: "craftsman.step2.desc" as const },
+              { step: 3, icon: "🔨", titleKey: "craftsman.step3.title" as const, descKey: "craftsman.step3.desc" as const },
+              { step: 4, icon: "✨", titleKey: "craftsman.step4.title" as const, descKey: "craftsman.step4.desc" as const },
+            ].map((item, index) => (
+              <div key={item.step} className="relative text-center group">
+                {/* Connector line */}
+                {index < 3 && (
+                  <div className="hidden md:block absolute top-12 left-[60%] w-[80%] h-px bg-gold/20" />
+                )}
+                <div className="w-24 h-24 mx-auto rounded-full bg-white border-2 border-gold/20 flex items-center justify-center text-4xl mb-6 shadow-md group-hover:border-gold group-hover:shadow-lg transition-all duration-300 relative z-10">
+                  {item.icon}
+                </div>
+                <div className="w-8 h-8 mx-auto -mt-9 mb-3 rounded-full bg-gold text-white text-sm font-bold flex items-center justify-center relative z-20 shadow-sm">
+                  {item.step}
+                </div>
+                <h3 className="text-h5 font-serif font-bold text-teak-dark mb-3 mt-2">
+                  {t(item.titleKey)}
+                </h3>
+                <p className="text-text-muted text-sm leading-relaxed max-w-[250px] mx-auto">
+                  {t(item.descKey)}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* STATISTICS */}
       <section className="py-20 border-b border-gold-soft/20">
         <div className="max-w-6xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">

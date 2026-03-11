@@ -2,15 +2,11 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import axios from "axios";
 import { User, Mail, Lock, Eye, EyeOff, CheckCircle, AlertCircle } from "lucide-react";
-import { useAuth } from "../../context/AuthContext";
 import { useLocale } from "@/app/context/LocaleContext";
 
 export default function RegisterClient() {
-  const router = useRouter();
-  const { login } = useAuth();
   const { t } = useLocale();
 
   const [username, setUsername] = useState("");
@@ -21,6 +17,7 @@ export default function RegisterClient() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [registered, setRegistered] = useState(false);
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,13 +36,11 @@ export default function RegisterClient() {
     }
 
     try {
-      const response = await axios.post(
+      await axios.post(
         `${process.env.NEXT_PUBLIC_STRAPI_BASE_URL}/api/auth/local/register`,
         { username, email, password }
       );
-      const { jwt, user: userData } = response.data;
-      login(userData, jwt);
-      router.push("/");
+      setRegistered(true);
     } catch (err: unknown) {
       if (axios.isAxiosError(err)) {
         const strapiError = err.response?.data?.error?.message;
@@ -61,6 +56,38 @@ export default function RegisterClient() {
       setIsLoading(false);
     }
   };
+
+  // Success screen — check your email
+  if (registered) {
+    return (
+      <main className="w-full min-h-screen flex items-center justify-center bg-cream p-4 relative overflow-hidden">
+        <div className="absolute top-0 left-0 w-full h-1/2 bg-teak-dark z-0" />
+
+        <div className="relative z-10 w-full max-w-md bg-card rounded-xl shadow-2xl overflow-hidden border-t-4 border-gold">
+          <div className="p-10 text-center">
+            <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <Mail size={36} className="text-green-600" />
+            </div>
+            <h1 className="text-h3 font-serif text-teak-dark mb-3 font-bold">
+              {t("register.success")}
+            </h1>
+            <p className="text-body text-text-muted mb-4 leading-relaxed">
+              {t("register.checkEmail")}
+            </p>
+            <p className="text-sm text-text-muted/70 mb-8">
+              {t("register.checkSpam")}
+            </p>
+            <Link
+              href="/login"
+              className="inline-block bg-teak hover:bg-teak-dark text-cream text-body font-bold py-3 px-8 rounded-lg transition-colors"
+            >
+              {t("register.goToLogin")}
+            </Link>
+          </div>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="w-full min-h-screen flex items-center justify-center bg-cream p-4 relative overflow-hidden">

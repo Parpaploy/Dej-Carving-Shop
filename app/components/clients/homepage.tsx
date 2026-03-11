@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import axios from "axios";
-import { Truck, ShieldCheck, Phone, Award } from "lucide-react";
+import { Truck, ShieldCheck, Phone, Award, ArrowRight, Star, Quote } from "lucide-react";
+import { motion , Variants } from "framer-motion";
 import { useAuth } from "../../context/AuthContext";
 import { useLocale } from "@/app/context/LocaleContext";
 import AddToCartButton from "../ui/AddToCartButton";
@@ -16,6 +16,15 @@ const categories = [
   { id: 3, nameKey: "home.cat.carved" as const, subKey: "home.cat.carvedSub" as const, icon: "🪵" },
   { id: 4, nameKey: "home.cat.collectibles" as const, subKey: "home.cat.collectiblesSub" as const, icon: "🏺" },
 ];
+
+const fadeUpVariant: Variants = {
+  hidden: { opacity: 0, y: 30 },
+  visible: { 
+    opacity: 1, 
+    y: 0, 
+    transition: { duration: 0.6, ease: "easeOut" } 
+  },
+};
 
 export default function HomepageClient() {
   const { user } = useAuth();
@@ -63,69 +72,81 @@ export default function HomepageClient() {
   };
 
   return (
-    <main className="w-full min-h-screen bg-cream text-text-main">
-
+    <main className="w-full min-h-screen bg-[#FDFBF7] text-text-main">
+      
       {/* === HERO === */}
-      <section className="relative w-full min-h-[420px] bg-teak-light flex items-center justify-center overflow-hidden">
+      <section className="relative w-full min-h-[500px] md:min-h-[600px] bg-teak-dark flex items-center justify-center overflow-hidden">
         {heroImages.map((src, i) => (
           <div
             key={src}
-            className="absolute inset-0 transition-opacity duration-1000 ease-in-out"
-            style={{ opacity: i === currentSlide ? 1 : 0 }}
+            className="absolute inset-0 transition-all duration-1000 ease-in-out"
+            style={{ 
+              opacity: i === currentSlide ? 1 : 0,
+              transform: i === currentSlide ? "scale(1)" : "scale(1.05)"
+            }}
           >
             <img
               src={src}
-              alt=""
+              alt="Hero Background"
               className="w-full h-full object-cover"
             />
           </div>
         ))}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/40 to-teak-dark/70 z-[1]" />
-        <div className="relative z-[2] text-center px-6 max-w-4xl mx-auto py-20">
-          {user ? (
-            <div>
-              <p className="text-gold-soft text-body-lg font-semibold mb-2 tracking-widest uppercase">
-                {t("home.welcomeBack")}
-              </p>
-              <h1 className="text-h1 md:text-display font-serif text-cream mb-6 tracking-wide">
-                {user.username}
-              </h1>
-              <p className="text-body-lg text-cream/80 mb-8">
-                {t("home.newItemsForYou")}
-              </p>
-            </div>
-          ) : (
-            <>
-              <p className="text-gold-soft text-body font-semibold mb-4 tracking-widest uppercase">
-                {t("home.heroLocation")}
-              </p>
-              <h1 className="text-h1 md:text-display font-serif text-cream mb-4">
-                {t("home.teakCarvings")}
-              </h1>
-              <h2 className="text-h3 md:text-h2 font-serif text-gold-soft mb-6">
-                {t("common.shopName")}
-              </h2>
-              <p className="text-body-lg text-cream/80 mb-8 max-w-2xl mx-auto">
-                {t("home.heroTagline")}
-              </p>
-            </>
-          )}
-          <Link
-            href="/products"
-            className="inline-block bg-gold hover:bg-gold-hover text-cream text-body-lg font-bold py-4 px-10 rounded-lg transition-colors shadow-xl min-h-[56px]"
-          >
-            {t("home.browseCollection")}
-          </Link>
+        {/* Richer Gradient Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/30 to-teak-dark/90 z-[1]" />
+        
+        <div className="relative z-[2] text-center px-6 max-w-4xl mx-auto py-20 mt-10">
+          <motion.div initial="hidden" animate="visible" variants={fadeUpVariant}>
+            {user ? (
+              <div>
+                <p className="text-gold-soft text-sm md:text-base font-bold mb-3 tracking-[0.2em] uppercase">
+                  {t("home.welcomeBack")}
+                </p>
+                <h1 className="text-4xl md:text-6xl font-serif text-cream/90 mb-6 tracking-wide drop-shadow-md">
+                  {user.username}
+                </h1>
+                <p className="text-lg md:text-xl text-cream/90 mb-10 font-light">
+                  {t("home.newItemsForYou")}
+                </p>
+              </div>
+            ) : (
+              <>
+                <p className="text-gold-soft text-sm md:text-base font-bold mb-4 tracking-[0.2em] uppercase flex items-center justify-center gap-2">
+                  <span className="w-8 h-[1px] bg-gold-soft/50"></span>
+                  {t("home.heroLocation")}
+                  <span className="w-8 h-[1px] bg-gold-soft/50"></span>
+                </p>
+                <h1 className="text-4xl md:text-6xl font-serif text-white mb-4 drop-shadow-lg leading-tight">
+                  {t("home.teakCarvings")}
+                </h1>
+                <h2 className="text-2xl md:text-4xl font-serif text-gold-soft mb-6 drop-shadow-md">
+                  {t("common.shopName")}
+                </h2>
+                <p className="text-lg md:text-xl text-cream/90 mb-10 max-w-2xl mx-auto font-light leading-relaxed">
+                  {t("home.heroTagline")}
+                </p>
+              </>
+            )}
+            <Link
+              href="/products"
+              className="inline-flex items-center justify-center gap-3 bg-gold hover:bg-white text-teak-dark text-lg font-bold py-4 px-10 rounded-full transition-all duration-300 shadow-[0_8px_30px_rgb(218,165,32,0.3)] hover:shadow-[0_8px_30px_rgb(255,255,255,0.4)] hover:-translate-y-1 group"
+            >
+              {t("home.browseCollection")}
+              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            </Link>
+          </motion.div>
+
+          {/* Dots Indicator */}
           {heroImages.length > 1 && (
-            <div className="flex justify-center gap-2 mt-6">
+            <div className="flex justify-center gap-3 mt-12">
               {heroImages.map((_, i) => (
                 <button
                   key={i}
                   onClick={() => setCurrentSlide(i)}
-                  className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
+                  className={`h-2 rounded-full transition-all duration-500 ${
                     i === currentSlide
-                      ? "bg-gold-soft w-6"
-                      : "bg-cream/50 hover:bg-cream/80"
+                      ? "bg-gold w-8"
+                      : "bg-white/40 w-2 hover:bg-white/70"
                   }`}
                   aria-label={`Slide ${i + 1}`}
                 />
@@ -136,118 +157,183 @@ export default function HomepageClient() {
       </section>
 
       {/* === TRUST BADGES === */}
-      <section className="py-12 bg-cream-alt border-b border-gold-soft/30">
-        <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-          <div className="flex flex-col items-center">
-            <Award className="w-14 h-14 text-teak mb-3" />
-            <h3 className="text-h5 font-serif font-bold text-teak-dark">{t("home.since1995")}</h3>
-            <p className="text-body text-text-muted">{t("home.since1995sub")}</p>
-          </div>
-          <div className="flex flex-col items-center">
-            <ShieldCheck className="w-14 h-14 text-teak mb-3" />
-            <h3 className="text-h5 font-serif font-bold text-teak-dark">{t("home.authentic100")}</h3>
-            <p className="text-body text-text-muted">{t("home.authentic100sub")}</p>
-          </div>
-          <div className="flex flex-col items-center">
-            <Truck className="w-14 h-14 text-teak mb-3" />
-            <h3 className="text-h5 font-serif font-bold text-teak-dark">{t("home.safeShipping")}</h3>
-            <p className="text-body text-text-muted">{t("home.safeShippingSub")}</p>
-          </div>
+      <section className="py-16 bg-white border-b border-cream-alt shadow-sm relative z-10 -mt-6 mx-4 md:mx-auto max-w-6xl rounded-2xl">
+        <div className="px-6 grid grid-cols-1 md:grid-cols-3 gap-10 text-center divide-y md:divide-y-0 md:divide-x divide-cream-alt">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUpVariant} className="flex flex-col items-center pt-6 md:pt-0 px-4">
+            <div className="w-16 h-16 rounded-full bg-gold/10 flex items-center justify-center mb-5 text-teak">
+              <Award className="w-8 h-8" />
+            </div>
+            <h3 className="text-xl font-serif font-bold text-teak-dark mb-2">{t("home.since1995")}</h3>
+            <p className="text-text-muted leading-relaxed">{t("home.since1995sub")}</p>
+          </motion.div>
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUpVariant} className="flex flex-col items-center pt-6 md:pt-0 px-4">
+            <div className="w-16 h-16 rounded-full bg-gold/10 flex items-center justify-center mb-5 text-teak">
+              <ShieldCheck className="w-8 h-8" />
+            </div>
+            <h3 className="text-xl font-serif font-bold text-teak-dark mb-2">{t("home.authentic100")}</h3>
+            <p className="text-text-muted leading-relaxed">{t("home.authentic100sub")}</p>
+          </motion.div>
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUpVariant} className="flex flex-col items-center pt-6 md:pt-0 px-4">
+            <div className="w-16 h-16 rounded-full bg-gold/10 flex items-center justify-center mb-5 text-teak">
+              <Truck className="w-8 h-8" />
+            </div>
+            <h3 className="text-xl font-serif font-bold text-teak-dark mb-2">{t("home.safeShipping")}</h3>
+            <p className="text-text-muted leading-relaxed">{t("home.safeShippingSub")}</p>
+          </motion.div>
         </div>
       </section>
 
       {/* === CATEGORIES === */}
-      <section className="py-20 max-w-7xl mx-auto px-6">
-        <div className="text-center mb-12">
-          <h2 className="text-h2 font-serif text-teak-dark mb-2">{t("home.categories")}</h2>
-          <p className="text-body text-text-muted">{t("home.categoriesSub")}</p>
-          <div className="h-1 w-24 bg-gold mx-auto mt-4" />
+      <section className="py-24 max-w-7xl mx-auto px-6">
+        <div className="text-center mb-16">
+          <motion.h2 initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUpVariant} className="text-3xl md:text-4xl font-serif text-teak-dark mb-4">
+            {t("home.categories")}
+          </motion.h2>
+          <motion.p initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUpVariant} className="text-text-muted max-w-2xl mx-auto text-lg">
+            {t("home.categoriesSub")}
+          </motion.p>
+          <div className="h-1 w-20 bg-gold mx-auto mt-6 rounded-full" />
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-          {categories.map((cat) => (
-            <Link
+        
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {categories.map((cat, index) => (
+            <motion.div
               key={cat.id}
-              href="/products"
-              className="bg-card p-6 rounded-xl shadow-md border border-gold-soft/20 text-center hover:shadow-xl hover:-translate-y-1 transition-all group"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: index * 0.1 }}
             >
-              <div className="text-5xl mb-4">{cat.icon}</div>
-              <h3 className="text-h5 font-serif text-teak-dark group-hover:text-gold transition-colors">
-                {t(cat.nameKey)}
-              </h3>
-              <p className="text-sm text-text-muted mt-1">{t(cat.subKey)}</p>
-            </Link>
+              <Link
+                href="/products"
+                className="block bg-white p-8 rounded-2xl shadow-sm border border-cream hover:shadow-xl hover:-translate-y-2 transition-all duration-300 group text-center"
+              >
+                <div className="w-20 h-20 mx-auto rounded-full bg-[#FDFBF7] flex items-center justify-center text-4xl mb-6 shadow-inner group-hover:scale-110 transition-transform duration-300">
+                  {cat.icon}
+                </div>
+                <h3 className="text-xl font-serif font-bold text-teak-dark group-hover:text-gold transition-colors mb-2">
+                  {t(cat.nameKey)}
+                </h3>
+                <p className="text-sm text-text-muted">{t(cat.subKey)}</p>
+              </Link>
+            </motion.div>
           ))}
         </div>
       </section>
 
       {/* === NEW ARRIVALS === */}
-      <section className="py-20 bg-teak-dark text-cream">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="flex flex-col md:flex-row justify-between items-center mb-12">
+      <section className="py-24 bg-teak text-cream relative overflow-hidden">
+        {/* Decorative background element */}
+        <div className="absolute top-0 right-0 w-96 h-96 bg-gold/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+        
+        <div className="max-w-7xl mx-auto px-6 relative z-10">
+          <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
             <div>
-              <h2 className="text-h2 font-serif text-gold-soft">{t("home.newArrivals")}</h2>
-              <p className="text-body text-cream/70 mt-1">{t("home.newArrivalsSub")}</p>
+              <h2 className="text-3xl md:text-4xl font-serif text-gold-soft mb-3">{t("home.newArrivals")}</h2>
+              <p className="text-lg text-cream/70 font-light">{t("home.newArrivalsSub")}</p>
             </div>
             <Link
               href="/products"
-              className="mt-4 md:mt-0 text-body-lg border-b-2 border-gold-soft pb-1 text-gold-soft hover:text-cream transition-colors"
+              className="group flex items-center gap-2 text-lg text-gold-soft hover:text-white transition-colors pb-1 border-b border-gold-soft/30 hover:border-white"
             >
-              {t("home.seeAll")} →
+              {t("home.seeAll")}
+              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>
 
           {loading ? (
-            <div className="text-center py-20 text-gold-soft text-body-lg">{t("common.loading")}</div>
+            <div className="text-center py-20 text-gold-soft text-xl animate-pulse">{t("common.loading")}</div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-              {products.slice(0, 6).map((item) => (
-                <div
+              {products.slice(0, 6).map((item, index) => (
+                <motion.div
                   key={item.id}
-                  className="bg-card rounded-xl overflow-hidden shadow-xl text-text-main flex flex-col"
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.1 }}
+                  className="bg-white rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl text-text-main flex flex-col group transition-all duration-300 hover:-translate-y-1"
                 >
                   <Link href={`/products/${(item as any).documentId || item.id}`}>
                     <div className="aspect-[4/3] bg-cream-alt relative overflow-hidden">
                       <img
                         src={getImageUrl(item)}
                         alt={item.name}
-                        className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-in-out"
                       />
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
                     </div>
                   </Link>
-                  <div className="p-5 flex flex-col flex-grow">
-                    <h4 className="text-h5 font-serif font-bold mb-2 line-clamp-2">
+                  <div className="p-6 flex flex-col flex-grow">
+                    <h4 className="text-lg font-serif font-bold mb-3 line-clamp-2 text-teak-dark group-hover:text-gold transition-colors">
                       {item.name}
                     </h4>
-                    <div className="mt-auto pt-4 flex items-center justify-between border-t border-cream-alt">
-                      <span className="text-h4 font-bold text-price">
+                    <div className="mt-auto pt-5 flex items-center justify-between border-t border-cream-alt">
+                      <span className="text-xl font-bold text-[#b45309]">
                         ฿{(item.price ?? 0).toLocaleString()}
                       </span>
                       <AddToCartButton product={item} />
                     </div>
                   </div>
-                </div>
+                </motion.div>
               ))}
             </div>
           )}
         </div>
       </section>
 
-      {/* === CONTACT CTA === */}
-      <section className="py-16 bg-gold text-teak-dark text-center px-6">
-        <div className="max-w-3xl mx-auto">
-          <Phone className="w-12 h-12 mx-auto mb-4" />
-          <h2 className="text-h2 font-serif mb-4">{t("home.interested")}</h2>
-          <p className="text-body-lg mb-6">
-            {t("home.interestedSub")}
+      {/* === CONTACT CTA (Enhanced from image) === */}
+      <section className="py-20 bg-gradient-to-br from-[#A68331] to-[#8C6B1C] text-white text-center px-6 relative overflow-hidden">
+        {/* Subtle background patterns for depth */}
+        <div className="absolute top-0 left-0 w-full h-full opacity-10 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white via-transparent to-transparent pointer-events-none" />
+        
+        <motion.div 
+          initial="hidden" 
+          whileInView="visible" 
+          viewport={{ once: true }} 
+          variants={fadeUpVariant}
+          className="max-w-3xl mx-auto relative z-10"
+        >
+          <div className="w-20 h-20 mx-auto bg-[#4A3525]/20 rounded-full flex items-center justify-center mb-6">
+            <Phone className="w-10 h-10 text-[#4A3525] animate-[wiggle_1s_ease-in-out_infinite]" />
+          </div>
+          
+          <h2 className="text-3xl md:text-5xl font-serif text-[#4A3525] font-bold mb-4 drop-shadow-sm">
+            {t("home.interested") || "สนใจสินค้า?"}
+          </h2>
+          <p className="text-lg md:text-xl text-[#4A3525]/80 mb-10 font-medium">
+            {t("home.interestedSub") || "โทรหาเราได้เลย หรือแอดไลน์"}
           </p>
-          <a
-            href="tel:092-3640013"
-            className="inline-block bg-teak-dark text-cream text-body-lg font-bold py-4 px-10 rounded-lg hover:bg-teak transition-colors shadow-lg min-h-[56px]"
-          >
-            {t("home.callUs")}
-          </a>
-        </div>
+          
+          {/* CTA Buttons Container */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-8">
+            
+            {/* LINE Button */}
+            <a
+              href="https://line.me/ti/p/~YOUR_LINE_ID" // 👈 Change this to your actual LINE link
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-3 bg-[#00B900] text-white text-lg md:text-xl font-bold py-4 px-8 md:px-10 rounded-full hover:bg-[#009900] transition-all duration-300 shadow-[0_10px_20px_rgba(0,185,0,0.3)] hover:shadow-[0_15px_30px_rgba(0,185,0,0.5)] hover:-translate-y-1 w-full sm:w-auto"
+            >
+              {/* Custom LINE SVG Icon */}
+              <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor" className="w-6 h-6">
+                <path d="M24 10.304c0-5.369-5.383-9.738-12-9.738-6.616 0-12 4.369-12 9.738 0 4.814 3.966 8.874 9.421 9.613.37.08.872.247.994.57.108.283.033.722 0 1.009 0 0-.156.947-.193 1.157-.061.353-.284 1.393 1.222.758 1.506-.634 8.125-4.783 10.518-7.757C23.364 14.12 24 12.308 24 10.304z"/>
+              </svg>
+              {t("home.addLine") || "แอดไลน์"}
+            </a>
+
+            {/* Phone Button */}
+            <a
+              href="tel:092-3640013"
+              className="inline-flex items-center justify-center gap-3 bg-[#4A3525] text-gold-soft text-lg md:text-xl font-bold py-4 px-8 md:px-10 rounded-full hover:bg-[#3A291C] hover:text-white transition-all duration-300 shadow-[0_10px_20px_rgba(74,53,37,0.3)] hover:shadow-[0_15px_30px_rgba(74,53,37,0.5)] hover:-translate-y-1 w-full sm:w-auto"
+            >
+              <Phone className="w-5 h-5" />
+              {t("home.callUs") || "โทร"} 
+            </a>
+            
+          </div>
+        </motion.div>
       </section>
+      
     </main>
-  );
-}
+  );}

@@ -1,6 +1,7 @@
 import { BlocksContent } from "@strapi/blocks-react-renderer";
 import { Image } from "./interface";
 import { IOrder } from "./order.interface";
+import { ICategory } from "./category.interface";
 
 export interface IProduct {
   id: number;
@@ -11,4 +12,5 @@ export interface IProduct {
   description: BlocksContent;
   price: number;
   orders: IOrder[];
+  category?: ICategory;
 }

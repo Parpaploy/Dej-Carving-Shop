@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Castoro, IBM_Plex_Sans_Thai } from "next/font/google";
+import { Castoro } from "next/font/google";
 import "./globals.css";
 import { CartProvider } from "./context/CartContext";
 import { AuthProvider } from "./context/AuthContext";
@@ -17,12 +17,6 @@ const castoro = Castoro({
   display: "swap",
 });
 
-const ibmPlexSansThai = IBM_Plex_Sans_Thai({
-  subsets: ["latin", "thai"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-ibm-plex",
-  display: "swap",
-});
 
 export const metadata: Metadata = {
   title: "ร้านเดชแกะสลัก | Dej Carving Shop",
@@ -36,7 +30,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="th">
-      <body className={`${castoro.variable} ${ibmPlexSansThai.variable} antialiased`}>
+      <body className={`${castoro.variable} antialiased`}>
         <LocaleProvider>
           <AuthProvider>
             <CartProvider>

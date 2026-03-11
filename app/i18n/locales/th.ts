@@ -1,17 +1,17 @@
 const th = {
   // ============ COMMON ============
-  "common.shopName": "ร้านเดชแกะสลัก",
-  "common.shopTagline": "งานแกะสลักไม้สักแท้ จากบ้านถวาย เชียงใหม่",
+  "common.shopName": "ร้านเดชบุญหมื่น",
+  "common.shopTagline": "งานแกะสลักไม้สักแท้ จากบ้านถวาย จังหวัดเชียงใหม่",
   "common.phone": "092-364-0013",
   "common.loading": "กำลังโหลด...",
   "common.currency": "฿",
   "common.free": "ฟรี",
   "common.items": "รายการ",
   "common.back": "กลับ",
-  "common.openHours": "เปิดทุกวัน 08:00 - 18:00",
+  "common.openHours": "เปิดทุกวัน 08:00 - 17:30",
   "common.openHoursSub": "Open Daily",
   "common.banTawai": "บ้านถวาย เชียงใหม่",
-  "common.email": "dej.carving@email.com",
+  "common.email": "dejboonmeuncarvingshop@gmail.com",
 
   // ============ NAV ============
   "nav.home": "หน้าแรก",
@@ -22,6 +22,7 @@ const th = {
   "nav.login": "เข้าสู่ระบบ",
   "nav.logout": "ออกจากระบบ",
   "nav.profile": "โปรไฟล์",
+  "nav.allProducts": "สินค้าทั้งหมด",
 
   // ============ HOMEPAGE ============
   "home.welcomeBack": "ยินดีต้อนรับกลับ",
@@ -32,8 +33,8 @@ const th = {
   "home.browseCollection": "ดูสินค้าทั้งหมด",
   "home.since1995": "ตั้งแต่ปี 1995",
   "home.since1995sub": "30+ ปีแห่งความเชี่ยวชาญ",
-  "home.authentic100": "ไม้สักแท้ 100%",
-  "home.authentic100sub": "รับรองคุณภาพแท้",
+  "home.authentic100": "ไม้สักเเละไม้เนื้อเเข็งแท้ 100%",
+  "home.authentic100sub": "รับรองคุณภาพ ใส่ใจทุกรายละเอียด",
   "home.safeShipping": "จัดส่งปลอดภัย",
   "home.safeShippingSub": "แพ็คด้วยความใส่ใจ",
   "home.categories": "หมวดหมู่สินค้า",
@@ -52,7 +53,7 @@ const th = {
   "home.cat.carvedSub": "Carved Items",
   "home.cat.collectibles": "ของสะสม",
   "home.cat.collectiblesSub": "Collectibles",
-
+  "home.addLine": "แอดไลน์ @dejcarving",
   // ============ PRODUCTS PAGE ============
   "products.title": "สินค้าทั้งหมด",
   "products.subtitle": "เลือกชมสินค้าของเรา",
@@ -92,7 +93,7 @@ const th = {
   "checkout.recipientName": "ชื่อผู้รับ",
   "checkout.recipientPlaceholder": "ชื่อ-สกุล ผู้รับสินค้า",
   "checkout.phone": "เบอร์โทร",
-  "checkout.phonePlaceholder": "08X-XXX-XXXX",
+  "checkout.phonePlaceholder": "092-364-0013",
   "checkout.address": "ที่อยู่จัดส่ง",
   "checkout.addressPlaceholder": "บ้านเลขที่ ซอย ถนน ตำบล อำเภอ จังหวัด รหัสไปรษณีย์",
   "checkout.paymentMethod": "วิธีชำระเงิน",
@@ -153,6 +154,13 @@ const th = {
   "register.emailTaken": "อีเมลนี้มีผู้ใช้แล้ว",
   "register.failed": "สมัครไม่สำเร็จ",
   "register.failedConnection": "สมัครไม่สำเร็จ กรุณาตรวจสอบการเชื่อมต่อ",
+  "register.success": "สมัครสำเร็จ!",
+  "register.checkEmail": "เราส่งลิงก์ยืนยันไปที่อีเมลของคุณแล้ว กรุณาตรวจสอบอีเมลเพื่อยืนยันบัญชี",
+  "register.checkSpam": "ไม่เห็นอีเมล? ตรวจสอบในโฟลเดอร์สแปม",
+  "register.goToLogin": "ไปหน้าเข้าสู่ระบบ",
+
+  "login.notConfirmed": "กรุณายืนยันอีเมลของคุณก่อนเข้าสู่ระบบ",
+  "login.confirmed": "ยืนยันอีเมลสำเร็จ! กรุณาเข้าสู่ระบบ",
 
   // ============ PROFILE ============
   "profile.title": "บัญชีของฉัน",
@@ -237,11 +245,45 @@ const th = {
   "contact.faq3q": "รับสั่งทำพิเศษไหม?",
   "contact.faq3a": "ได้ครับ ช่างแกะสลักของเราสามารถสร้างงานตามแบบของคุณได้ ใช้เวลาประมาณ 4-8 สัปดาห์",
 
+  // ============ TESTIMONIALS ============
+  "testimonials.title": "ลูกค้าพูดถึงเรา",
+  "testimonials.subtitle": "เสียงจากผู้ที่ไว้วางใจ",
+  "testimonials.1.name": "คุณสมศรี",
+  "testimonials.1.location": "กรุงเทพฯ",
+  "testimonials.1.text": "ตู้ไม้สักสวยมากค่ะ คุณภาพดีเกินราคา ช่างฝีมือจริงๆ แนะนำเลย",
+  "testimonials.2.name": "คุณวิชัย",
+  "testimonials.2.location": "เชียงใหม่",
+  "testimonials.2.text": "สั่งโต๊ะชุดไม้สัก จัดส่งดี แพ็คอย่างดี ของถึงบ้านสภาพสมบูรณ์",
+  "testimonials.3.name": "คุณนภา",
+  "testimonials.3.location": "ภูเก็ต",
+  "testimonials.3.text": "ซื้อมาหลายชิ้นแล้วค่ะ งานแกะสลักละเอียดสวยงาม ของแท้ร้อยเปอร์เซ็นต์",
+  "testimonials.4.name": "Mr. James",
+  "testimonials.4.location": "Australia",
+  "testimonials.4.text": "Amazing craftsmanship! Shipped internationally with great care. The teak cabinet is absolutely stunning.",
+
+  // ============ CRAFTSMAN ============
+  "craftsman.title": "ฝีมือช่างแกะสลัก",
+  "craftsman.subtitle": "The Art Behind Every Piece",
+  "craftsman.step1.title": "คัดเลือกไม้",
+  "craftsman.step1.desc": "คัดสรรไม้สักแท้คุณภาพสูง จากแหล่งที่ยั่งยืน",
+  "craftsman.step2.title": "ร่างแบบ",
+  "craftsman.step2.desc": "ออกแบบลวดลายโดยช่างที่มีประสบการณ์กว่า 30 ปี",
+  "craftsman.step3.title": "แกะสลักด้วยมือ",
+  "craftsman.step3.desc": "ทุกชิ้นงานแกะสลักด้วยมือทุกขั้นตอน ใส่ใจทุกรายละเอียด",
+  "craftsman.step4.title": "ตกแต่งและเคลือบ",
+  "craftsman.step4.desc": "ขัดเงาและเคลือบผิวเพื่อความทนทานและความสวยงามที่ยาวนาน",
+
   // ============ FOOTER ============
   "footer.menu": "เมนู",
   "footer.contactUs": "ติดต่อเรา",
   "footer.copyright": "สงวนลิขสิทธิ์",
-
+  "footer.location": "ที่ตั้งของเรา",
+  "footer.newsletter": "รับข่าวสารจากเรา",
+  "footer.newsletterSub": "สมัครรับข่าวสินค้าใหม่และโปรโมชั่น",
+  "footer.emailPlaceholder": "กรอกอีเมลของคุณ",
+  "footer.subscribe": "สมัคร",
+  "footer.subscribed": "สมัครสำเร็จ!",
+  "footer.payment": "ช่องทางชำระเงิน",
   // ============ FLOATING CONTACT ============
   "float.contactTitle": "ติดต่อเรา",
   "float.callUs": "โทรหาเรา",

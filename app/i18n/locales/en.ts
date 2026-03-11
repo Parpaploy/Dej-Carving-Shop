@@ -13,7 +13,7 @@ const en: Record<TranslationKey, string> = {
   "common.openHours": "Open Daily 08:00 - 18:00",
   "common.openHoursSub": "Open Daily",
   "common.banTawai": "Ban Tawai, Chiang Mai",
-  "common.email": "dej.carving@email.com",
+  "common.email": "dejboonmeuncarvingshop@gmail.com",
 
   // ============ NAV ============
   "nav.home": "Home",
@@ -24,6 +24,7 @@ const en: Record<TranslationKey, string> = {
   "nav.login": "Sign In",
   "nav.logout": "Sign Out",
   "nav.profile": "Profile",
+  "nav.allProducts": "All Products",
 
   // ============ HOMEPAGE ============
   "home.welcomeBack": "Welcome Back",
@@ -54,7 +55,7 @@ const en: Record<TranslationKey, string> = {
   "home.cat.carvedSub": "Hand Carved",
   "home.cat.collectibles": "Collectibles",
   "home.cat.collectiblesSub": "Rare Finds",
-
+  "home.addLine": "Add us on LINE",
   // ============ PRODUCTS PAGE ============
   "products.title": "All Products",
   "products.subtitle": "Browse our collection",
@@ -155,6 +156,13 @@ const en: Record<TranslationKey, string> = {
   "register.emailTaken": "This email is already registered.",
   "register.failed": "Registration failed.",
   "register.failedConnection": "Registration failed. Please check your connection.",
+  "register.success": "Account Created!",
+  "register.checkEmail": "We sent a confirmation link to your email. Please check your inbox to verify your account.",
+  "register.checkSpam": "Don't see the email? Check your spam folder.",
+  "register.goToLogin": "Go to Sign In",
+
+  "login.notConfirmed": "Please confirm your email before signing in.",
+  "login.confirmed": "Email confirmed! You can now sign in.",
 
   // ============ PROFILE ============
   "profile.title": "My Account",
@@ -239,10 +247,44 @@ const en: Record<TranslationKey, string> = {
   "contact.faq3q": "Do you accept custom orders?",
   "contact.faq3a": "Yes! Our carvers can create custom pieces to your specifications. Typical lead time is 4-8 weeks.",
 
+  // ============ TESTIMONIALS ============
+  "testimonials.title": "What Our Customers Say",
+  "testimonials.subtitle": "Trusted by collectors and homeowners",
+  "testimonials.1.name": "Somsri K.",
+  "testimonials.1.location": "Bangkok",
+  "testimonials.1.text": "The teak cabinet is absolutely beautiful. Quality far exceeds the price. True craftsmanship!",
+  "testimonials.2.name": "Wichai P.",
+  "testimonials.2.location": "Chiang Mai",
+  "testimonials.2.text": "Ordered a teak dining set. Excellent shipping, packed with care. Arrived in perfect condition.",
+  "testimonials.3.name": "Napa S.",
+  "testimonials.3.location": "Phuket",
+  "testimonials.3.text": "I've bought several pieces. The carving detail is exquisite. 100% authentic every time.",
+  "testimonials.4.name": "Mr. James",
+  "testimonials.4.location": "Australia",
+  "testimonials.4.text": "Amazing craftsmanship! Shipped internationally with great care. The teak cabinet is absolutely stunning.",
+
+  // ============ CRAFTSMAN ============
+  "craftsman.title": "Master Craftsmanship",
+  "craftsman.subtitle": "The Art Behind Every Piece",
+  "craftsman.step1.title": "Select the Wood",
+  "craftsman.step1.desc": "We source premium-grade teak from sustainable origins.",
+  "craftsman.step2.title": "Design the Pattern",
+  "craftsman.step2.desc": "Each design is drawn by artisans with 30+ years of experience.",
+  "craftsman.step3.title": "Hand Carve",
+  "craftsman.step3.desc": "Every piece is carved entirely by hand, with attention to every detail.",
+  "craftsman.step4.title": "Finish & Polish",
+  "craftsman.step4.desc": "Sanded smooth and sealed for lasting beauty and durability.",
+
   // ============ FOOTER ============
   "footer.menu": "Menu",
   "footer.contactUs": "Contact Us",
   "footer.copyright": "All rights reserved.",
+  "footer.newsletter": "Stay Updated",
+  "footer.newsletterSub": "Get notified about new arrivals and special offers",
+  "footer.emailPlaceholder": "Enter your email",
+  "footer.subscribe": "Subscribe",
+  "footer.subscribed": "Subscribed!",
+  "footer.payment": "Payment Methods",
 
   // ============ FLOATING CONTACT ============
   "float.contactTitle": "Contact",

@@ -4,7 +4,7 @@ import React from "react";
 import Link from "next/link";
 import { IProduct } from "@/app/interfaces/product.interface";
 import AddToCartButton from "../ui/AddToCartButton";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, X } from "lucide-react";
 import { useLocale } from "@/app/context/LocaleContext";
 
 const getImageUrl = (url: string | undefined) => {
@@ -13,7 +13,7 @@ const getImageUrl = (url: string | undefined) => {
   return `${process.env.NEXT_PUBLIC_STRAPI_BASE_URL}${url}`;
 };
 
-export default function ProductsClient({ products }: { products: IProduct[] }) {
+export default function ProductsClient({ products, activeCategory }: { products: IProduct[]; activeCategory?: string }) {
   const { t } = useLocale();
 
   return (
@@ -31,7 +31,18 @@ export default function ProductsClient({ products }: { products: IProduct[] }) {
               <p className="text-text-muted mt-1 text-body">{t("products.subtitle")}</p>
             </div>
           </div>
-          <p className="text-body text-text-muted">{products.length} {t("common.items")}</p>
+          <div className="flex items-center gap-4">
+            {activeCategory && (
+              <Link
+                href="/products"
+                className="flex items-center gap-2 px-4 py-2 bg-teak/10 text-teak-dark rounded-full text-body font-medium hover:bg-teak/20 transition-colors"
+              >
+                <span className="capitalize">{activeCategory.replace(/-/g, " ")}</span>
+                <X size={16} />
+              </Link>
+            )}
+            <p className="text-body text-text-muted">{products.length} {t("common.items")}</p>
+          </div>
         </div>
 
         {/* PRODUCTS GRID */}

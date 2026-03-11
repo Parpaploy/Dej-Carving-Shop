@@ -2,12 +2,16 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import axios from "axios";
-import { User, Lock, Eye, EyeOff, ArrowRight, AlertCircle } from "lucide-react";
+import { User, Lock, Eye, EyeOff, ArrowRight, AlertCircle, CheckCircle } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { useLocale } from "@/app/context/LocaleContext";
 
 export default function LoginClient() {
+  const searchParams = useSearchParams();
+  const confirmed = searchParams.get("confirmed") === "true";
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -34,6 +38,8 @@ export default function LoginClient() {
         const strapiError = err.response?.data?.error?.message;
         if (strapiError === "Invalid identifier or password") {
           setError(t("login.invalidCredentials"));
+        } else if (strapiError === "Your account email is not confirmed") {
+          setError(t("login.notConfirmed"));
         } else {
           setError(strapiError || t("login.failed"));
         }
@@ -59,6 +65,14 @@ export default function LoginClient() {
         {/* Form */}
         <div className="p-8 pt-2">
           <form onSubmit={handleLogin} className="flex flex-col gap-6">
+            {/* Email confirmed success banner */}
+            {confirmed && !error && (
+              <div className="bg-green-50 border-l-4 border-green-500 p-4 flex items-center gap-3 rounded-r-lg">
+                <CheckCircle className="text-green-600 flex-shrink-0" size={20} />
+                <p className="text-green-700 font-medium text-body">{t("login.confirmed")}</p>
+              </div>
+            )}
+
             {error && (
               <div className="bg-red-50 border-l-4 border-[#9B1B1B] p-4 flex items-center gap-3 rounded-r-lg">
                 <AlertCircle className="text-[#9B1B1B] flex-shrink-0" />
