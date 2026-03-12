@@ -6,10 +6,11 @@ import { IProduct } from "@/app/interfaces/product.interface";
 import AddToCartButton from "../ui/AddToCartButton";
 import { ArrowLeft, X, ChevronLeft, ChevronRight } from "lucide-react";
 import { useLocale } from "@/app/context/LocaleContext";
+import { fixSupabaseUrl } from "@/app/lib/strapi";
 
 const getImageUrl = (url: string | undefined) => {
   if (!url) return "https://placehold.co/400x400/png?text=No+Image";
-  if (url.startsWith("http")) return url;
+  if (url.startsWith("http")) return fixSupabaseUrl(url);
   return `${process.env.NEXT_PUBLIC_STRAPI_BASE_URL}${url}`;
 };
 

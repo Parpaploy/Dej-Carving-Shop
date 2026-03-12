@@ -9,6 +9,7 @@ import { useAuth } from "../../context/AuthContext";
 import { useLocale } from "@/app/context/LocaleContext";
 import AddToCartButton from "../ui/AddToCartButton";
 import { IProduct } from "@/app/interfaces/product.interface";
+import { fixSupabaseUrl } from "@/app/lib/strapi";
 
 const categories = [
   { id: 1, nameKey: "home.cat.cabinets" as const, subKey: "home.cat.cabinetsSub" as const, icon: "🏛️" },
@@ -80,7 +81,7 @@ export default function HomepageClient() {
   const getImageUrl = (item: IProduct) => {
     const img = item.images?.[0]?.url;
     if (!img) return "https://placehold.co/600x400/png?text=No+Image";
-    if (img.startsWith("http")) return img;
+    if (img.startsWith("http")) return fixSupabaseUrl(img);
     return `${process.env.NEXT_PUBLIC_STRAPI_BASE_URL}${img}`;
   };
 
@@ -388,7 +389,7 @@ function HomeProductCard({ item, getImageUrl, blocksToText }: { item: IProduct; 
         {images.length > 0 ? images.map((img, i) => (
           <Link key={i} href={`/products/${linkId}`} className="absolute inset-0">
             <img
-              src={img.url?.startsWith("http") ? img.url : `${process.env.NEXT_PUBLIC_STRAPI_BASE_URL}${img.url}`}
+              src={img.url?.startsWith("http") ? fixSupabaseUrl(img.url) : `${process.env.NEXT_PUBLIC_STRAPI_BASE_URL}${img.url}`}
               alt={`${item.name} ${i + 1}`}
               className={`w-full h-full object-cover transition-all duration-500 ${
                 i === activeIndex ? "opacity-100 scale-100" : "opacity-0 scale-105"
