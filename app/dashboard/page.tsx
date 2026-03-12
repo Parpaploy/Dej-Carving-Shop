@@ -167,7 +167,7 @@ function ProductManager() {
   const [categories, setCategories] = useState<CategoryOption[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [editingId, setEditingId] = useState<number | null>(null);
+  const [editingId, setEditingId] = useState<string | number | null>(null);
   const [formData, setFormData] = useState({ name: "", price: "", description: "", categories: [] as number[] });
   const [file, setFile] = useState<File | null>(null);
 
@@ -191,11 +191,12 @@ function ProductManager() {
 
   useEffect(() => { fetchProducts(); fetchCategories(); }, []);
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = async (product: IProduct) => {
     if (!confirm(t("dash.confirmDelete"))) return;
+    const docId = (product as any).documentId || product.id;
     try {
-      await axios.delete(`${API}/api/products/${id}`, { headers: getAuthHeaders() });
-      setProducts(products.filter((p) => p.id !== id));
+      await axios.delete(`${API}/api/products/${docId}`, { headers: getAuthHeaders() });
+      setProducts(products.filter((p) => p.id !== product.id));
       toast.success(t("toast.addressDeleted"));
     } catch {
       toast.error(t("dash.deleteError"));
@@ -241,7 +242,7 @@ function ProductManager() {
   };
 
   const openEdit = (product: IProduct) => {
-    setEditingId(product.id);
+    setEditingId((product as any).documentId || product.id);
     setFormData({ name: product.name, price: String(product.price), description: blocksToText(product.description), categories: product.categories?.map((c) => c.id) || [] });
     setFile(null);
     setIsModalOpen(true);
@@ -309,7 +310,7 @@ function ProductManager() {
                         <button onClick={() => openEdit(p)} className="text-blue-600 hover:bg-blue-50 p-2.5 rounded-lg transition-colors" title={t("dash.editProduct")}>
                           <Edit size={18} />
                         </button>
-                        <button onClick={() => handleDelete(p.id)} className="text-red-500 hover:bg-red-50 p-2.5 rounded-lg transition-colors" title={t("dash.delete")}>
+                        <button onClick={() => handleDelete(p)} className="text-red-500 hover:bg-red-50 p-2.5 rounded-lg transition-colors" title={t("dash.delete")}>
                           <Trash2 size={18} />
                         </button>
                       </div>
