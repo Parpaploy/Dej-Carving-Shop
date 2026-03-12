@@ -33,25 +33,40 @@ export default function HomepageClient() {
   const [loading, setLoading] = useState(true);
   const [currentSlide, setCurrentSlide] = useState(0);
 
-  // Static hero images — replace with real shop/workshop photos
-  const heroImages = [
+  const fallbackHeroImages = [
     "/images/hero/shop-front.jpg",
     "/images/hero/workshop.jpg",
     "/images/hero/showroom.jpg",
   ];
+  const [heroImages, setHeroImages] = useState<string[]>(fallbackHeroImages);
 
   useEffect(() => {
-    const fetchProducts = async () => {
+    const fetchData = async () => {
       try {
-        const res = await axios.get(`${process.env.NEXT_PUBLIC_STRAPI_BASE_URL}/api/products?populate=*`);
-        setProducts(res.data.data);
+        const [productsRes, heroRes] = await Promise.all([
+          axios.get(`${process.env.NEXT_PUBLIC_STRAPI_BASE_URL}/api/products?populate=*`),
+          axios.get(`${process.env.NEXT_PUBLIC_STRAPI_BASE_URL}/api/hero-banner?populate=*`).catch(() => null),
+        ]);
+        setProducts(productsRes.data.data);
+
+        const heroData = heroRes?.data?.data?.images;
+        if (heroData && heroData.length > 0) {
+          setHeroImages(
+            heroData.map((img: any) => {
+              const url = img.url;
+              if (!url) return null;
+              if (url.startsWith("http")) return url;
+              return `${process.env.NEXT_PUBLIC_STRAPI_BASE_URL}${url}`;
+            }).filter(Boolean)
+          );
+        }
       } catch (error) {
-        console.error("Failed to fetch products:", error);
+        console.error("Failed to fetch data:", error);
       } finally {
         setLoading(false);
       }
     };
-    fetchProducts();
+    fetchData();
   }, []);
 
   useEffect(() => {
