@@ -75,7 +75,7 @@ export default function HomepageClient() {
     <main className="w-full min-h-screen bg-cream text-text-main">
       
       {/* === HERO === */}
-      <section className="relative w-full min-h-[500px] md:min-h-[600px] bg-teak-dark flex items-center justify-center overflow-hidden">
+      <section className="relative w-full min-h-[400px] md:min-h-[480px] bg-teak-dark flex items-center justify-center overflow-hidden">
         {heroImages.map((src, i) => (
         <div
           key={src}
@@ -96,7 +96,7 @@ export default function HomepageClient() {
         {/* Richer Gradient Overlay */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-teak-dark/95 z-[2]" />
 
-        <div className="relative z-[3] text-center px-6 max-w-4xl mx-auto py-20">
+        <div className="relative z-[3] text-center px-6 max-w-4xl mx-auto py-14">
           <motion.div initial="hidden" animate="visible" variants={fadeUpVariant}>
             {user ? (
               <div>
@@ -158,7 +158,7 @@ export default function HomepageClient() {
       </section>
 
       {/* === TRUST BADGES === */}
-      <section className="py-16 bg-card border-b border-cream-alt shadow-sm relative z-10 -mt-6 mx-4 md:mx-auto max-w-6xl rounded-2xl">
+      <section className="py-16 bg-card border-b border-cream-alt shadow-sm relative mx-4 md:mx-auto max-w-6xl rounded-2xl">
         <div className="px-6 grid grid-cols-1 md:grid-cols-3 gap-10 text-center divide-y md:divide-y-0 md:divide-x divide-cream-alt">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUpVariant} className="flex flex-col items-center pt-6 md:pt-0 px-4">
             <div className="w-16 h-16 rounded-full bg-gold/10 flex items-center justify-center mb-5 text-teak">
