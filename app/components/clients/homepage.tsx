@@ -156,7 +156,7 @@ export default function HomepageClient() {
       </section>
 
       {/* === TRUST BADGES === */}
-      <section className="py-16 bg-card border-b border-cream-alt shadow-sm relative mx-4 md:mx-auto max-w-6xl rounded-2xl">
+      <section className="py-16 mt-10 bg-card border-b border-cream-alt shadow-sm relative mx-4 md:mx-auto max-w-6xl rounded-2xl">
         <div className="px-6 grid grid-cols-1 md:grid-cols-3 gap-10 text-center divide-y md:divide-y-0 md:divide-x divide-cream-alt">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUpVariant} className="flex flex-col items-center pt-6 md:pt-0 px-4">
             <div className="w-16 h-16 rounded-full bg-gold/10 flex items-center justify-center mb-5 text-teak">
