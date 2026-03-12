@@ -33,6 +33,13 @@ export default function HomepageClient() {
   const [loading, setLoading] = useState(true);
   const [currentSlide, setCurrentSlide] = useState(0);
 
+  // Static hero images — replace with real shop/workshop photos
+  const heroImages = [
+    "/images/hero/shop-front.jpg",
+    "/images/hero/workshop.jpg",
+    "/images/hero/showroom.jpg",
+  ];
+
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -47,20 +54,11 @@ export default function HomepageClient() {
     fetchProducts();
   }, []);
 
-  const heroImages = products
-    .filter((p) => p.images && p.images.length > 0)
-    .slice(0, 5)
-    .map((p) => {
-      const img = p.images![0].url;
-      if (img.startsWith("http")) return img;
-      return `${process.env.NEXT_PUBLIC_STRAPI_BASE_URL}${img}`;
-    });
-
   useEffect(() => {
     if (heroImages.length <= 1) return;
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % heroImages.length);
-    }, 5000);
+    }, 6000);
     return () => clearInterval(timer);
   }, [heroImages.length]);
 
