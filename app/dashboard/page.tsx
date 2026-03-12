@@ -193,7 +193,7 @@ function ProductManager() {
 
   const handleDelete = async (product: IProduct) => {
     if (!confirm(t("dash.confirmDelete"))) return;
-    const docId = (product as any).documentId || product.id;
+    const docId = product.documentId || product.id;
     try {
       await axios.delete(`${API}/api/products/${docId}`, { headers: getAuthHeaders() });
       setProducts(products.filter((p) => p.id !== product.id));
@@ -242,7 +242,7 @@ function ProductManager() {
   };
 
   const openEdit = (product: IProduct) => {
-    setEditingId((product as any).documentId || product.id);
+    setEditingId(product.documentId || product.id);
     setFormData({ name: product.name, price: String(product.price), description: blocksToText(product.description), categories: product.categories?.map((c) => c.id) || [] });
     setFile(null);
     setIsModalOpen(true);

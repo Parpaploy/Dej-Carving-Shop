@@ -5,6 +5,7 @@ import { ICategory } from "./category.interface";
 
 export interface IProduct {
   id: number;
+  documentId: string;
   createdAt: string;
   updatedAt?: string;
   images: Image[];

@@ -366,7 +366,7 @@ function HomeProductCard({ item, getImageUrl, blocksToText }: { item: IProduct; 
   const [isHovering, setIsHovering] = useState(false);
   const images = item.images?.length ? item.images : [];
   const hasMultiple = images.length > 1;
-  const linkId = (item as any).documentId || item.id;
+  const linkId = item.documentId || item.id;
   const cats = item.categories || [];
   const desc = blocksToText(item.description);
 

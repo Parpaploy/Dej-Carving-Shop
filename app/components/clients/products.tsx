@@ -27,7 +27,7 @@ function ProductCard({ product }: { product: IProduct }) {
   const hasMultiple = images.length > 1;
   const [activeIndex, setActiveIndex] = useState(0);
   const [isHovering, setIsHovering] = useState(false);
-  const linkId = (product as any).documentId || product.id;
+  const linkId = product.documentId || product.id;
   const cats = product.categories || [];
   const desc = blocksToText(product.description);
 
