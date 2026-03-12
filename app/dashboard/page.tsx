@@ -36,23 +36,47 @@ function getAuthHeaders() {
 // ==================== MAIN DASHBOARD ====================
 export default function AdminDashboard() {
   const { user, logout } = useAuth();
-  const { t } = useLocale();
+  const { t, locale } = useLocale();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<"products" | "orders" | "users">("orders");
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [authChecked, setAuthChecked] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem("jwt");
-    if (!token || !localStorage.getItem("user")) {
+    const storedUser = localStorage.getItem("user");
+    if (!token || !storedUser) {
       router.push("/login");
+      return;
     }
-  }, [router]);
+    try {
+      const parsed = JSON.parse(storedUser);
+      const roleName = parsed.role?.name?.toLowerCase();
+      if (roleName !== "admin") {
+        toast.error(locale === "th" ? "คุณไม่มีสิทธิ์เข้าถึงหน้านี้" : "You do not have permission to access this page");
+        router.push("/");
+        return;
+      }
+    } catch {
+      router.push("/login");
+      return;
+    }
+    setAuthChecked(true);
+  }, [router, locale]);
 
   const tabs = [
     { key: "orders" as const, label: t("dash.orders"), icon: <ShoppingCart size={20} />, color: "bg-blue-600" },
     { key: "products" as const, label: t("dash.products"), icon: <Package size={20} />, color: "bg-emerald-600" },
     { key: "users" as const, label: t("dash.users"), icon: <Users size={20} />, color: "bg-purple-600" },
   ];
+
+  if (!authChecked) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-gray-400 animate-pulse">{t("common.loading")}</div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen bg-gray-50 font-sans">

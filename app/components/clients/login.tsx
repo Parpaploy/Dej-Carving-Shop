@@ -30,8 +30,20 @@ export default function LoginClient() {
         `${process.env.NEXT_PUBLIC_STRAPI_BASE_URL}/api/auth/local`,
         { identifier: email, password }
       );
-      const { jwt, user } = response.data;
-      login(user, jwt);
+      const { jwt, user: userData } = response.data;
+
+      // Fetch role info
+      try {
+        const meRes = await axios.get(
+          `${process.env.NEXT_PUBLIC_STRAPI_BASE_URL}/api/users/me?populate=role`,
+          { headers: { Authorization: `Bearer ${jwt}` } }
+        );
+        userData.role = meRes.data.role || null;
+      } catch {
+        userData.role = null;
+      }
+
+      login(userData, jwt);
       window.location.href = "/";
     } catch (err: unknown) {
       if (axios.isAxiosError(err)) {
