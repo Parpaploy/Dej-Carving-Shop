@@ -32,13 +32,14 @@ export default function LoginClient() {
       );
       const { jwt, user: userData } = response.data;
 
-      // Fetch role info
+      // Fetch role + profile image
       try {
         const meRes = await axios.get(
           `${process.env.NEXT_PUBLIC_STRAPI_BASE_URL}/api/users/me?populate=role`,
           { headers: { Authorization: `Bearer ${jwt}` } }
         );
         userData.role = meRes.data.role || null;
+        userData.profileImage = meRes.data.profileImage || null;
       } catch {
         userData.role = null;
       }
