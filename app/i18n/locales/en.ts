@@ -155,6 +155,13 @@ const en: Record<TranslationKey, string> = {
   "register.emailTaken": "This email is already registered.",
   "register.failed": "Registration failed.",
   "register.failedConnection": "Registration failed. Please check your connection.",
+  "register.success": "Registration successful!",
+  "register.checkEmail": "We've sent a confirmation link to your email. Please check your inbox to verify your account.",
+  "register.checkSpam": "Don't see the email? Check your spam folder.",
+  "register.goToLogin": "Go to Sign In",
+
+  "login.notConfirmed": "Please verify your email before signing in.",
+  "login.confirmed": "Email verified successfully! Please sign in.",
 
   // ============ PROFILE ============
   "profile.title": "My Account",
@@ -239,11 +246,45 @@ const en: Record<TranslationKey, string> = {
   "contact.faq3q": "Do you accept custom orders?",
   "contact.faq3a": "Yes! Our carvers can create custom pieces to your specifications. Typical lead time is 4-8 weeks.",
 
+  // ============ TESTIMONIALS ============
+  "testimonials.title": "What Our Customers Say",
+  "testimonials.subtitle": "Voices of Trust",
+  "testimonials.1.name": "Khun Somsri",
+  "testimonials.1.location": "Bangkok",
+  "testimonials.1.text": "The teak cabinet is beautiful! Quality far exceeds the price. True craftsmanship. Highly recommended.",
+  "testimonials.2.name": "Khun Wichai",
+  "testimonials.2.location": "Chiang Mai",
+  "testimonials.2.text": "Ordered a teak table set — great delivery, well packed, arrived in perfect condition.",
+  "testimonials.3.name": "Khun Napa",
+  "testimonials.3.location": "Phuket",
+  "testimonials.3.text": "I've bought several pieces. The carvings are incredibly detailed and beautiful. 100% authentic.",
+  "testimonials.4.name": "Mr. James",
+  "testimonials.4.location": "Australia",
+  "testimonials.4.text": "Amazing craftsmanship! Shipped internationally with great care. The teak cabinet is absolutely stunning.",
+
+  // ============ CRAFTSMAN ============
+  "craftsman.title": "Master Craftsmanship",
+  "craftsman.subtitle": "The Art Behind Every Piece",
+  "craftsman.step1.title": "Wood Selection",
+  "craftsman.step1.desc": "Carefully selected high-quality authentic teak from sustainable sources.",
+  "craftsman.step2.title": "Design & Sketching",
+  "craftsman.step2.desc": "Patterns designed by artisans with over 30 years of experience.",
+  "craftsman.step3.title": "Hand Carving",
+  "craftsman.step3.desc": "Every piece is entirely hand-carved with meticulous attention to detail.",
+  "craftsman.step4.title": "Finishing & Coating",
+  "craftsman.step4.desc": "Polished and coated for lasting durability and timeless beauty.",
+
   // ============ FOOTER ============
   "footer.menu": "Menu",
   "footer.contactUs": "Contact Us",
   "footer.copyright": "All rights reserved.",
   "footer.location": "Our Location",
+  "footer.newsletter": "Stay Updated",
+  "footer.newsletterSub": "Subscribe for new arrivals and promotions",
+  "footer.emailPlaceholder": "Enter your email",
+  "footer.subscribe": "Subscribe",
+  "footer.subscribed": "Subscribed successfully!",
+  "footer.payment": "Payment Methods",
   // ============ FLOATING CONTACT ============
   "float.contactTitle": "Contact",
   "float.callUs": "Call Us",
