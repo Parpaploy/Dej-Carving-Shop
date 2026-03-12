@@ -65,7 +65,7 @@ export default function Navbar() {
          {/* LOGO & BRAND */}
           <Link
             href="/"
-            className="flex items-center gap-3 font-sans text-2xl md:text-3xl tracking-wide text-cream hover:text-gold-soft transition-colors drop-shadow-sm group font-semibold"
+            className="flex items-center gap-3 font-sans text-2xl md:text-3xl tracking-wide text-white hover:text-white/70 transition-colors drop-shadow-sm group font-semibold"
           >
             {/* Logo Placeholder */}
             <div className="relative w-10 h-10 md:w-12 md:h-12 flex-shrink-0 rounded-full overflow-hidden border-2 border-gold-soft/40 group-hover:border-gold-soft transition-colors shadow-sm bg-teak/50 flex items-center justify-center">
