@@ -89,12 +89,12 @@ export default function HomepageClient() {
             <img
               src={src}
               alt="Hero Background"
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover opacity-50"
             />
           </div>
         ))}
         {/* Richer Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/30 to-teak-dark/90 z-[2]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-teak-dark/95 z-[2]" />
 
         <div className="relative z-[3] text-center px-6 max-w-4xl mx-auto py-20">
           <motion.div initial="hidden" animate="visible" variants={fadeUpVariant}>

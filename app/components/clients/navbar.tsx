@@ -58,7 +58,7 @@ export default function Navbar() {
   };
 
   return (
-   <header className="w-full z-[100] sticky top-0 bg-teak shadow-md border-b border-gold/10 transition-all duration-300">
+   <header className="w-full z-[100] sticky top-0 shadow-md border-b border-gold/10 transition-all duration-300" style={{ backgroundColor: '#482a1d' }}>
       <nav className="text-cream px-6 py-3">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
 

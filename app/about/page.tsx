@@ -106,13 +106,15 @@ export default function AboutPage() {
                 {index < 3 && (
                   <div className="hidden md:block absolute top-12 left-[60%] w-[80%] h-px bg-gold/20" />
                 )}
-                <div className="w-24 h-24 mx-auto rounded-full bg-card border-2 border-gold/20 flex items-center justify-center text-4xl mb-6 shadow-md group-hover:border-gold group-hover:shadow-lg transition-all duration-300 relative z-10">
-                  {item.icon}
+                <div className="relative w-24 h-24 mx-auto mb-8">
+                  <div className="w-24 h-24 rounded-full bg-card border-2 border-gold/20 flex items-center justify-center text-4xl shadow-md group-hover:border-gold group-hover:shadow-lg transition-all duration-300">
+                    {item.icon}
+                  </div>
+                  <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-8 h-8 rounded-full bg-gold text-white text-sm font-bold flex items-center justify-center z-20 shadow-sm">
+                    {item.step}
+                  </div>
                 </div>
-                <div className="w-8 h-8 mx-auto -mt-9 mb-3 rounded-full bg-gold text-white text-sm font-bold flex items-center justify-center relative z-20 shadow-sm">
-                  {item.step}
-                </div>
-                <h3 className="text-h5 font-serif font-bold text-teak-dark mb-3 mt-2">
+                <h3 className="text-h5 font-serif font-bold text-teak-dark mb-3">
                   {t(item.titleKey)}
                 </h3>
                 <p className="text-text-muted text-sm leading-relaxed max-w-[250px] mx-auto">
