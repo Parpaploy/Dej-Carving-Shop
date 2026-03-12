@@ -110,7 +110,7 @@ export default function AboutPage() {
                   <div className="w-24 h-24 rounded-full bg-card border-2 border-gold/20 flex items-center justify-center text-4xl shadow-md group-hover:border-gold group-hover:shadow-lg transition-all duration-300">
                     {item.icon}
                   </div>
-                  <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-8 h-8 rounded-full bg-gold text-white text-sm font-bold flex items-center justify-center z-20 shadow-sm">
+                  <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-8 h-8 rounded-full bg-white text-teak-dark text-sm font-bold border border-gold/30 flex items-center justify-center z-20 shadow-sm">
                     {item.step}
                   </div>
                 </div>
