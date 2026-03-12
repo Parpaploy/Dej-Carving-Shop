@@ -104,7 +104,7 @@ export default function Navbar() {
             >
               <Link
                 href="/products"
-                className="relative group text-body-lg font-medium text-cream/90 hover:text-white transition-colors pb-1 flex items-center gap-1"
+                className="relative group text-body-lg font-medium text-white hover:text-white/70 transition-colors pb-1 flex items-center gap-1"
               >
                 {t("nav.products")}
                 {categories.length > 0 && (
@@ -178,7 +178,7 @@ export default function Navbar() {
                       </div>
                     )}
                   </div>
-                  <span className="text-body font-medium max-w-[120px] truncate text-cream/90">
+                  <span className="text-body font-medium max-w-[120px] truncate text-white">
                     {user.username}
                   </span>
                 </button>
@@ -212,7 +212,7 @@ export default function Navbar() {
             ) : (
               <Link
                 href="/login"
-                className="flex items-center gap-2 text-cream/90 hover:text-gold-soft transition-colors"
+                className="flex items-center gap-2 text-white hover:text-gold-soft transition-colors"
               >
                 <User size={20} />
                 <span className="text-body font-medium">{t("nav.login")}</span>
@@ -222,7 +222,7 @@ export default function Navbar() {
             {/* Cart */}
             <Link
               href="/cart"
-              className="flex items-center gap-2 bg-gold text-cream/90 px-5 py-2.5 rounded-full hover:bg-gold-soft hover:text-white hover:shadow-lg hover:shadow-gold/20 hover:-translate-y-0.5 transition-all duration-300 relative font-semibold"
+              className="flex items-center gap-2 bg-gold text-white px-5 py-2.5 rounded-full hover:bg-gold-soft hover:text-white hover:shadow-lg hover:shadow-gold/20 hover:-translate-y-0.5 transition-all duration-300 relative font-semibold"
             >
               <ShoppingCart size={20} />
               <span className="text-body">{t("nav.cart")}</span>
@@ -282,7 +282,7 @@ export default function Navbar() {
                     <Link
                       href="/products"
                       onClick={() => setIsMobileMenuOpen(false)}
-                      className="flex-grow text-lg py-3 px-4 text-cream/90 hover:text-white hover:bg-white/5 rounded-xl transition-all duration-200"
+                      className="flex-grow text-lg py-3 px-4 text-white hover:text-white/70 hover:bg-white/5 rounded-xl transition-all duration-200"
                     >
                       {t("nav.products")}
                     </Link>
@@ -384,7 +384,7 @@ function NavLink({ href, children }: { href: string; children: React.ReactNode }
   return (
     <Link
       href={href}
-      className="relative group text-body-lg font-medium text-cream/90 hover:text-white transition-colors pb-1"
+      className="relative group text-body-lg font-medium text-white hover:text-white/70 transition-colors pb-1"
     >
       {children}
       <span className="absolute left-0 bottom-1 w-full h-[2px] bg-gold-soft scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300 ease-out rounded-full" />
@@ -397,7 +397,7 @@ function MobileLink({ href, children, onClick }: { href: string; children: React
     <Link
       href={href}
       onClick={onClick}
-      className="text-lg py-3 px-4 text-cream/90 hover:text-white hover:bg-white/5 rounded-xl block mx-2 transition-all duration-200"
+      className="text-lg py-3 px-4 text-white hover:text-white/70 hover:bg-white/5 rounded-xl block mx-2 transition-all duration-200"
     >
       {children}
     </Link>
