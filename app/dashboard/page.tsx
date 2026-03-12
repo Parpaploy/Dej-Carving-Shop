@@ -7,10 +7,12 @@ import {
   Image as ImageIcon, Eye, ChevronDown, Phone, MapPin,
   Mail, Calendar, Shield, Search, RefreshCw,
   Check, XCircle, Truck, Clock, CheckCircle, Ban, Save, StickyNote,
+  Home, LogOut,
 } from "lucide-react";
 import { toast } from "sonner";
 import { IProduct } from "@/app/interfaces/product.interface";
 import { useAuth } from "@/app/context/AuthContext";
+import { useLocale } from "@/app/context/LocaleContext";
 
 const API = process.env.NEXT_PUBLIC_STRAPI_BASE_URL;
 
@@ -33,9 +35,11 @@ function getAuthHeaders() {
 
 // ==================== MAIN DASHBOARD ====================
 export default function AdminDashboard() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
+  const { t } = useLocale();
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<"products" | "orders" | "users">("products");
+  const [activeTab, setActiveTab] = useState<"products" | "orders" | "users">("orders");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem("jwt");
@@ -45,48 +49,94 @@ export default function AdminDashboard() {
   }, [router]);
 
   const tabs = [
-    { key: "products" as const, label: "Products", icon: <Package size={20} /> },
-    { key: "orders" as const, label: "Orders", icon: <ShoppingCart size={20} /> },
-    { key: "users" as const, label: "Users", icon: <Users size={20} /> },
+    { key: "orders" as const, label: t("dash.orders"), icon: <ShoppingCart size={20} />, color: "bg-blue-600" },
+    { key: "products" as const, label: t("dash.products"), icon: <Package size={20} />, color: "bg-emerald-600" },
+    { key: "users" as const, label: t("dash.users"), icon: <Users size={20} />, color: "bg-purple-600" },
   ];
 
   return (
-    <div className="flex min-h-screen bg-gray-100 font-sans">
+    <div className="flex min-h-screen bg-gray-50 font-sans">
+      {/* Mobile sidebar overlay */}
+      {sidebarOpen && (
+        <div className="fixed inset-0 bg-black/50 z-40 lg:hidden" onClick={() => setSidebarOpen(false)} />
+      )}
+
       {/* SIDEBAR */}
-      <aside className="w-64 bg-slate-900 text-white p-6 flex flex-col flex-shrink-0">
-        <h1 className="text-xl font-bold mb-8">Dej Admin</h1>
-        <nav className="flex flex-col gap-1">
-          {tabs.map((t) => (
+      <aside className={`fixed lg:static inset-y-0 left-0 z-50 w-64 bg-slate-900 text-white flex flex-col flex-shrink-0 transform transition-transform lg:transform-none ${sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}>
+        <div className="p-6 border-b border-slate-700">
+          <h1 className="text-xl font-bold">{t("dash.title")}</h1>
+          <p className="text-xs text-slate-400 mt-1">{t("common.shopName")}</p>
+        </div>
+
+        <nav className="flex flex-col gap-1 p-4 flex-grow">
+          {tabs.map((tab) => (
             <button
-              key={t.key}
-              onClick={() => setActiveTab(t.key)}
-              className={`flex items-center gap-3 p-3 rounded-lg text-left transition-colors ${
-                activeTab === t.key ? "bg-blue-600" : "hover:bg-slate-800"
+              key={tab.key}
+              onClick={() => { setActiveTab(tab.key); setSidebarOpen(false); }}
+              className={`flex items-center gap-3 p-3 rounded-lg text-left transition-all ${
+                activeTab === tab.key
+                  ? `${tab.color} shadow-lg shadow-blue-900/30`
+                  : "hover:bg-slate-800 text-slate-300"
               }`}
             >
-              {t.icon} <span>{t.label}</span>
+              {tab.icon} <span className="font-medium">{tab.label}</span>
             </button>
           ))}
+
+          <div className="h-px bg-slate-700 my-4" />
+
+          <a href="/" className="flex items-center gap-3 p-3 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition-colors">
+            <Home size={20} /> <span className="font-medium">{t("nav.home")}</span>
+          </a>
         </nav>
+
         {user && (
-          <div className="mt-auto pt-6 border-t border-slate-700 text-sm text-slate-400">
-            Logged in as <span className="text-white font-medium">{user.username}</span>
+          <div className="p-4 border-t border-slate-700">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-9 h-9 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+                {user.username?.charAt(0)?.toUpperCase() || "?"}
+              </div>
+              <div className="min-w-0">
+                <p className="text-sm font-medium text-white truncate">{user.username}</p>
+                <p className="text-xs text-slate-400 truncate">{user.email}</p>
+              </div>
+            </div>
+            <button
+              onClick={logout}
+              className="w-full flex items-center justify-center gap-2 p-2 rounded-lg text-sm text-slate-400 hover:bg-slate-800 hover:text-red-400 transition-colors"
+            >
+              <LogOut size={16} /> {t("nav.logout")}
+            </button>
           </div>
         )}
       </aside>
 
       {/* MAIN */}
-      <main className="flex-1 p-8 overflow-y-auto">
-        {activeTab === "products" && <ProductManager />}
-        {activeTab === "orders" && <OrderManager />}
-        {activeTab === "users" && <UserManager />}
-      </main>
+      <div className="flex-1 flex flex-col min-w-0">
+        {/* Top bar for mobile */}
+        <header className="lg:hidden flex items-center justify-between p-4 bg-white border-b shadow-sm">
+          <button onClick={() => setSidebarOpen(true)} className="p-2 hover:bg-gray-100 rounded-lg">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+          <h1 className="font-bold text-gray-800">{t("dash.title")}</h1>
+          <div className="w-10" />
+        </header>
+
+        <main className="flex-1 p-4 md:p-8 overflow-y-auto">
+          {activeTab === "products" && <ProductManager />}
+          {activeTab === "orders" && <OrderManager />}
+          {activeTab === "users" && <UserManager />}
+        </main>
+      </div>
     </div>
   );
 }
 
 // ==================== PRODUCT MANAGER ====================
 function ProductManager() {
+  const { t } = useLocale();
   const [products, setProducts] = useState<IProduct[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -106,12 +156,13 @@ function ProductManager() {
   useEffect(() => { fetchProducts(); }, []);
 
   const handleDelete = async (id: number) => {
-    if (!confirm("Are you sure?")) return;
+    if (!confirm(t("dash.confirmDelete"))) return;
     try {
       await axios.delete(`${API}/api/products/${id}`, { headers: getAuthHeaders() });
       setProducts(products.filter((p) => p.id !== id));
+      toast.success(t("toast.addressDeleted"));
     } catch {
-      alert("Error deleting product");
+      toast.error(t("dash.deleteError"));
     }
   };
 
@@ -143,9 +194,10 @@ function ProductManager() {
       }
       await fetchProducts();
       closeModal();
+      toast.success(editingId ? t("dash.updated") : t("dash.saveProduct"));
     } catch (err) {
       console.error(err);
-      alert("Failed to save.");
+      toast.error(t("dash.saveFailed"));
     } finally {
       setLoading(false);
     }
@@ -167,69 +219,90 @@ function ProductManager() {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-gray-800">Product Management</h2>
-        <button onClick={() => setIsModalOpen(true)} className="bg-blue-600 text-white px-4 py-2 rounded flex items-center gap-2 hover:bg-blue-700">
-          <Plus size={18} /> Add Product
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-800">{t("dash.productMgmt")}</h2>
+          <p className="text-sm text-gray-400 mt-1">{products.length} {t("dash.products")}</p>
+        </div>
+        <button onClick={() => setIsModalOpen(true)} className="bg-emerald-600 text-white px-5 py-2.5 rounded-lg flex items-center gap-2 hover:bg-emerald-700 transition-colors shadow-sm font-medium">
+          <Plus size={18} /> {t("dash.addProduct")}
         </button>
       </div>
 
-      <div className="bg-white rounded-lg shadow overflow-hidden">
-        <table className="w-full text-left">
-          <thead className="bg-gray-50 border-b">
-            <tr>
-              <th className="p-4">Image</th>
-              <th className="p-4">Name</th>
-              <th className="p-4">Price</th>
-              <th className="p-4 text-right">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {products.map((p) => {
-              const raw = p.images?.[0]?.url;
-              const imgUrl = raw ? (raw.startsWith("http") ? raw : `${API}${raw}`) : null;
-              return (
-                <tr key={p.id} className="border-b hover:bg-gray-50">
-                  <td className="p-4">
-                    {imgUrl ? (
-                      <img src={imgUrl} alt={p.name} className="w-12 h-12 object-cover rounded" />
-                    ) : (
-                      <div className="w-12 h-12 bg-gray-200 rounded flex items-center justify-center text-gray-400"><ImageIcon size={20} /></div>
-                    )}
-                  </td>
-                  <td className="p-4 font-medium">{p.name}</td>
-                  <td className="p-4 text-green-600 font-bold">฿{(p.price ?? 0).toLocaleString()}</td>
-                  <td className="p-4 text-right">
-                    <button onClick={() => openEdit(p)} className="text-blue-500 hover:bg-blue-50 p-2 rounded mr-2"><Edit size={18} /></button>
-                    <button onClick={() => handleDelete(p.id)} className="text-red-500 hover:bg-red-50 p-2 rounded"><Trash2 size={18} /></button>
-                  </td>
-                </tr>
-              );
-            })}
-            {products.length === 0 && (
-              <tr><td colSpan={4} className="p-8 text-center text-gray-400">No products yet</td></tr>
-            )}
-          </tbody>
-        </table>
+      <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left">
+            <thead className="bg-gray-50 border-b">
+              <tr>
+                <th className="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">{t("dash.image")}</th>
+                <th className="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">{t("dash.name")}</th>
+                <th className="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">{t("dash.price")}</th>
+                <th className="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">{t("dash.actions")}</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {products.map((p) => {
+                const raw = p.images?.[0]?.url;
+                const imgUrl = raw ? (raw.startsWith("http") ? raw : `${API}${raw}`) : null;
+                return (
+                  <tr key={p.id} className="hover:bg-gray-50 transition-colors">
+                    <td className="p-4">
+                      {imgUrl ? (
+                        <img src={imgUrl} alt={p.name} className="w-14 h-14 object-cover rounded-lg shadow-sm" />
+                      ) : (
+                        <div className="w-14 h-14 bg-gray-100 rounded-lg flex items-center justify-center text-gray-300"><ImageIcon size={22} /></div>
+                      )}
+                    </td>
+                    <td className="p-4 font-medium text-gray-800">{p.name}</td>
+                    <td className="p-4 text-emerald-600 font-bold text-lg">฿{(p.price ?? 0).toLocaleString()}</td>
+                    <td className="p-4 text-right">
+                      <div className="flex items-center justify-end gap-1">
+                        <button onClick={() => openEdit(p)} className="text-blue-600 hover:bg-blue-50 p-2.5 rounded-lg transition-colors" title={t("dash.editProduct")}>
+                          <Edit size={18} />
+                        </button>
+                        <button onClick={() => handleDelete(p.id)} className="text-red-500 hover:bg-red-50 p-2.5 rounded-lg transition-colors" title={t("dash.delete")}>
+                          <Trash2 size={18} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+              {products.length === 0 && (
+                <tr><td colSpan={4} className="p-12 text-center text-gray-400">{t("dash.noProducts")}</td></tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
 
+      {/* Product Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-xl w-full max-w-lg shadow-2xl">
-            <div className="flex justify-between mb-4">
-              <h3 className="text-xl font-bold">{editingId ? "Edit Product" : "New Product"}</h3>
-              <button onClick={closeModal}><X size={24} /></button>
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl w-full max-w-lg shadow-2xl overflow-hidden">
+            <div className="bg-slate-900 text-white px-6 py-4 flex items-center justify-between">
+              <h3 className="text-lg font-bold">{editingId ? t("dash.editProduct") : t("dash.newProduct")}</h3>
+              <button onClick={closeModal} className="text-slate-400 hover:text-white transition-colors"><X size={24} /></button>
             </div>
-            <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-              <input className="border p-3 rounded" placeholder="Product Name" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} required />
-              <input className="border p-3 rounded" type="number" placeholder="Price" value={formData.price} onChange={(e) => setFormData({ ...formData, price: e.target.value })} required />
-              <textarea className="border p-3 rounded" placeholder="Description" rows={4} value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} />
+            <form onSubmit={handleSubmit} className="p-6 flex flex-col gap-4">
               <div>
-                <label className="block text-sm text-gray-600 mb-1">Product Image</label>
-                <input type="file" accept="image/*" onChange={(e: ChangeEvent<HTMLInputElement>) => setFile(e.target.files ? e.target.files[0] : null)} className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:bg-blue-50 file:text-blue-700" />
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">{t("dash.productName")}</label>
+                <input className="w-full border rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder={t("dash.productName")} value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} required />
               </div>
-              <button type="submit" disabled={loading} className="bg-blue-600 text-white py-3 rounded font-bold hover:bg-blue-700 disabled:bg-gray-400">
-                {loading ? "Saving..." : "Save Product"}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">{t("dash.price")}</label>
+                <input className="w-full border rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none" type="number" placeholder="0" value={formData.price} onChange={(e) => setFormData({ ...formData, price: e.target.value })} required />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">{t("dash.description")}</label>
+                <textarea className="w-full border rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder={t("dash.description")} rows={4} value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">{t("dash.productImage")}</label>
+                <input type="file" accept="image/*" onChange={(e: ChangeEvent<HTMLInputElement>) => setFile(e.target.files ? e.target.files[0] : null)} className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:bg-blue-50 file:text-blue-700 file:font-medium file:cursor-pointer" />
+              </div>
+              <button type="submit" disabled={loading} className="bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 disabled:bg-gray-400 transition-colors mt-2">
+                {loading ? t("dash.saving") : t("dash.saveProduct")}
               </button>
             </form>
           </div>
@@ -265,15 +338,8 @@ const STATUS_COLORS: Record<string, string> = {
   cancelled: "bg-red-100 text-red-800 border-red-300",
 };
 
-const STATUS_LABELS: Record<string, string> = {
-  pending: "รอชำระ / Pending",
-  paid: "ชำระแล้ว / Paid",
-  shipped: "จัดส่งแล้ว / Shipped",
-  delivered: "ส่งถึงแล้ว / Delivered",
-  cancelled: "ยกเลิก / Cancelled",
-};
-
 function OrderManager() {
+  const { t, locale } = useLocale();
   const [orders, setOrders] = useState<OrderData[]>([]);
   const [loading, setLoading] = useState(true);
   const [expandedId, setExpandedId] = useState<number | null>(null);
@@ -288,13 +354,23 @@ function OrderManager() {
   const prevOrderIdsRef = useRef<Set<number>>(new Set());
   const isFirstLoadRef = useRef(true);
 
+  const statusLabel = (status: string) => {
+    const map: Record<string, string> = {
+      pending: t("dash.pending"),
+      paid: t("dash.paid"),
+      shipped: t("dash.shipped"),
+      delivered: t("dash.delivered"),
+      cancelled: t("dash.cancelled"),
+    };
+    return map[status] || status;
+  };
+
   const fetchOrders = useCallback(async (silent = false) => {
     if (!silent) setLoading(true);
     try {
       const res = await axios.get(`${API}/api/orders?populate=*&sort=createdAt:desc`, { headers: getAuthHeaders() });
       const fetched: OrderData[] = res.data.data;
 
-      // Detect new orders (skip on first load)
       if (!isFirstLoadRef.current) {
         const currentIds = new Set(fetched.map((o) => o.id));
         const brandNew: number[] = [];
@@ -303,7 +379,7 @@ function OrderManager() {
         });
         if (brandNew.length > 0) {
           setNewOrderIds(new Set(brandNew));
-          toast.success(`${brandNew.length} คำสั่งซื้อใหม่! / ${brandNew.length} new order(s)!`);
+          toast.success(`${brandNew.length} ${t("dash.newOrders")}`);
           setTimeout(() => setNewOrderIds(new Set()), 4000);
         }
       }
@@ -317,19 +393,16 @@ function OrderManager() {
     } finally {
       if (!silent) setLoading(false);
     }
-  }, []);
+  }, [t]);
 
-  // Initial fetch
   useEffect(() => { fetchOrders(); }, [fetchOrders]);
 
-  // Auto-polling every 15 seconds (pause when editing)
   useEffect(() => {
     if (editingOrder) return;
     const interval = setInterval(() => fetchOrders(true), 15000);
     return () => clearInterval(interval);
   }, [fetchOrders, editingOrder]);
 
-  // Seconds-ago ticker
   useEffect(() => {
     const tick = setInterval(() => {
       setSecondsAgo(Math.floor((Date.now() - lastRefreshed.getTime()) / 1000));
@@ -342,27 +415,27 @@ function OrderManager() {
     try {
       await axios.put(`${API}/api/orders/${docId}`, { data: { status: newStatus } }, { headers: getAuthHeaders() });
       setOrders((prev) => prev.map((o) => (o.id === order.id ? { ...o, status: newStatus } : o)));
-      toast.success(`${order.orderNumber} → ${STATUS_LABELS[newStatus] || newStatus}`);
+      toast.success(`${order.orderNumber} → ${statusLabel(newStatus)}`);
     } catch (err) {
       console.error("Failed to update status:", err);
-      toast.error("Failed to update order status");
+      toast.error(t("dash.failedUpdateStatus"));
     }
   };
 
-  const quickAction = async (order: OrderData, newStatus: string, label: string) => {
-    if (newStatus === "cancelled" && !confirm(`ยกเลิกคำสั่งซื้อ ${order.orderNumber}? / Cancel order ${order.orderNumber}?`)) return;
+  const quickAction = async (order: OrderData, newStatus: string) => {
+    if (newStatus === "cancelled" && !confirm(`${t("dash.confirmCancel")} ${order.orderNumber}?`)) return;
     await updateStatus(order, newStatus);
   };
 
   const deleteOrder = async (order: OrderData) => {
-    if (!confirm(`ลบคำสั่งซื้อ ${order.orderNumber}? / Delete order ${order.orderNumber}?`)) return;
+    if (!confirm(`${t("dash.confirmDeleteOrder")} ${order.orderNumber}?`)) return;
     const docId = order.documentId || order.id;
     try {
       await axios.delete(`${API}/api/orders/${docId}`, { headers: getAuthHeaders() });
       setOrders((prev) => prev.filter((o) => o.id !== order.id));
-      toast.success(`Deleted ${order.orderNumber}`);
+      toast.success(`${t("dash.delete")} ${order.orderNumber}`);
     } catch (err) {
-      toast.error("Failed to delete order");
+      toast.error(t("dash.failedDeleteOrder"));
     }
   };
 
@@ -387,10 +460,10 @@ function OrderManager() {
       setOrders((prev) =>
         prev.map((o) => (o.id === editingOrder.id ? { ...o, ...editForm } : o))
       );
-      toast.success(`${editingOrder.orderNumber} updated`);
+      toast.success(`${editingOrder.orderNumber} ${t("dash.updated")}`);
       setEditingOrder(null);
     } catch (err) {
-      toast.error("Failed to update order");
+      toast.error(t("dash.failedSaveOrder"));
     } finally {
       setEditSaving(false);
     }
@@ -419,35 +492,35 @@ function OrderManager() {
         return (
           <div className="flex gap-2">
             <button
-              onClick={(e) => { e.stopPropagation(); quickAction(order, "paid", "Approve"); }}
-              className="flex items-center gap-1.5 px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-bold hover:bg-green-700 active:scale-95 transition-all"
+              onClick={(e) => { e.stopPropagation(); quickAction(order, "paid"); }}
+              className="flex items-center gap-1.5 px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-bold hover:bg-green-700 active:scale-95 transition-all shadow-sm"
             >
-              <Check size={16} /> Approve
+              <Check size={16} /> {t("dash.approve")}
             </button>
             <button
-              onClick={(e) => { e.stopPropagation(); quickAction(order, "cancelled", "Reject"); }}
-              className="flex items-center gap-1.5 px-4 py-2 bg-red-500 text-white rounded-lg text-sm font-bold hover:bg-red-600 active:scale-95 transition-all"
+              onClick={(e) => { e.stopPropagation(); quickAction(order, "cancelled"); }}
+              className="flex items-center gap-1.5 px-4 py-2 bg-red-500 text-white rounded-lg text-sm font-bold hover:bg-red-600 active:scale-95 transition-all shadow-sm"
             >
-              <Ban size={16} /> Reject
+              <Ban size={16} /> {t("dash.reject")}
             </button>
           </div>
         );
       case "paid":
         return (
           <button
-            onClick={(e) => { e.stopPropagation(); quickAction(order, "shipped", "Ship"); }}
-            className="flex items-center gap-1.5 px-4 py-2 bg-purple-600 text-white rounded-lg text-sm font-bold hover:bg-purple-700 active:scale-95 transition-all"
+            onClick={(e) => { e.stopPropagation(); quickAction(order, "shipped"); }}
+            className="flex items-center gap-1.5 px-4 py-2 bg-purple-600 text-white rounded-lg text-sm font-bold hover:bg-purple-700 active:scale-95 transition-all shadow-sm"
           >
-            <Truck size={16} /> Ship Order
+            <Truck size={16} /> {t("dash.shipOrder")}
           </button>
         );
       case "shipped":
         return (
           <button
-            onClick={(e) => { e.stopPropagation(); quickAction(order, "delivered", "Delivered"); }}
-            className="flex items-center gap-1.5 px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-bold hover:bg-green-700 active:scale-95 transition-all"
+            onClick={(e) => { e.stopPropagation(); quickAction(order, "delivered"); }}
+            className="flex items-center gap-1.5 px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-bold hover:bg-green-700 active:scale-95 transition-all shadow-sm"
           >
-            <CheckCircle size={16} /> Mark Delivered
+            <CheckCircle size={16} /> {t("dash.markDelivered")}
           </button>
         );
       default:
@@ -458,41 +531,41 @@ function OrderManager() {
   return (
     <div>
       {/* Header with live indicator */}
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <div className="flex items-center gap-3">
-          <h2 className="text-2xl font-bold text-gray-800">Order Management</h2>
+          <h2 className="text-2xl font-bold text-gray-800">{t("dash.orderMgmt")}</h2>
           <div className="flex items-center gap-2 bg-green-50 border border-green-200 px-3 py-1 rounded-full">
             <span className="relative flex h-2.5 w-2.5">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
               <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500" />
             </span>
-            <span className="text-xs text-green-700 font-medium">Live</span>
+            <span className="text-xs text-green-700 font-medium">{t("dash.live")}</span>
           </div>
         </div>
         <div className="flex items-center gap-3">
           <span className="text-xs text-gray-400 flex items-center gap-1">
             <Clock size={14} />
-            {secondsAgo < 5 ? "just now" : `${secondsAgo}s ago`}
+            {secondsAgo < 5 ? t("dash.justNow") : `${secondsAgo}${t("dash.secondsAgo")}`}
           </span>
-          <button onClick={() => fetchOrders()} className="text-gray-500 hover:text-blue-600 p-2 rounded hover:bg-blue-50">
+          <button onClick={() => fetchOrders()} className="text-gray-500 hover:text-blue-600 p-2 rounded-lg hover:bg-blue-50 transition-colors">
             <RefreshCw size={20} />
           </button>
         </div>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
         {[
-          { label: "Total", value: orderStats.total, color: "bg-gray-50 border-gray-200", icon: <ShoppingCart size={18} className="text-gray-400" /> },
-          { label: "Pending", value: orderStats.pending, color: "bg-yellow-50 border-yellow-200", icon: <Clock size={18} className="text-yellow-500" /> },
-          { label: "Paid", value: orderStats.paid, color: "bg-blue-50 border-blue-200", icon: <Check size={18} className="text-blue-500" /> },
-          { label: "Shipped", value: orderStats.shipped, color: "bg-purple-50 border-purple-200", icon: <Truck size={18} className="text-purple-500" /> },
-          { label: "Delivered", value: orderStats.delivered, color: "bg-green-50 border-green-200", icon: <CheckCircle size={18} className="text-green-500" /> },
+          { label: t("dash.total"), value: orderStats.total, color: "bg-white border-gray-200", icon: <ShoppingCart size={18} className="text-gray-400" /> },
+          { label: t("dash.pending"), value: orderStats.pending, color: "bg-yellow-50 border-yellow-200", icon: <Clock size={18} className="text-yellow-500" /> },
+          { label: t("dash.paid"), value: orderStats.paid, color: "bg-blue-50 border-blue-200", icon: <Check size={18} className="text-blue-500" /> },
+          { label: t("dash.shipped"), value: orderStats.shipped, color: "bg-purple-50 border-purple-200", icon: <Truck size={18} className="text-purple-500" /> },
+          { label: t("dash.delivered"), value: orderStats.delivered, color: "bg-green-50 border-green-200", icon: <CheckCircle size={18} className="text-green-500" /> },
         ].map((s) => (
-          <div key={s.label} className={`${s.color} border rounded-lg p-4 text-center`}>
+          <div key={s.label} className={`${s.color} border rounded-xl p-4 text-center shadow-sm`}>
             <div className="flex justify-center mb-1">{s.icon}</div>
-            <p className="text-2xl font-bold">{s.value}</p>
-            <p className="text-sm text-gray-500">{s.label}</p>
+            <p className="text-2xl font-bold text-gray-800">{s.value}</p>
+            <p className="text-xs text-gray-500 font-medium">{s.label}</p>
           </div>
         ))}
       </div>
@@ -503,56 +576,56 @@ function OrderManager() {
           <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
           <input
             type="text"
-            placeholder="Search order number, name, phone..."
+            placeholder={t("dash.searchOrders")}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            className="w-full pl-10 pr-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white shadow-sm"
           />
         </div>
         <select
           value={filterStatus}
           onChange={(e) => setFilterStatus(e.target.value)}
-          className="border rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+          className="border rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white shadow-sm font-medium"
         >
-          <option value="all">All Status</option>
-          <option value="pending">Pending</option>
-          <option value="paid">Paid</option>
-          <option value="shipped">Shipped</option>
-          <option value="delivered">Delivered</option>
-          <option value="cancelled">Cancelled</option>
+          <option value="all">{t("dash.allStatus")}</option>
+          <option value="pending">{t("dash.pending")}</option>
+          <option value="paid">{t("dash.paid")}</option>
+          <option value="shipped">{t("dash.shipped")}</option>
+          <option value="delivered">{t("dash.delivered")}</option>
+          <option value="cancelled">{t("dash.cancelled")}</option>
         </select>
       </div>
 
       {/* Orders List */}
       {loading ? (
-        <div className="text-center py-10 text-gray-400">Loading orders...</div>
+        <div className="text-center py-16 text-gray-400">{t("dash.loadingOrders")}</div>
       ) : filtered.length === 0 ? (
-        <div className="text-center py-10 text-gray-400">No orders found</div>
+        <div className="text-center py-16 text-gray-400">{t("dash.noOrders")}</div>
       ) : (
         <div className="space-y-3">
           {filtered.map((order) => (
             <div
               key={order.id}
-              className={`bg-white rounded-lg shadow border overflow-hidden transition-all ${
+              className={`bg-white rounded-xl shadow-sm border overflow-hidden transition-all ${
                 newOrderIds.has(order.id)
                   ? "border-green-400 ring-2 ring-green-200 animate-pulse"
-                  : "border-gray-100"
+                  : "border-gray-100 hover:border-gray-200"
               }`}
             >
               {/* Row */}
               <div
-                className="flex flex-wrap items-center gap-4 p-4 cursor-pointer hover:bg-gray-50"
+                className="flex flex-wrap items-center gap-4 p-4 cursor-pointer hover:bg-gray-50 transition-colors"
                 onClick={() => setExpandedId(expandedId === order.id ? null : order.id)}
               >
                 <div className="flex-grow min-w-0">
                   <div className="flex items-center gap-2">
                     {newOrderIds.has(order.id) && (
-                      <span className="px-2 py-0.5 bg-green-500 text-white text-[10px] font-bold rounded-full uppercase">New</span>
+                      <span className="px-2 py-0.5 bg-green-500 text-white text-[10px] font-bold rounded-full uppercase">{t("dash.new")}</span>
                     )}
                     <p className="font-bold text-gray-800">{order.orderNumber}</p>
                   </div>
                   <p className="text-sm text-gray-400">
-                    {new Date(order.orderDate || order.createdAt).toLocaleDateString("th-TH", {
+                    {new Date(order.orderDate || order.createdAt).toLocaleDateString(locale === "th" ? "th-TH" : "en-US", {
                       year: "numeric", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit",
                     })}
                   </p>
@@ -563,13 +636,12 @@ function OrderManager() {
                   <p className="text-gray-400">{order.phone || ""}</p>
                 </div>
 
-                <p className="font-bold text-green-700 text-lg">฿{(order.totalAmount ?? 0).toLocaleString()}</p>
+                <p className="font-bold text-emerald-700 text-lg">฿{(order.totalAmount ?? 0).toLocaleString()}</p>
 
                 <span className={`px-3 py-1 rounded-full text-xs font-bold border ${STATUS_COLORS[order.status] || "bg-gray-100 text-gray-600"}`}>
-                  {STATUS_LABELS[order.status] || order.status}
+                  {statusLabel(order.status)}
                 </span>
 
-                {/* Quick Actions inline */}
                 <div className="hidden md:block" onClick={(e) => e.stopPropagation()}>
                   {renderQuickActions(order)}
                 </div>
@@ -580,21 +652,20 @@ function OrderManager() {
               {/* Expanded Details */}
               {expandedId === order.id && (
                 <div className="border-t bg-gray-50 p-5 space-y-4">
-                  {/* Mobile quick actions */}
                   <div className="md:hidden flex justify-center">
                     {renderQuickActions(order)}
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                      <p className="text-xs text-gray-400 uppercase mb-1">Shipping Address</p>
+                    <div className="bg-white rounded-lg p-3 border">
+                      <p className="text-xs text-gray-400 uppercase mb-1 font-semibold">{t("dash.shippingAddress")}</p>
                       <div className="flex items-start gap-2">
                         <MapPin size={16} className="text-gray-400 mt-0.5 flex-shrink-0" />
-                        <p className="text-sm text-gray-700">{order.shippingAddress || "No address"}</p>
+                        <p className="text-sm text-gray-700">{order.shippingAddress || t("dash.noAddress")}</p>
                       </div>
                     </div>
-                    <div>
-                      <p className="text-xs text-gray-400 uppercase mb-1">Contact</p>
+                    <div className="bg-white rounded-lg p-3 border">
+                      <p className="text-xs text-gray-400 uppercase mb-1 font-semibold">{t("dash.contact")}</p>
                       <div className="flex items-center gap-2 mb-1">
                         <Phone size={16} className="text-gray-400" />
                         <p className="text-sm text-gray-700">{order.phone || "—"}</p>
@@ -606,18 +677,17 @@ function OrderManager() {
                         </div>
                       )}
                     </div>
-                    <div>
-                      <p className="text-xs text-gray-400 uppercase mb-1">Payment</p>
+                    <div className="bg-white rounded-lg p-3 border">
+                      <p className="text-xs text-gray-400 uppercase mb-1 font-semibold">{t("dash.payment")}</p>
                       <p className="text-sm text-gray-700 font-medium">
-                        {order.paymentMethod === "promptpay" ? "PromptPay" : "Bank Transfer"}
+                        {order.paymentMethod === "promptpay" ? t("dash.promptpay") : t("dash.bankTransfer")}
                       </p>
                     </div>
                   </div>
 
-                  {/* Admin Notes */}
                   {order.adminNotes && (
                     <div>
-                      <p className="text-xs text-gray-400 uppercase mb-1">Admin Notes</p>
+                      <p className="text-xs text-gray-400 uppercase mb-1 font-semibold">{t("dash.adminNotes")}</p>
                       <div className="flex items-start gap-2 bg-yellow-50 border border-yellow-200 rounded-lg p-3">
                         <StickyNote size={16} className="text-yellow-600 mt-0.5 flex-shrink-0" />
                         <p className="text-sm text-gray-700">{order.adminNotes}</p>
@@ -625,51 +695,49 @@ function OrderManager() {
                     </div>
                   )}
 
-                  {/* Products in order */}
                   {order.products && order.products.length > 0 && (
                     <div>
-                      <p className="text-xs text-gray-400 uppercase mb-2">Products</p>
+                      <p className="text-xs text-gray-400 uppercase mb-2 font-semibold">{t("dash.productsInOrder")}</p>
                       <div className="space-y-1">
                         {order.products.map((prod) => (
-                          <div key={prod.id} className="flex justify-between text-sm bg-white px-3 py-2 rounded border">
+                          <div key={prod.id} className="flex justify-between text-sm bg-white px-3 py-2 rounded-lg border">
                             <span className="text-gray-700">{prod.name}</span>
-                            <span className="text-green-600 font-medium">฿{(prod.price ?? 0).toLocaleString()}</span>
+                            <span className="text-emerald-600 font-medium">฿{(prod.price ?? 0).toLocaleString()}</span>
                           </div>
                         ))}
                       </div>
                     </div>
                   )}
 
-                  {/* Actions Row */}
                   <div className="flex flex-wrap items-center gap-3 pt-3 border-t">
                     <button
                       onClick={() => openEdit(order)}
                       className="flex items-center gap-1.5 px-4 py-2 bg-blue-50 text-blue-700 rounded-lg text-sm font-medium hover:bg-blue-100 transition-colors"
                     >
-                      <Edit size={16} /> Edit Order
+                      <Edit size={16} /> {t("dash.editOrder")}
                     </button>
 
                     <div className="flex items-center gap-2">
-                      <label className="text-sm text-gray-500">Status:</label>
+                      <label className="text-sm text-gray-500 font-medium">{t("dash.status")}:</label>
                       <select
                         value={order.status}
                         onChange={(e) => updateStatus(order, e.target.value)}
-                        className="border rounded px-3 py-1.5 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                        className="border rounded-lg px-3 py-1.5 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white"
                       >
-                        <option value="pending">Pending</option>
-                        <option value="paid">Paid</option>
-                        <option value="shipped">Shipped</option>
-                        <option value="delivered">Delivered</option>
-                        <option value="cancelled">Cancelled</option>
+                        <option value="pending">{t("dash.pending")}</option>
+                        <option value="paid">{t("dash.paid")}</option>
+                        <option value="shipped">{t("dash.shipped")}</option>
+                        <option value="delivered">{t("dash.delivered")}</option>
+                        <option value="cancelled">{t("dash.cancelled")}</option>
                       </select>
                     </div>
 
                     <div className="flex-grow" />
                     <button
                       onClick={() => deleteOrder(order)}
-                      className="text-red-500 hover:bg-red-50 px-3 py-1.5 rounded text-sm flex items-center gap-1"
+                      className="text-red-500 hover:bg-red-50 px-3 py-1.5 rounded-lg text-sm flex items-center gap-1 transition-colors"
                     >
-                      <Trash2 size={16} /> Delete
+                      <Trash2 size={16} /> {t("dash.delete")}
                     </button>
                   </div>
                 </div>
@@ -679,25 +747,23 @@ function OrderManager() {
         </div>
       )}
 
-      {/* ===== EDIT ORDER MODAL ===== */}
+      {/* Edit Order Modal */}
       {editingOrder && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl w-full max-w-lg shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
-            {/* Modal Header */}
             <div className="bg-slate-900 text-white px-6 py-4 flex items-center justify-between flex-shrink-0">
               <div>
-                <h3 className="text-lg font-bold">Edit Order</h3>
+                <h3 className="text-lg font-bold">{t("dash.editOrder")}</h3>
                 <p className="text-slate-400 text-sm">{editingOrder.orderNumber}</p>
               </div>
-              <button onClick={() => setEditingOrder(null)} className="text-slate-400 hover:text-white">
+              <button onClick={() => setEditingOrder(null)} className="text-slate-400 hover:text-white transition-colors">
                 <X size={24} />
               </button>
             </div>
 
-            {/* Modal Body */}
             <div className="p-6 space-y-4 overflow-y-auto">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Recipient Name</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">{t("dash.recipientName")}</label>
                 <input
                   type="text"
                   value={editForm.recipientName}
@@ -707,7 +773,7 @@ function OrderManager() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">{t("dash.phone")}</label>
                 <input
                   type="tel"
                   value={editForm.phone}
@@ -717,7 +783,7 @@ function OrderManager() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Shipping Address</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">{t("dash.shippingAddress")}</label>
                 <textarea
                   rows={3}
                   value={editForm.shippingAddress}
@@ -728,58 +794,57 @@ function OrderManager() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Payment Method</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">{t("dash.paymentMethod")}</label>
                   <select
                     value={editForm.paymentMethod}
                     onChange={(e) => setEditForm({ ...editForm, paymentMethod: e.target.value })}
                     className="w-full border rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none"
                   >
-                    <option value="bank_transfer">Bank Transfer</option>
-                    <option value="promptpay">PromptPay</option>
+                    <option value="bank_transfer">{t("dash.bankTransfer")}</option>
+                    <option value="promptpay">{t("dash.promptpay")}</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">{t("dash.status")}</label>
                   <select
                     value={editForm.status}
                     onChange={(e) => setEditForm({ ...editForm, status: e.target.value })}
                     className="w-full border rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none"
                   >
-                    <option value="pending">Pending</option>
-                    <option value="paid">Paid</option>
-                    <option value="shipped">Shipped</option>
-                    <option value="delivered">Delivered</option>
-                    <option value="cancelled">Cancelled</option>
+                    <option value="pending">{t("dash.pending")}</option>
+                    <option value="paid">{t("dash.paid")}</option>
+                    <option value="shipped">{t("dash.shipped")}</option>
+                    <option value="delivered">{t("dash.delivered")}</option>
+                    <option value="cancelled">{t("dash.cancelled")}</option>
                   </select>
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Admin Notes</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">{t("dash.adminNotes")}</label>
                 <textarea
                   rows={2}
                   value={editForm.adminNotes}
                   onChange={(e) => setEditForm({ ...editForm, adminNotes: e.target.value })}
-                  placeholder="Internal notes (not visible to customer)"
+                  placeholder={t("dash.internalNotes")}
                   className="w-full border rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none bg-yellow-50"
                 />
               </div>
             </div>
 
-            {/* Modal Footer */}
             <div className="border-t px-6 py-4 flex gap-3 flex-shrink-0">
               <button
                 onClick={() => setEditingOrder(null)}
                 className="flex-1 py-2.5 border rounded-lg font-medium text-gray-600 hover:bg-gray-50 transition-colors"
               >
-                Cancel
+                {t("dash.cancel")}
               </button>
               <button
                 onClick={saveEdit}
                 disabled={editSaving}
                 className="flex-1 py-2.5 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700 disabled:bg-gray-400 flex items-center justify-center gap-2 transition-colors"
               >
-                {editSaving ? "Saving..." : <><Save size={18} /> Save Changes</>}
+                {editSaving ? t("dash.saving") : <><Save size={18} /> {t("dash.saveChanges")}</>}
               </button>
             </div>
           </div>
@@ -801,6 +866,7 @@ interface UserData {
 }
 
 function UserManager() {
+  const { t, locale } = useLocale();
   const [users, setUsers] = useState<UserData[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -821,25 +887,27 @@ function UserManager() {
   useEffect(() => { fetchUsers(); }, []);
 
   const toggleBlock = async (u: UserData) => {
-    const action = u.blocked ? "unblock" : "block";
-    if (!confirm(`${action} user ${u.username}?`)) return;
+    const msg = u.blocked ? t("dash.confirmUnblockUser") : t("dash.confirmBlockUser");
+    if (!confirm(`${msg} (${u.username})`)) return;
     try {
       await axios.put(`${API}/api/users/${u.id}`, { blocked: !u.blocked }, { headers: getAuthHeaders() });
       setUsers(users.map((usr) => (usr.id === u.id ? { ...usr, blocked: !usr.blocked } : usr)));
       setSelectedUser(null);
+      toast.success(t("dash.updated"));
     } catch (err) {
-      alert(`Failed to ${action} user`);
+      toast.error(t("dash.failedBlockUser"));
     }
   };
 
   const deleteUser = async (u: UserData) => {
-    if (!confirm(`Permanently delete user ${u.username}? This cannot be undone.`)) return;
+    if (!confirm(t("dash.confirmDeleteUser"))) return;
     try {
       await axios.delete(`${API}/api/users/${u.id}`, { headers: getAuthHeaders() });
       setUsers(users.filter((usr) => usr.id !== u.id));
       setSelectedUser(null);
+      toast.success(`${t("dash.delete")} ${u.username}`);
     } catch (err) {
-      alert("Failed to delete user");
+      toast.error(t("dash.failedDeleteUser"));
     }
   };
 
@@ -851,12 +919,12 @@ function UserManager() {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <div>
-          <h2 className="text-2xl font-bold text-gray-800">User Management</h2>
-          <p className="text-sm text-gray-400">{users.length} registered users</p>
+          <h2 className="text-2xl font-bold text-gray-800">{t("dash.userMgmt")}</h2>
+          <p className="text-sm text-gray-400 mt-1">{users.length} {t("dash.registeredUsers")}</p>
         </div>
-        <button onClick={fetchUsers} className="text-gray-500 hover:text-blue-600 p-2 rounded hover:bg-blue-50">
+        <button onClick={fetchUsers} className="text-gray-500 hover:text-blue-600 p-2 rounded-lg hover:bg-blue-50 transition-colors">
           <RefreshCw size={20} />
         </button>
       </div>
@@ -866,77 +934,79 @@ function UserManager() {
         <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
         <input
           type="text"
-          placeholder="Search by username or email..."
+          placeholder={t("dash.searchUsers")}
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full pl-10 pr-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+          className="w-full pl-10 pr-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white shadow-sm"
         />
       </div>
 
       {loading ? (
-        <div className="text-center py-10 text-gray-400">Loading users...</div>
+        <div className="text-center py-16 text-gray-400">{t("dash.loadingUsers")}</div>
       ) : (
-        <div className="bg-white rounded-lg shadow overflow-hidden">
-          <table className="w-full text-left">
-            <thead className="bg-gray-50 border-b">
-              <tr>
-                <th className="p-4">User</th>
-                <th className="p-4">Email</th>
-                <th className="p-4">Role</th>
-                <th className="p-4">Status</th>
-                <th className="p-4">Joined</th>
-                <th className="p-4 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map((u) => (
-                <tr key={u.id} className="border-b hover:bg-gray-50">
-                  <td className="p-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center font-bold text-sm">
-                        {u.username?.charAt(0)?.toUpperCase() || "?"}
-                      </div>
-                      <span className="font-medium">{u.username}</span>
-                    </div>
-                  </td>
-                  <td className="p-4 text-gray-600">{u.email}</td>
-                  <td className="p-4">
-                    <span className={`px-2 py-1 rounded text-xs font-medium ${
-                      u.role?.name === "Admin" ? "bg-purple-100 text-purple-700" : "bg-gray-100 text-gray-600"
-                    }`}>
-                      {u.role?.name || "Authenticated"}
-                    </span>
-                  </td>
-                  <td className="p-4">
-                    {u.blocked ? (
-                      <span className="px-2 py-1 rounded text-xs font-medium bg-red-100 text-red-700">Blocked</span>
-                    ) : u.confirmed ? (
-                      <span className="px-2 py-1 rounded text-xs font-medium bg-green-100 text-green-700">Active</span>
-                    ) : (
-                      <span className="px-2 py-1 rounded text-xs font-medium bg-yellow-100 text-yellow-700">Unconfirmed</span>
-                    )}
-                  </td>
-                  <td className="p-4 text-sm text-gray-500">
-                    {new Date(u.createdAt).toLocaleDateString("th-TH", { year: "numeric", month: "short", day: "numeric" })}
-                  </td>
-                  <td className="p-4 text-right">
-                    <button onClick={() => setSelectedUser(u)} className="text-blue-500 hover:bg-blue-50 p-2 rounded">
-                      <Eye size={18} />
-                    </button>
-                  </td>
+        <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left">
+              <thead className="bg-gray-50 border-b">
+                <tr>
+                  <th className="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">{t("dash.user")}</th>
+                  <th className="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">{t("dash.email")}</th>
+                  <th className="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">{t("dash.role")}</th>
+                  <th className="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">{t("dash.status")}</th>
+                  <th className="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">{t("dash.joined")}</th>
+                  <th className="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">{t("dash.actions")}</th>
                 </tr>
-              ))}
-              {filtered.length === 0 && (
-                <tr><td colSpan={6} className="p-8 text-center text-gray-400">No users found</td></tr>
-              )}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {filtered.map((u) => (
+                  <tr key={u.id} className="hover:bg-gray-50 transition-colors">
+                    <td className="p-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-9 h-9 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0">
+                          {u.username?.charAt(0)?.toUpperCase() || "?"}
+                        </div>
+                        <span className="font-medium text-gray-800">{u.username}</span>
+                      </div>
+                    </td>
+                    <td className="p-4 text-gray-600 text-sm">{u.email}</td>
+                    <td className="p-4">
+                      <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${
+                        u.role?.name === "Admin" ? "bg-purple-100 text-purple-700" : "bg-gray-100 text-gray-600"
+                      }`}>
+                        {u.role?.name || "Authenticated"}
+                      </span>
+                    </td>
+                    <td className="p-4">
+                      {u.blocked ? (
+                        <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700">{t("dash.blocked")}</span>
+                      ) : u.confirmed ? (
+                        <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">{t("dash.active")}</span>
+                      ) : (
+                        <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-700">{t("dash.unconfirmed")}</span>
+                      )}
+                    </td>
+                    <td className="p-4 text-sm text-gray-500">
+                      {new Date(u.createdAt).toLocaleDateString(locale === "th" ? "th-TH" : "en-US", { year: "numeric", month: "short", day: "numeric" })}
+                    </td>
+                    <td className="p-4 text-right">
+                      <button onClick={() => setSelectedUser(u)} className="text-blue-500 hover:bg-blue-50 p-2.5 rounded-lg transition-colors">
+                        <Eye size={18} />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+                {filtered.length === 0 && (
+                  <tr><td colSpan={6} className="p-12 text-center text-gray-400">{t("dash.noUsers")}</td></tr>
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
 
       {/* User Detail Modal */}
       {selectedUser && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl w-full max-w-md shadow-2xl overflow-hidden">
             <div className="bg-slate-900 text-white p-6 text-center">
               <div className="w-16 h-16 bg-blue-500 rounded-full mx-auto flex items-center justify-center text-white text-2xl font-bold mb-3">
@@ -949,42 +1019,42 @@ function UserManager() {
             <div className="p-6 space-y-4">
               <div className="flex items-center gap-3 text-gray-700">
                 <Mail size={18} className="text-gray-400" />
-                <span>{selectedUser.email}</span>
+                <span className="text-sm">{selectedUser.email}</span>
               </div>
               <div className="flex items-center gap-3 text-gray-700">
                 <Calendar size={18} className="text-gray-400" />
-                <span>Joined {new Date(selectedUser.createdAt).toLocaleDateString("th-TH", { year: "numeric", month: "long", day: "numeric" })}</span>
+                <span className="text-sm">{t("dash.joined")} {new Date(selectedUser.createdAt).toLocaleDateString(locale === "th" ? "th-TH" : "en-US", { year: "numeric", month: "long", day: "numeric" })}</span>
               </div>
               <div className="flex items-center gap-3 text-gray-700">
                 <Shield size={18} className="text-gray-400" />
-                <span>
-                  {selectedUser.blocked ? "Blocked" : selectedUser.confirmed ? "Confirmed & Active" : "Unconfirmed"}
+                <span className="text-sm">
+                  {selectedUser.blocked ? t("dash.blocked") : selectedUser.confirmed ? t("dash.confirmedActive") : t("dash.unconfirmed")}
                 </span>
               </div>
 
               <div className="flex gap-3 pt-4 border-t">
                 <button
                   onClick={() => toggleBlock(selectedUser)}
-                  className={`flex-1 py-2.5 rounded font-medium text-sm ${
+                  className={`flex-1 py-2.5 rounded-lg font-medium text-sm transition-colors ${
                     selectedUser.blocked
                       ? "bg-green-100 text-green-700 hover:bg-green-200"
                       : "bg-yellow-100 text-yellow-700 hover:bg-yellow-200"
                   }`}
                 >
-                  {selectedUser.blocked ? "Unblock User" : "Block User"}
+                  {selectedUser.blocked ? t("dash.unblockUser") : t("dash.blockUser")}
                 </button>
                 <button
                   onClick={() => deleteUser(selectedUser)}
-                  className="flex-1 bg-red-100 text-red-700 py-2.5 rounded font-medium text-sm hover:bg-red-200"
+                  className="flex-1 bg-red-100 text-red-700 py-2.5 rounded-lg font-medium text-sm hover:bg-red-200 transition-colors"
                 >
-                  Delete User
+                  {t("dash.deleteUser")}
                 </button>
               </div>
               <button
                 onClick={() => setSelectedUser(null)}
-                className="w-full py-2.5 border rounded font-medium text-sm text-gray-600 hover:bg-gray-50"
+                className="w-full py-2.5 border rounded-lg font-medium text-sm text-gray-600 hover:bg-gray-50 transition-colors"
               >
-                Close
+                {t("dash.close")}
               </button>
             </div>
           </div>
