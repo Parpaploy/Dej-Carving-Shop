@@ -326,7 +326,7 @@ export default function HomepageClient() {
             {/* Phone Button */}
             <a
               href="tel:092-3640013"
-              className="inline-flex items-center justify-center gap-3 bg-[#1d1d1d] text-cream text-lg md:text-xl font-bold py-4 px-8 md:px-10 rounded-full hover:bg-[#2a2a2a] hover:text-white transition-all duration-300 shadow-[0_10px_20px_rgba(29,29,29,0.3)] hover:shadow-[0_15px_30px_rgba(29,29,29,0.5)] hover:-translate-y-1 w-full sm:w-auto"
+              className="inline-flex items-center justify-center gap-3 bg-[#1d1d1d] text-white text-lg md:text-xl font-bold py-4 px-8 md:px-10 rounded-full hover:bg-[#2a2a2a] hover:text-white transition-all duration-300 shadow-[0_10px_20px_rgba(29,29,29,0.3)] hover:shadow-[0_15px_30px_rgba(29,29,29,0.5)] hover:-translate-y-1 w-full sm:w-auto"
             >
               <Phone className="w-5 h-5" />
               {t("home.callUs") || "โทร"} 
