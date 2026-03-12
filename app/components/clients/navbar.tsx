@@ -247,7 +247,7 @@ export default function Navbar() {
             <Link href="/cart" className="relative p-2" aria-label="Shopping cart">
               <ShoppingCart size={24} className="text-cream" />
               {cartCount > 0 && (
-                <span className="absolute 0 -right-1 bg-red-500 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-teak">
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-teak">
                   {cartCount}
                 </span>
               )}

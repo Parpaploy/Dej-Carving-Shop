@@ -35,12 +35,12 @@ export default function RootLayout({
           <AuthProvider>
             <CartProvider>
               <Navbar />
-              <main>{children}</main>
+              {children}
               <Footer />
               <FloatingContact />
               <LanguageToggle />
               <Toaster
-                position="bottom-left"
+                position="bottom-right"
                 toastOptions={{
                   style: {
                     fontSize: "1rem",

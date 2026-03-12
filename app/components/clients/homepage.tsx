@@ -80,10 +80,10 @@ export default function HomepageClient() {
         <div
           key={src}
           className="absolute inset-0 bg-teak-dark transition-all duration-1000 ease-in-out" // Added bg-teak-dark here
-          style={{ 
+          style={{
             opacity: i === currentSlide ? 1 : 0,
             transform: i === currentSlide ? "scale(1)" : "scale(1.05)",
-            zIndex: i === currentSlide ? 10 : 0 // Added zIndex to prevent ghosting
+            zIndex: i === currentSlide ? 1 : 0
           }}
         >
             <img
@@ -94,9 +94,9 @@ export default function HomepageClient() {
           </div>
         ))}
         {/* Richer Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/30 to-teak-dark/90 z-[1]" />
-        
-        <div className="relative z-[2] text-center px-6 max-w-4xl mx-auto py-20 mt-10">
+        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/30 to-teak-dark/90 z-[2]" />
+
+        <div className="relative z-[3] text-center px-6 max-w-4xl mx-auto py-20">
           <motion.div initial="hidden" animate="visible" variants={fadeUpVariant}>
             {user ? (
               <div>

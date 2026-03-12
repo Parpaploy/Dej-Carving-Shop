@@ -15,9 +15,10 @@ const config: Config = {
         foreground: "var(--foreground)",
       },
       fontFamily: {
-        serif: ["var(--font-playfair)", "serif"],
-        sans: ["var(--font-lato)", "sans-serif"],
-        pattaya: ["var(--font-pattaya)", "sans-serif"],
+        serif: ["'Mitr'", "var(--font-castoro)", "serif"],
+        sans: ["'Krub'", "sans-serif"],
+        pattaya: ["'Pattaya'", "sans-serif"],
+        castoro: ["var(--font-castoro)", "serif"],
       },
     },
   },

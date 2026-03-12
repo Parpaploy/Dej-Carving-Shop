@@ -240,7 +240,7 @@ export default function ProfileClient() {
             <img
               src={user.profileImage}
               alt={user.username}
-              className="w-28 h-28 rounded-full object-cover border-3 border-gold"
+              className="w-28 h-28 rounded-full object-cover border-[3px] border-gold"
             />
           ) : (
             <div className="w-28 h-28 bg-gold rounded-full flex items-center justify-center text-teak-dark text-4xl font-bold">
@@ -309,7 +309,7 @@ export default function ProfileClient() {
                     <img
                       src={user.profileImage}
                       alt={user.username}
-                      className="w-24 h-24 rounded-full object-cover border-3 border-gold"
+                      className="w-24 h-24 rounded-full object-cover border-[3px] border-gold"
                     />
                   ) : (
                     <div className="w-24 h-24 bg-gold rounded-full flex items-center justify-center text-teak-dark text-3xl font-bold">
