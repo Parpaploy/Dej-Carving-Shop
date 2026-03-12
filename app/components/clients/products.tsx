@@ -1,10 +1,10 @@
 "use client";
 
-import React from "react";
+import React, { useState, useCallback } from "react";
 import Link from "next/link";
 import { IProduct } from "@/app/interfaces/product.interface";
 import AddToCartButton from "../ui/AddToCartButton";
-import { ArrowLeft, X } from "lucide-react";
+import { ArrowLeft, X, ChevronLeft, ChevronRight } from "lucide-react";
 import { useLocale } from "@/app/context/LocaleContext";
 
 const getImageUrl = (url: string | undefined) => {
@@ -12,6 +12,144 @@ const getImageUrl = (url: string | undefined) => {
   if (url.startsWith("http")) return url;
   return `${process.env.NEXT_PUBLIC_STRAPI_BASE_URL}${url}`;
 };
+
+const blocksToText = (blocks: unknown): string => {
+  try {
+    return (blocks as any)?.map((b: any) => b.children?.map((c: any) => c.text).join("")).join(" ") || "";
+  } catch {
+    return "";
+  }
+};
+
+function ProductCard({ product }: { product: IProduct }) {
+  const images = product.images?.length ? product.images : [];
+  const hasMultiple = images.length > 1;
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [isHovering, setIsHovering] = useState(false);
+  const linkId = (product as any).documentId || product.id;
+  const cats = product.categories || [];
+  const desc = blocksToText(product.description);
+
+  const goNext = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setActiveIndex((prev) => (prev + 1) % images.length);
+  }, [images.length]);
+
+  const goPrev = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setActiveIndex((prev) => (prev - 1 + images.length) % images.length);
+  }, [images.length]);
+
+  return (
+    <div className="group bg-white rounded-2xl overflow-hidden flex flex-col h-full shadow-md hover:shadow-2xl transition-all duration-500 hover:-translate-y-1">
+      {/* IMAGE CAROUSEL */}
+      <div
+        className="relative aspect-[4/3] bg-cream-alt overflow-hidden"
+        onMouseEnter={() => setIsHovering(true)}
+        onMouseLeave={() => { setIsHovering(false); setActiveIndex(0); }}
+      >
+        {/* All images stacked, crossfade */}
+        {images.length > 0 ? images.map((img, i) => (
+          <Link key={i} href={`/products/${linkId}`} className="absolute inset-0">
+            <img
+              src={getImageUrl(img.url)}
+              alt={`${product.name} ${i + 1}`}
+              className={`w-full h-full object-cover transition-all duration-500 ${
+                i === activeIndex ? "opacity-100 scale-100" : "opacity-0 scale-105"
+              } ${isHovering && i === activeIndex ? "scale-110" : ""}`}
+            />
+          </Link>
+        )) : (
+          <Link href={`/products/${linkId}`} className="absolute inset-0">
+            <img
+              src="https://placehold.co/400x400/png?text=No+Image"
+              alt={product.name}
+              className="w-full h-full object-cover"
+            />
+          </Link>
+        )}
+
+        {/* Hover gradient */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+
+        {/* Category badges */}
+        {cats.length > 0 && (
+          <div className="absolute top-3 left-3 flex flex-wrap gap-1.5 z-10">
+            {cats.map((cat) => (
+              <span key={cat.id} className="px-2.5 py-1 bg-white/90 backdrop-blur-sm text-teak-dark text-xs font-semibold rounded-full shadow-sm">
+                {cat.name}
+              </span>
+            ))}
+          </div>
+        )}
+
+        {/* Arrows — only show on hover when multiple images */}
+        {hasMultiple && isHovering && (
+          <>
+            <button
+              onClick={goPrev}
+              className="absolute left-2 top-1/2 -translate-y-1/2 z-10 w-8 h-8 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center shadow-md hover:bg-white transition-colors"
+              aria-label="Previous image"
+            >
+              <ChevronLeft size={18} className="text-teak-dark" />
+            </button>
+            <button
+              onClick={goNext}
+              className="absolute right-2 top-1/2 -translate-y-1/2 z-10 w-8 h-8 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center shadow-md hover:bg-white transition-colors"
+              aria-label="Next image"
+            >
+              <ChevronRight size={18} className="text-teak-dark" />
+            </button>
+          </>
+        )}
+
+        {/* Dot indicators */}
+        {hasMultiple && (
+          <div className={`absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 z-10 transition-opacity duration-300 ${isHovering ? "opacity-100" : "opacity-0"}`}>
+            {images.map((_, i) => (
+              <button
+                key={i}
+                onClick={(e) => { e.preventDefault(); e.stopPropagation(); setActiveIndex(i); }}
+                className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                  i === activeIndex ? "bg-white w-4" : "bg-white/50 hover:bg-white/80"
+                }`}
+                aria-label={`Image ${i + 1}`}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* CARD CONTENT */}
+      <div className="p-5 flex flex-col flex-grow">
+        <h2 className="text-lg font-serif font-bold text-teak-dark leading-snug mb-3 line-clamp-2 group-hover:text-gold transition-colors duration-300">
+          <Link href={`/products/${linkId}`}>
+            {product.name}
+          </Link>
+        </h2>
+
+        {/* DESCRIPTION SUB-CARD */}
+        {desc && (
+          <div className="bg-cream/60 rounded-lg px-4 py-3 mb-4">
+            <p className="text-sm text-text-muted leading-relaxed line-clamp-2">
+              {desc}
+            </p>
+          </div>
+        )}
+
+        {/* FOOTER */}
+        <div className="mt-auto pt-4 flex items-center justify-between">
+          <span className="text-xl font-bold text-price">
+            ฿{(product.price ?? 0).toLocaleString()}
+          </span>
+          <AddToCartButton product={product} />
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function ProductsClient({ products, activeCategory }: { products: IProduct[]; activeCategory?: string }) {
   const { t } = useLocale();
@@ -47,44 +185,9 @@ export default function ProductsClient({ products, activeCategory }: { products:
 
         {/* PRODUCTS GRID */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          {products.map((product) => {
-            const firstImage = product.images && product.images.length > 0 ? product.images[0].url : "";
-            const imageUrl = getImageUrl(firstImage);
-            const linkId = (product as any).documentId || product.id;
-
-            return (
-              <div
-                key={product.id}
-                className="bg-card rounded-xl shadow-lg overflow-hidden flex flex-col h-full border border-gold-soft/20 hover:shadow-xl transition-shadow duration-300"
-              >
-                {/* IMAGE */}
-                <Link href={`/products/${linkId}`} className="relative aspect-[4/3] bg-cream-alt overflow-hidden group">
-                  <img
-                    src={imageUrl}
-                    alt={product.name}
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                  />
-                </Link>
-
-                {/* CARD CONTENT */}
-                <div className="p-5 flex flex-col flex-grow">
-                  <h2 className="text-h5 font-serif font-bold text-teak-dark leading-tight mb-3">
-                    <Link href={`/products/${linkId}`} className="hover:text-gold transition-colors">
-                      {product.name}
-                    </Link>
-                  </h2>
-
-                  {/* FOOTER */}
-                  <div className="mt-auto pt-4 border-t border-cream-alt flex items-center justify-between">
-                    <span className="text-h4 font-bold text-price">
-                      ฿ {(product.price ?? 0).toLocaleString()}
-                    </span>
-                    <AddToCartButton product={product} />
-                  </div>
-                </div>
-              </div>
-            );
-          })}
+          {products.map((product) => (
+            <ProductCard key={product.id} product={product} />
+          ))}
         </div>
       </div>
     </main>

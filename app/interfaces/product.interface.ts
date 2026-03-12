@@ -12,5 +12,5 @@ export interface IProduct {
   description: BlocksContent;
   price: number;
   orders: IOrder[];
-  category?: ICategory;
+  categories?: ICategory[];
 }

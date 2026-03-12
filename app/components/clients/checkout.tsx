@@ -15,6 +15,9 @@ import {
   Banknote,
   QrCode,
   Copy,
+  Upload,
+  Image as ImageIcon,
+  X,
 } from "lucide-react";
 import { useCart } from "../../context/CartContext";
 import { useAuth } from "../../context/AuthContext";
@@ -34,6 +37,14 @@ export default function CheckoutClient() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [orderComplete, setOrderComplete] = useState(false);
   const [orderNumber, setOrderNumber] = useState("");
+  const [orderDocumentId, setOrderDocumentId] = useState("");
+
+  // Transfer proof upload states
+  const [proofFile, setProofFile] = useState<File | null>(null);
+  const [proofPreview, setProofPreview] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [proofUploaded, setProofUploaded] = useState(false);
+  const [uploadedProofUrl, setUploadedProofUrl] = useState("");
 
   // Redirect if not logged in
   React.useEffect(() => {
@@ -74,7 +85,7 @@ export default function CheckoutClient() {
     const newOrderNumber = generateOrderNumber();
 
     try {
-      await axios.post(
+      const orderRes = await axios.post(
         `${process.env.NEXT_PUBLIC_STRAPI_BASE_URL}/api/orders`,
         {
           data: {
@@ -96,6 +107,7 @@ export default function CheckoutClient() {
       );
 
       setOrderNumber(newOrderNumber);
+      setOrderDocumentId(orderRes.data.data.documentId);
       setOrderComplete(true);
       clearCart();
       toast.success(t("toast.orderSuccess"));
@@ -110,6 +122,61 @@ export default function CheckoutClient() {
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
     toast.success(t("toast.copied"));
+  };
+
+  const handleProofSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+      toast.error(t("checkout.uploadErrorType"));
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error(t("checkout.uploadErrorSize"));
+      return;
+    }
+
+    setProofFile(file);
+    setProofPreview(URL.createObjectURL(file));
+  };
+
+  const handleProofUpload = async () => {
+    if (!proofFile || !orderDocumentId) return;
+    setIsUploading(true);
+
+    const jwt = localStorage.getItem("jwt");
+    if (!jwt) return;
+
+    const formData = new FormData();
+    formData.append("file", proofFile);
+    formData.append("orderId", orderDocumentId);
+
+    try {
+      const res = await axios.post(
+        `${process.env.NEXT_PUBLIC_STRAPI_BASE_URL}/api/transfer-proof`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${jwt}`,
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      setUploadedProofUrl(res.data.url);
+      setProofUploaded(true);
+      toast.success(t("checkout.uploadSuccess"));
+    } catch {
+      toast.error(t("checkout.uploadError"));
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const clearProofFile = () => {
+    setProofFile(null);
+    if (proofPreview) URL.revokeObjectURL(proofPreview);
+    setProofPreview(null);
   };
 
   // === ORDER COMPLETE STATE ===
@@ -162,6 +229,84 @@ export default function CheckoutClient() {
               <p className="text-sm text-text-muted mt-4 border-t border-cream pt-3">
                 {t("checkout.payWithin24h")}
               </p>
+            </div>
+
+            {/* Transfer Proof Upload */}
+            <div className="bg-cream-alt rounded-lg p-6 text-left mb-6 border border-gold-soft/30">
+              <h3 className="text-body font-bold text-teak-dark mb-2 flex items-center gap-2">
+                <Upload size={20} className="text-gold" />
+                {t("checkout.uploadProofTitle")}
+              </h3>
+              <p className="text-sm text-text-muted mb-4">{t("checkout.uploadProofDesc")}</p>
+
+              {proofUploaded ? (
+                <div className="text-center">
+                  <div className="inline-flex items-center gap-2 bg-green-50 text-green-700 px-4 py-2 rounded-lg border border-green-200 mb-3">
+                    <CheckCircle size={18} />
+                    <span className="font-medium text-sm">{t("checkout.uploadSuccess")}</span>
+                  </div>
+                  <div className="mt-2">
+                    <img
+                      src={`${process.env.NEXT_PUBLIC_STRAPI_BASE_URL}${uploadedProofUrl}`}
+                      alt="Transfer proof"
+                      className="max-h-48 mx-auto rounded-lg border border-cream-alt shadow-sm"
+                    />
+                  </div>
+                </div>
+              ) : (
+                <>
+                  {proofPreview ? (
+                    <div className="space-y-3">
+                      <div className="relative inline-block">
+                        <img
+                          src={proofPreview}
+                          alt="Preview"
+                          className="max-h-48 rounded-lg border border-cream-alt shadow-sm"
+                        />
+                        <button
+                          onClick={clearProofFile}
+                          className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 shadow hover:bg-red-600"
+                          aria-label="Remove"
+                        >
+                          <X size={14} />
+                        </button>
+                      </div>
+                      <div>
+                        <button
+                          onClick={handleProofUpload}
+                          disabled={isUploading}
+                          className={`w-full py-3 rounded-lg font-bold text-body flex items-center justify-center gap-2 transition-all ${
+                            isUploading
+                              ? "bg-text-muted text-cream cursor-not-allowed"
+                              : "bg-teak text-cream hover:bg-teak-dark"
+                          }`}
+                        >
+                          {isUploading ? (
+                            t("checkout.uploading")
+                          ) : (
+                            <>
+                              <Upload size={18} />
+                              {t("checkout.uploadButton")}
+                            </>
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <label className="flex flex-col items-center justify-center border-2 border-dashed border-gold/40 rounded-lg p-6 cursor-pointer hover:border-gold hover:bg-gold/5 transition-all">
+                      <ImageIcon size={36} className="text-gold/60 mb-2" />
+                      <span className="text-sm font-medium text-teak-dark">{t("checkout.uploadChoose")}</span>
+                      <span className="text-xs text-text-muted mt-1">JPG, PNG, WebP (max 5MB)</span>
+                      <input
+                        type="file"
+                        accept="image/jpeg,image/png,image/webp"
+                        onChange={handleProofSelect}
+                        className="hidden"
+                      />
+                    </label>
+                  )}
+                </>
+              )}
             </div>
 
             <div className="flex flex-col sm:flex-row gap-3">
@@ -224,7 +369,7 @@ export default function CheckoutClient() {
                       value={recipientName}
                       onChange={(e) => setRecipientName(e.target.value)}
                       placeholder={t("checkout.recipientPlaceholder")}
-                      className="w-full py-3 px-4 text-body border-2 border-cream-alt rounded-lg focus:border-gold focus:ring-1 focus:ring-gold outline-none bg-cream text-text-main"
+                      className="w-full py-3 px-4 text-body border-2 border-cream-alt rounded-lg focus:border-gold focus:ring-1 focus:ring-gold outline-none bg-white text-text-main"
                     />
                   </div>
 
@@ -239,7 +384,7 @@ export default function CheckoutClient() {
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
                       placeholder="08X-XXX-XXXX"
-                      className="w-full py-3 px-4 text-body border-2 border-cream-alt rounded-lg focus:border-gold focus:ring-1 focus:ring-gold outline-none bg-cream text-text-main"
+                      className="w-full py-3 px-4 text-body border-2 border-cream-alt rounded-lg focus:border-gold focus:ring-1 focus:ring-gold outline-none bg-white text-text-main"
                     />
                   </div>
 
@@ -254,7 +399,7 @@ export default function CheckoutClient() {
                       value={shippingAddress}
                       onChange={(e) => setShippingAddress(e.target.value)}
                       placeholder={t("checkout.addressPlaceholder")}
-                      className="w-full py-3 px-4 text-body border-2 border-cream-alt rounded-lg focus:border-gold focus:ring-1 focus:ring-gold outline-none bg-cream text-text-main"
+                      className="w-full py-3 px-4 text-body border-2 border-cream-alt rounded-lg focus:border-gold focus:ring-1 focus:ring-gold outline-none bg-white text-text-main"
                     />
                   </div>
                 </div>

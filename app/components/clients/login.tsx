@@ -106,7 +106,7 @@ export default function LoginClient() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="name@example.com"
-                  className="w-full pl-12 pr-4 py-4 text-body border-2 border-cream-alt rounded-lg focus:border-gold focus:ring-1 focus:ring-gold outline-none transition-all text-text-main bg-cream"
+                  className="w-full pl-12 pr-4 py-4 text-body border-2 border-cream-alt rounded-lg focus:border-gold focus:ring-1 focus:ring-gold outline-none transition-all text-text-main bg-white"
                 />
               </div>
             </div>
@@ -124,7 +124,7 @@ export default function LoginClient() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder={t("login.passwordPlaceholder")}
-                  className="w-full pl-12 pr-14 py-4 text-body border-2 border-cream-alt rounded-lg focus:border-gold focus:ring-1 focus:ring-gold outline-none transition-all text-text-main bg-cream"
+                  className="w-full pl-12 pr-14 py-4 text-body border-2 border-cream-alt rounded-lg focus:border-gold focus:ring-1 focus:ring-gold outline-none transition-all text-text-main bg-white"
                 />
                 <button
                   type="button"
@@ -140,11 +140,21 @@ export default function LoginClient() {
             <button
               type="submit"
               disabled={isLoading}
-              className={`mt-2 w-full text-cream text-body-lg font-bold py-4 rounded-lg shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2 min-h-[56px] ${
-                isLoading ? "bg-text-muted cursor-not-allowed" : "bg-teak hover:bg-teak-dark"
+              className={`relative overflow-hidden mt-2 w-full text-white text-body-lg font-bold py-4 rounded-lg shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2 min-h-[56px] ${
+                isLoading ? "bg-text-muted cursor-not-allowed" : "hover:shadow-xl"
               }`}
+              onMouseMove={(e) => {
+                if (isLoading) return;
+                const rect = e.currentTarget.getBoundingClientRect();
+                e.currentTarget.style.setProperty("--gx", `${e.clientX - rect.left}px`);
+                e.currentTarget.style.setProperty("--gy", `${e.clientY - rect.top}px`);
+              }}
+              style={{ "--gx": "50%", "--gy": "50%", backgroundColor: isLoading ? undefined : "#482a1d" } as React.CSSProperties}
             >
-              {isLoading ? t("login.submitting") : <>{t("login.submit")} <ArrowRight size={22} /></>}
+              <span className="pointer-events-none absolute inset-0 opacity-0 hover:opacity-100 transition-opacity duration-300" style={{ background: "radial-gradient(120px circle at var(--gx) var(--gy), rgba(255,255,255,0.15), transparent 70%)" }} />
+              <span className="relative z-10 flex items-center gap-2">
+                {isLoading ? t("login.submitting") : <>{t("login.submit")} <ArrowRight size={22} /></>}
+              </span>
             </button>
           </form>
         </div>
@@ -153,9 +163,18 @@ export default function LoginClient() {
           <p className="text-body text-text-muted mb-3">{t("login.noAccount")}</p>
           <Link
             href="/register"
-            className="inline-block border-2 border-teak text-teak text-body font-bold py-2 px-6 rounded-lg hover:bg-teak hover:text-cream transition-colors"
+            className="relative overflow-hidden inline-block text-white text-body font-bold py-3 px-8 rounded-lg hover:shadow-xl transition-all active:scale-95"
+            onMouseMove={(e) => {
+              const rect = e.currentTarget.getBoundingClientRect();
+              e.currentTarget.style.setProperty("--gx", `${e.clientX - rect.left}px`);
+              e.currentTarget.style.setProperty("--gy", `${e.clientY - rect.top}px`);
+              e.currentTarget.style.setProperty("--go", "1");
+            }}
+            onMouseLeave={(e) => { e.currentTarget.style.setProperty("--go", "0"); }}
+            style={{ "--gx": "50%", "--gy": "50%", "--go": "0", backgroundColor: "#321c13" } as React.CSSProperties}
           >
-            {t("login.createAccount")}
+            <span className="pointer-events-none absolute inset-0 transition-opacity duration-300" style={{ background: "radial-gradient(120px circle at var(--gx) var(--gy), rgba(255,255,255,0.18), transparent 70%)", opacity: "var(--go)" }} />
+            <span className="relative z-10">{t("login.createAccount")}</span>
           </Link>
         </div>
       </div>

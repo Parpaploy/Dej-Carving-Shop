@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import axios from "axios";
-import { Truck, ShieldCheck, Phone, Award, ArrowRight, Star, Quote } from "lucide-react";
+import { Truck, ShieldCheck, Phone, Award, ArrowRight, Star, Quote, ChevronLeft, ChevronRight } from "lucide-react";
 import { motion , Variants } from "framer-motion";
 import { useAuth } from "../../context/AuthContext";
 import { useLocale } from "@/app/context/LocaleContext";
@@ -67,6 +67,14 @@ export default function HomepageClient() {
     if (!img) return "https://placehold.co/600x400/png?text=No+Image";
     if (img.startsWith("http")) return img;
     return `${process.env.NEXT_PUBLIC_STRAPI_BASE_URL}${img}`;
+  };
+
+  const blocksToText = (blocks: unknown): string => {
+    try {
+      return (blocks as any)?.map((b: any) => b.children?.map((c: any) => c.text).join("")).join(" ") || "";
+    } catch {
+      return "";
+    }
   };
 
   return (
@@ -205,15 +213,36 @@ export default function HomepageClient() {
             >
               <Link
                 href="/products"
-                className="block bg-card p-8 rounded-2xl shadow-sm border border-cream-alt hover:shadow-xl hover:-translate-y-2 transition-all duration-300 group text-center"
+                className="relative block bg-card p-8 rounded-2xl shadow-sm border border-cream-alt hover:shadow-xl hover:-translate-y-2 transition-all duration-300 group text-center overflow-hidden"
+                onMouseMove={(e) => {
+                  const rect = e.currentTarget.getBoundingClientRect();
+                  const x = e.clientX - rect.left;
+                  const y = e.clientY - rect.top;
+                  e.currentTarget.style.setProperty("--mouse-x", `${x}px`);
+                  e.currentTarget.style.setProperty("--mouse-y", `${y}px`);
+                  e.currentTarget.style.setProperty("--glow-opacity", "1");
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.setProperty("--glow-opacity", "0");
+                }}
+                style={{ "--mouse-x": "0px", "--mouse-y": "0px", "--glow-opacity": "0" } as React.CSSProperties}
               >
-                <div className="w-20 h-20 mx-auto rounded-full bg-cream flex items-center justify-center text-4xl mb-6 shadow-inner group-hover:scale-110 transition-transform duration-300">
-                  {cat.icon}
+                <div
+                  className="pointer-events-none absolute inset-0 rounded-2xl transition-opacity duration-300"
+                  style={{
+                    background: "radial-gradient(250px circle at var(--mouse-x) var(--mouse-y), rgba(107,76,56,0.15), transparent 70%)",
+                    opacity: "var(--glow-opacity)",
+                  }}
+                />
+                <div className="relative z-10">
+                  <div className="w-20 h-20 mx-auto rounded-full bg-cream flex items-center justify-center text-4xl mb-6 shadow-inner group-hover:scale-110 transition-transform duration-300">
+                    {cat.icon}
+                  </div>
+                  <h3 className="text-xl font-serif font-bold text-teak-dark group-hover:text-gold transition-colors mb-2">
+                    {t(cat.nameKey)}
+                  </h3>
+                  <p className="text-sm text-text-muted">{t(cat.subKey)}</p>
                 </div>
-                <h3 className="text-xl font-serif font-bold text-teak-dark group-hover:text-gold transition-colors mb-2">
-                  {t(cat.nameKey)}
-                </h3>
-                <p className="text-sm text-text-muted">{t(cat.subKey)}</p>
               </Link>
             </motion.div>
           ))}
@@ -251,29 +280,8 @@ export default function HomepageClient() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
-                  className="bg-card rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl text-text-main flex flex-col group transition-all duration-300 hover:-translate-y-1"
                 >
-                  <Link href={`/products/${(item as any).documentId || item.id}`}>
-                    <div className="aspect-[4/3] bg-cream-alt relative overflow-hidden">
-                      <img
-                        src={getImageUrl(item)}
-                        alt={item.name}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-in-out"
-                      />
-                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
-                    </div>
-                  </Link>
-                  <div className="p-6 flex flex-col flex-grow">
-                    <h4 className="text-lg font-serif font-bold mb-3 line-clamp-2 text-teak-dark group-hover:text-gold transition-colors">
-                      {item.name}
-                    </h4>
-                    <div className="mt-auto pt-5 flex items-center justify-between border-t border-cream-alt">
-                      <span className="text-xl font-bold text-price">
-                        ฿{(item.price ?? 0).toLocaleString()}
-                      </span>
-                      <AddToCartButton product={item} />
-                    </div>
-                  </div>
+                  <HomeProductCard item={item} getImageUrl={getImageUrl} blocksToText={blocksToText} />
                 </motion.div>
               ))}
             </div>
@@ -336,3 +344,99 @@ export default function HomepageClient() {
       
     </main>
   );}
+
+function HomeProductCard({ item, getImageUrl, blocksToText }: { item: IProduct; getImageUrl: (item: IProduct) => string; blocksToText: (blocks: unknown) => string }) {
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [isHovering, setIsHovering] = useState(false);
+  const images = item.images?.length ? item.images : [];
+  const hasMultiple = images.length > 1;
+  const linkId = (item as any).documentId || item.id;
+  const cats = item.categories || [];
+  const desc = blocksToText(item.description);
+
+  const goNext = (e: React.MouseEvent) => {
+    e.preventDefault(); e.stopPropagation();
+    setActiveIndex((prev) => (prev + 1) % images.length);
+  };
+  const goPrev = (e: React.MouseEvent) => {
+    e.preventDefault(); e.stopPropagation();
+    setActiveIndex((prev) => (prev - 1 + images.length) % images.length);
+  };
+
+  return (
+    <div className="bg-white rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl text-text-main flex flex-col group transition-all duration-500 hover:-translate-y-1 h-full">
+      <div
+        className="aspect-[4/3] bg-cream-alt relative overflow-hidden"
+        onMouseEnter={() => setIsHovering(true)}
+        onMouseLeave={() => { setIsHovering(false); setActiveIndex(0); }}
+      >
+        {images.length > 0 ? images.map((img, i) => (
+          <Link key={i} href={`/products/${linkId}`} className="absolute inset-0">
+            <img
+              src={img.url?.startsWith("http") ? img.url : `${process.env.NEXT_PUBLIC_STRAPI_BASE_URL}${img.url}`}
+              alt={`${item.name} ${i + 1}`}
+              className={`w-full h-full object-cover transition-all duration-500 ${
+                i === activeIndex ? "opacity-100 scale-100" : "opacity-0 scale-105"
+              } ${isHovering && i === activeIndex ? "scale-110" : ""}`}
+            />
+          </Link>
+        )) : (
+          <Link href={`/products/${linkId}`} className="absolute inset-0">
+            <img src={getImageUrl(item)} alt={item.name} className="w-full h-full object-cover" />
+          </Link>
+        )}
+
+        <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+
+        {cats.length > 0 && (
+          <div className="absolute top-3 left-3 flex flex-wrap gap-1.5 z-10">
+            {cats.map((cat) => (
+              <span key={cat.id} className="px-2.5 py-1 bg-white/90 backdrop-blur-sm text-teak-dark text-xs font-semibold rounded-full shadow-sm">
+                {cat.name}
+              </span>
+            ))}
+          </div>
+        )}
+
+        {hasMultiple && isHovering && (
+          <>
+            <button onClick={goPrev} className="absolute left-2 top-1/2 -translate-y-1/2 z-10 w-8 h-8 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center shadow-md hover:bg-white transition-colors" aria-label="Previous">
+              <ChevronLeft size={18} className="text-teak-dark" />
+            </button>
+            <button onClick={goNext} className="absolute right-2 top-1/2 -translate-y-1/2 z-10 w-8 h-8 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center shadow-md hover:bg-white transition-colors" aria-label="Next">
+              <ChevronRight size={18} className="text-teak-dark" />
+            </button>
+          </>
+        )}
+
+        {hasMultiple && (
+          <div className={`absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 z-10 transition-opacity duration-300 ${isHovering ? "opacity-100" : "opacity-0"}`}>
+            {images.map((_, i) => (
+              <button
+                key={i}
+                onClick={(e) => { e.preventDefault(); e.stopPropagation(); setActiveIndex(i); }}
+                className={`w-2 h-2 rounded-full transition-all duration-300 ${i === activeIndex ? "bg-white w-4" : "bg-white/50 hover:bg-white/80"}`}
+                aria-label={`Image ${i + 1}`}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div className="p-5 flex flex-col flex-grow">
+        <h4 className="text-lg font-serif font-bold mb-3 line-clamp-2 text-teak-dark group-hover:text-gold transition-colors duration-300">
+          {item.name}
+        </h4>
+        {desc && (
+          <div className="bg-cream/60 rounded-lg px-4 py-3 mb-4">
+            <p className="text-sm text-text-muted leading-relaxed line-clamp-2">{desc}</p>
+          </div>
+        )}
+        <div className="mt-auto pt-4 flex items-center justify-between">
+          <span className="text-xl font-bold text-price">฿{(item.price ?? 0).toLocaleString()}</span>
+          <AddToCartButton product={item} />
+        </div>
+      </div>
+    </div>
+  );
+}

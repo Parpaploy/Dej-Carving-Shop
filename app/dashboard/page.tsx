@@ -159,13 +159,16 @@ export default function AdminDashboard() {
 }
 
 // ==================== PRODUCT MANAGER ====================
+interface CategoryOption { id: number; documentId?: string; name: string; }
+
 function ProductManager() {
   const { t } = useLocale();
   const [products, setProducts] = useState<IProduct[]>([]);
+  const [categories, setCategories] = useState<CategoryOption[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
-  const [formData, setFormData] = useState({ name: "", price: "", description: "" });
+  const [formData, setFormData] = useState({ name: "", price: "", description: "", categories: [] as number[] });
   const [file, setFile] = useState<File | null>(null);
 
   const fetchProducts = async () => {
@@ -177,7 +180,16 @@ function ProductManager() {
     }
   };
 
-  useEffect(() => { fetchProducts(); }, []);
+  const fetchCategories = async () => {
+    try {
+      const res = await axios.get(`${API}/api/categories`);
+      setCategories(res.data.data);
+    } catch (err) {
+      console.error("Fetch categories error:", err);
+    }
+  };
+
+  useEffect(() => { fetchProducts(); fetchCategories(); }, []);
 
   const handleDelete = async (id: number) => {
     if (!confirm(t("dash.confirmDelete"))) return;
@@ -207,6 +219,7 @@ function ProductManager() {
           name: formData.name,
           price: Number(formData.price),
           description: textToBlocks(formData.description),
+          categories: formData.categories,
         },
       };
       if (uploadedImageId) payload.data.images = [uploadedImageId];
@@ -229,7 +242,7 @@ function ProductManager() {
 
   const openEdit = (product: IProduct) => {
     setEditingId(product.id);
-    setFormData({ name: product.name, price: String(product.price), description: blocksToText(product.description) });
+    setFormData({ name: product.name, price: String(product.price), description: blocksToText(product.description), categories: product.categories?.map((c) => c.id) || [] });
     setFile(null);
     setIsModalOpen(true);
   };
@@ -237,7 +250,7 @@ function ProductManager() {
   const closeModal = () => {
     setIsModalOpen(false);
     setEditingId(null);
-    setFormData({ name: "", price: "", description: "" });
+    setFormData({ name: "", price: "", description: "", categories: [] });
     setFile(null);
   };
 
@@ -260,6 +273,7 @@ function ProductManager() {
               <tr>
                 <th className="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">{t("dash.image")}</th>
                 <th className="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">{t("dash.name")}</th>
+                <th className="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">{t("dash.category")}</th>
                 <th className="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">{t("dash.price")}</th>
                 <th className="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">{t("dash.actions")}</th>
               </tr>
@@ -278,6 +292,17 @@ function ProductManager() {
                       )}
                     </td>
                     <td className="p-4 font-medium text-gray-800">{p.name}</td>
+                    <td className="p-4">
+                      {p.categories && p.categories.length > 0 ? (
+                        <div className="flex flex-wrap gap-1">
+                          {p.categories.map((cat) => (
+                            <span key={cat.id} className="px-2 py-0.5 bg-blue-50 text-blue-700 text-xs font-medium rounded-full border border-blue-200">{cat.name}</span>
+                          ))}
+                        </div>
+                      ) : (
+                        <span className="text-gray-300 italic text-sm">{t("dash.noCategory")}</span>
+                      )}
+                    </td>
                     <td className="p-4 text-emerald-600 font-bold text-lg">฿{(p.price ?? 0).toLocaleString()}</td>
                     <td className="p-4 text-right">
                       <div className="flex items-center justify-end gap-1">
@@ -293,7 +318,7 @@ function ProductManager() {
                 );
               })}
               {products.length === 0 && (
-                <tr><td colSpan={4} className="p-12 text-center text-gray-400">{t("dash.noProducts")}</td></tr>
+                <tr><td colSpan={5} className="p-12 text-center text-gray-400">{t("dash.noProducts")}</td></tr>
               )}
             </tbody>
           </table>
@@ -302,13 +327,13 @@ function ProductManager() {
 
       {/* Product Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl w-full max-w-lg shadow-2xl overflow-hidden">
-            <div className="bg-slate-900 text-white px-6 py-4 flex items-center justify-between">
-              <h3 className="text-lg font-bold">{editingId ? t("dash.editProduct") : t("dash.newProduct")}</h3>
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-2 sm:p-4 pt-16 sm:pt-20">
+          <div className="bg-white rounded-xl w-full max-w-lg shadow-2xl overflow-hidden max-h-[calc(100vh-5rem)] sm:max-h-[calc(100vh-6rem)] flex flex-col">
+            <div className="bg-slate-900 text-white px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between flex-shrink-0">
+              <h3 className="text-base sm:text-lg font-bold">{editingId ? t("dash.editProduct") : t("dash.newProduct")}</h3>
               <button onClick={closeModal} className="text-slate-400 hover:text-white transition-colors"><X size={24} /></button>
             </div>
-            <form onSubmit={handleSubmit} className="p-6 flex flex-col gap-4">
+            <form onSubmit={handleSubmit} className="p-4 sm:p-6 flex flex-col gap-4 overflow-y-auto">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1.5">{t("dash.productName")}</label>
                 <input className="w-full border rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder={t("dash.productName")} value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} required />
@@ -316,6 +341,29 @@ function ProductManager() {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1.5">{t("dash.price")}</label>
                 <input className="w-full border rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none" type="number" placeholder="0" value={formData.price} onChange={(e) => setFormData({ ...formData, price: e.target.value })} required />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">{t("dash.category")}</label>
+                <div className="flex flex-wrap gap-2 border rounded-lg px-4 py-3">
+                  {categories.length > 0 ? categories.map((cat) => (
+                    <label key={cat.id} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm cursor-pointer border transition-colors ${formData.categories.includes(cat.id) ? "bg-blue-50 border-blue-300 text-blue-700 font-medium" : "bg-gray-50 border-gray-200 text-gray-600 hover:border-gray-300"}`}>
+                      <input
+                        type="checkbox"
+                        checked={formData.categories.includes(cat.id)}
+                        onChange={(e) => {
+                          const updated = e.target.checked
+                            ? [...formData.categories, cat.id]
+                            : formData.categories.filter((id) => id !== cat.id);
+                          setFormData({ ...formData, categories: updated });
+                        }}
+                        className="sr-only"
+                      />
+                      {cat.name}
+                    </label>
+                  )) : (
+                    <span className="text-sm text-gray-400 italic">{t("dash.noCategory")}</span>
+                  )}
+                </div>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1.5">{t("dash.description")}</label>
@@ -349,6 +397,7 @@ interface OrderData {
   shippingAddress?: string;
   paymentMethod?: string;
   adminNotes?: string;
+  transferProofUrl?: string;
   user?: { id: number; username: string; email: string };
   products?: { id: number; name: string; price: number }[];
   createdAt: string;
@@ -375,6 +424,7 @@ function OrderManager() {
   const [editingOrder, setEditingOrder] = useState<OrderData | null>(null);
   const [editForm, setEditForm] = useState({ recipientName: "", phone: "", shippingAddress: "", paymentMethod: "", status: "", adminNotes: "" });
   const [editSaving, setEditSaving] = useState(false);
+  const [proofModalUrl, setProofModalUrl] = useState<string | null>(null);
   const prevOrderIdsRef = useRef<Set<number>>(new Set());
   const isFirstLoadRef = useRef(true);
 
@@ -649,6 +699,7 @@ function OrderManager() {
                     <p className="font-bold text-gray-800">{order.orderNumber}</p>
                   </div>
                   <p className="text-sm text-gray-400">
+                    {order.user?.username && <span className="text-gray-500 font-medium">{order.user.username} · </span>}
                     {new Date(order.orderDate || order.createdAt).toLocaleDateString(locale === "th" ? "th-TH" : "en-US", {
                       year: "numeric", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit",
                     })}
@@ -719,6 +770,25 @@ function OrderManager() {
                     </div>
                   )}
 
+                  {/* Transfer Proof */}
+                  <div>
+                    <p className="text-xs text-gray-400 uppercase mb-1 font-semibold">{t("dash.transferProof")}</p>
+                    {order.transferProofUrl ? (
+                      <button
+                        onClick={() => setProofModalUrl(`${API}${order.transferProofUrl}`)}
+                        className="inline-block"
+                      >
+                        <img
+                          src={`${API}${order.transferProofUrl}`}
+                          alt="Transfer proof"
+                          className="max-h-40 rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+                        />
+                      </button>
+                    ) : (
+                      <p className="text-sm text-gray-400 italic">{t("dash.noProof")}</p>
+                    )}
+                  </div>
+
                   {order.products && order.products.length > 0 && (
                     <div>
                       <p className="text-xs text-gray-400 uppercase mb-2 font-semibold">{t("dash.productsInOrder")}</p>
@@ -772,10 +842,31 @@ function OrderManager() {
       )}
 
       {/* Edit Order Modal */}
+      {/* Transfer Proof Modal */}
+      {proofModalUrl && (
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-2 sm:p-4 pt-16 sm:pt-20" onClick={() => setProofModalUrl(null)}>
+          <div className="relative bg-white rounded-xl shadow-2xl max-w-2xl w-full overflow-hidden max-h-[calc(100vh-5rem)] sm:max-h-[calc(100vh-6rem)] flex flex-col" onClick={(e) => e.stopPropagation()}>
+            <div className="bg-slate-900 text-white px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between flex-shrink-0">
+              <h3 className="text-base sm:text-lg font-bold">{t("dash.transferProof")}</h3>
+              <button onClick={() => setProofModalUrl(null)} className="text-slate-400 hover:text-white transition-colors">
+                <X size={24} />
+              </button>
+            </div>
+            <div className="p-3 sm:p-4 flex items-center justify-center bg-gray-50 overflow-y-auto">
+              <img
+                src={proofModalUrl}
+                alt="Transfer proof"
+                className="max-h-[calc(100vh-10rem)] max-w-full rounded-lg object-contain"
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
       {editingOrder && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl w-full max-w-lg shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
-            <div className="bg-slate-900 text-white px-6 py-4 flex items-center justify-between flex-shrink-0">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-2 sm:p-4 pt-16 sm:pt-20">
+          <div className="bg-white rounded-xl w-full max-w-lg shadow-2xl overflow-hidden max-h-[calc(100vh-5rem)] sm:max-h-[calc(100vh-6rem)] flex flex-col">
+            <div className="bg-slate-900 text-white px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between flex-shrink-0">
               <div>
                 <h3 className="text-lg font-bold">{t("dash.editOrder")}</h3>
                 <p className="text-slate-400 text-sm">{editingOrder.orderNumber}</p>
@@ -1030,8 +1121,8 @@ function UserManager() {
 
       {/* User Detail Modal */}
       {selectedUser && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl w-full max-w-md shadow-2xl overflow-hidden">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-2 sm:p-4 pt-16 sm:pt-20">
+          <div className="bg-white rounded-xl w-full max-w-md shadow-2xl overflow-hidden max-h-[calc(100vh-5rem)] sm:max-h-[calc(100vh-6rem)] overflow-y-auto">
             <div className="bg-slate-900 text-white p-6 text-center">
               <div className="w-16 h-16 bg-blue-500 rounded-full mx-auto flex items-center justify-center text-white text-2xl font-bold mb-3">
                 {selectedUser.username?.charAt(0)?.toUpperCase() || "?"}

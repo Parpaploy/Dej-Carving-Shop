@@ -132,7 +132,7 @@ export default function ContactPage() {
                     value={formData.name}
                     onChange={handleChange}
                     type="text"
-                    className="w-full p-4 bg-cream border border-cream-alt rounded-lg focus:ring-2 focus:ring-gold focus:outline-none transition-all text-body"
+                    className="w-full p-4 bg-white border border-cream-alt rounded-lg focus:ring-2 focus:ring-gold focus:outline-none transition-all text-body"
                     placeholder={t("contact.namePlaceholder")}
                   />
                 </div>
@@ -144,7 +144,7 @@ export default function ContactPage() {
                     type="email"
                     value={formData.email}
                     onChange={handleChange}
-                    className="w-full p-4 bg-cream border border-cream-alt rounded-lg focus:ring-2 focus:ring-gold focus:outline-none transition-all text-body"
+                    className="w-full p-4 bg-white border border-cream-alt rounded-lg focus:ring-2 focus:ring-gold focus:outline-none transition-all text-body"
                     placeholder="name@example.com"
                   />
                 </div>
@@ -158,7 +158,7 @@ export default function ContactPage() {
                   type="text"
                   value={formData.subject}
                   onChange={handleChange}
-                  className="w-full p-4 bg-cream border border-cream-alt rounded-lg focus:ring-2 focus:ring-gold focus:outline-none transition-all text-body"
+                  className="w-full p-4 bg-white border border-cream-alt rounded-lg focus:ring-2 focus:ring-gold focus:outline-none transition-all text-body"
                   placeholder={t("contact.subjectPlaceholder")}
                 />
               </div>
@@ -171,7 +171,7 @@ export default function ContactPage() {
                   rows={5}
                   value={formData.message}
                   onChange={handleChange}
-                  className="w-full p-4 bg-cream border border-cream-alt rounded-lg focus:ring-2 focus:ring-gold focus:outline-none transition-all text-body"
+                  className="w-full p-4 bg-white border border-cream-alt rounded-lg focus:ring-2 focus:ring-gold focus:outline-none transition-all text-body"
                   placeholder={t("contact.messagePlaceholder")}
                 />
               </div>

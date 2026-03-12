@@ -112,7 +112,7 @@ export default function RegisterClient() {
               <label htmlFor="fullname" className="text-body font-bold text-teak-dark">{t("register.fullName")}</label>
               <div className="relative group">
                 <div className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted group-focus-within:text-gold"><User size={22} /></div>
-                <input id="fullname" type="text" required value={username} onChange={(e) => setUsername(e.target.value)} placeholder={t("register.fullNamePlaceholder")} className="w-full pl-12 pr-4 py-4 text-body border-2 border-cream-alt rounded-lg focus:border-gold focus:ring-1 focus:ring-gold outline-none transition-all text-text-main bg-cream" />
+                <input id="fullname" type="text" required value={username} onChange={(e) => setUsername(e.target.value)} placeholder={t("register.fullNamePlaceholder")} className="w-full pl-12 pr-4 py-4 text-body border-2 border-cream-alt rounded-lg focus:border-gold focus:ring-1 focus:ring-gold outline-none transition-all text-text-main bg-white" />
               </div>
             </div>
 
@@ -120,7 +120,7 @@ export default function RegisterClient() {
               <label htmlFor="email" className="text-body font-bold text-teak-dark">{t("register.email")}</label>
               <div className="relative group">
                 <div className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted group-focus-within:text-gold"><Mail size={22} /></div>
-                <input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="name@example.com" className="w-full pl-12 pr-4 py-4 text-body border-2 border-cream-alt rounded-lg focus:border-gold focus:ring-1 focus:ring-gold outline-none transition-all text-text-main bg-cream" />
+                <input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="name@example.com" className="w-full pl-12 pr-4 py-4 text-body border-2 border-cream-alt rounded-lg focus:border-gold focus:ring-1 focus:ring-gold outline-none transition-all text-text-main bg-white" />
               </div>
             </div>
 
@@ -128,7 +128,7 @@ export default function RegisterClient() {
               <label htmlFor="password" className="text-body font-bold text-teak-dark">{t("register.password")}</label>
               <div className="relative group">
                 <div className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted group-focus-within:text-gold"><Lock size={22} /></div>
-                <input id="password" type={showPassword ? "text" : "password"} required value={password} onChange={(e) => setPassword(e.target.value)} placeholder={t("register.passwordPlaceholder")} className="w-full pl-12 pr-14 py-4 text-body border-2 border-cream-alt rounded-lg focus:border-gold focus:ring-1 focus:ring-gold outline-none transition-all text-text-main bg-cream" />
+                <input id="password" type={showPassword ? "text" : "password"} required value={password} onChange={(e) => setPassword(e.target.value)} placeholder={t("register.passwordPlaceholder")} className="w-full pl-12 pr-14 py-4 text-body border-2 border-cream-alt rounded-lg focus:border-gold focus:ring-1 focus:ring-gold outline-none transition-all text-text-main bg-white" />
                 <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-text-muted hover:text-teak-dark p-2" aria-label="Toggle password">
                   {showPassword ? <EyeOff size={22} /> : <Eye size={22} />}
                 </button>
@@ -139,7 +139,7 @@ export default function RegisterClient() {
               <label htmlFor="confirmPassword" className="text-body font-bold text-teak-dark">{t("register.confirmPassword")}</label>
               <div className="relative group">
                 <div className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted group-focus-within:text-gold"><CheckCircle size={22} /></div>
-                <input id="confirmPassword" type={showConfirmPassword ? "text" : "password"} required value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} placeholder={t("register.confirmPlaceholder")} className="w-full pl-12 pr-14 py-4 text-body border-2 border-cream-alt rounded-lg focus:border-gold focus:ring-1 focus:ring-gold outline-none transition-all text-text-main bg-cream" />
+                <input id="confirmPassword" type={showConfirmPassword ? "text" : "password"} required value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} placeholder={t("register.confirmPlaceholder")} className="w-full pl-12 pr-14 py-4 text-body border-2 border-cream-alt rounded-lg focus:border-gold focus:ring-1 focus:ring-gold outline-none transition-all text-text-main bg-white" />
                 <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-text-muted hover:text-teak-dark p-2" aria-label="Toggle confirm">
                   {showConfirmPassword ? <EyeOff size={22} /> : <Eye size={22} />}
                 </button>
@@ -149,19 +149,39 @@ export default function RegisterClient() {
             <button
               type="submit"
               disabled={isLoading}
-              className={`mt-2 w-full text-body-lg font-bold py-4 rounded-lg shadow-lg transition-all active:scale-95 min-h-[56px] ${
-                isLoading ? "bg-text-muted text-cream cursor-not-allowed" : "bg-gold hover:bg-gold-hover text-cream"
+              className={`relative overflow-hidden mt-2 w-full text-white text-body-lg font-bold py-4 rounded-lg shadow-lg transition-all active:scale-95 min-h-[56px] ${
+                isLoading ? "bg-text-muted cursor-not-allowed" : "hover:shadow-xl"
               }`}
+              onMouseMove={(e) => {
+                if (isLoading) return;
+                const rect = e.currentTarget.getBoundingClientRect();
+                e.currentTarget.style.setProperty("--gx", `${e.clientX - rect.left}px`);
+                e.currentTarget.style.setProperty("--gy", `${e.clientY - rect.top}px`);
+              }}
+              style={{ "--gx": "50%", "--gy": "50%", backgroundColor: isLoading ? undefined : "#482a1d" } as React.CSSProperties}
             >
-              {isLoading ? t("register.submitting") : t("register.submit")}
+              <span className="pointer-events-none absolute inset-0 opacity-0 hover:opacity-100 transition-opacity duration-300" style={{ background: "radial-gradient(120px circle at var(--gx) var(--gy), rgba(255,255,255,0.15), transparent 70%)" }} />
+              <span className="relative z-10">{isLoading ? t("register.submitting") : t("register.submit")}</span>
             </button>
           </form>
         </div>
 
         <div className="bg-cream p-6 text-center border-t border-cream-alt">
           <p className="text-body text-text-muted mb-2">{t("register.hasAccount")}</p>
-          <Link href="/login" className="text-body-lg font-bold text-teak border-b-2 border-teak hover:text-gold hover:border-gold transition-colors">
-            {t("register.login")}
+          <Link
+            href="/login"
+            className="relative overflow-hidden inline-block text-white text-body-lg font-bold py-3 px-8 rounded-lg hover:shadow-xl transition-all active:scale-95"
+            onMouseMove={(e) => {
+              const rect = e.currentTarget.getBoundingClientRect();
+              e.currentTarget.style.setProperty("--gx", `${e.clientX - rect.left}px`);
+              e.currentTarget.style.setProperty("--gy", `${e.clientY - rect.top}px`);
+              e.currentTarget.style.setProperty("--go", "1");
+            }}
+            onMouseLeave={(e) => { e.currentTarget.style.setProperty("--go", "0"); }}
+            style={{ "--gx": "50%", "--gy": "50%", "--go": "0", backgroundColor: "#321c13" } as React.CSSProperties}
+          >
+            <span className="pointer-events-none absolute inset-0 transition-opacity duration-300" style={{ background: "radial-gradient(120px circle at var(--gx) var(--gy), rgba(255,255,255,0.18), transparent 70%)", opacity: "var(--go)" }} />
+            <span className="relative z-10">{t("register.login")}</span>
           </Link>
         </div>
       </div>
