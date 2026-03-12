@@ -281,7 +281,7 @@ export default function CheckoutClient() {
                       value="bank_transfer"
                       checked={paymentMethod === "bank_transfer"}
                       onChange={() => setPaymentMethod("bank_transfer")}
-                      className="w-5 h-5 accent-[#8B6914]"
+                      className="w-5 h-5 accent-[#6b4c38]"
                     />
                     <Banknote size={24} className="text-teak flex-shrink-0" />
                     <div>
@@ -303,7 +303,7 @@ export default function CheckoutClient() {
                       value="promptpay"
                       checked={paymentMethod === "promptpay"}
                       onChange={() => setPaymentMethod("promptpay")}
-                      className="w-5 h-5 accent-[#8B6914]"
+                      className="w-5 h-5 accent-[#6b4c38]"
                     />
                     <QrCode size={24} className="text-teak flex-shrink-0" />
                     <div>

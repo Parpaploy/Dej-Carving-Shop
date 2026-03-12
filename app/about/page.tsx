@@ -86,7 +86,7 @@ export default function AboutPage() {
       </section>
 
       {/* CRAFTSMAN PROCESS */}
-      <section className="py-24 bg-[#FDFBF7]">
+      <section className="py-24 bg-cream">
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-h2 font-serif text-teak-dark mb-4">{t("craftsman.title")}</h2>
@@ -106,7 +106,7 @@ export default function AboutPage() {
                 {index < 3 && (
                   <div className="hidden md:block absolute top-12 left-[60%] w-[80%] h-px bg-gold/20" />
                 )}
-                <div className="w-24 h-24 mx-auto rounded-full bg-white border-2 border-gold/20 flex items-center justify-center text-4xl mb-6 shadow-md group-hover:border-gold group-hover:shadow-lg transition-all duration-300 relative z-10">
+                <div className="w-24 h-24 mx-auto rounded-full bg-card border-2 border-gold/20 flex items-center justify-center text-4xl mb-6 shadow-md group-hover:border-gold group-hover:shadow-lg transition-all duration-300 relative z-10">
                   {item.icon}
                 </div>
                 <div className="w-8 h-8 mx-auto -mt-9 mb-3 rounded-full bg-gold text-white text-sm font-bold flex items-center justify-center relative z-20 shadow-sm">

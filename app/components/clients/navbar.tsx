@@ -58,7 +58,7 @@ export default function Navbar() {
   };
 
   return (
-    <header className="w-full z-50 sticky top-0 bg-teak/90 backdrop-blur-md shadow-md border-b border-gold/10 transition-all duration-300">
+   <header className="w-full z-[100] sticky top-0 bg-teak shadow-md border-b border-gold/10 transition-all duration-300">
       <nav className="text-cream px-6 py-3">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
 
@@ -74,7 +74,7 @@ export default function Navbar() {
                 2. Change the src below to src="/logo.png"
               */}
               <img
-                src="https://placehold.co/100x100/A68331/FFFFFF?text=Logo"
+                src="https://placehold.co/100x100/482a1d/ddd9d0?text=Logo"
                 alt="Dej Carving Shop Logo"
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
               />
@@ -123,12 +123,12 @@ export default function Navbar() {
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: 10, scale: 0.95 }}
                     transition={{ duration: 0.15, ease: "easeOut" }}
-                    className="absolute left-0 mt-3 w-56 bg-white text-gray-800 rounded-xl shadow-2xl py-2 border border-gray-100 z-50 overflow-hidden"
+                    className="absolute left-0 mt-3 w-56 bg-white text-teak-dark rounded-xl shadow-2xl py-2 border border-cream-alt z-[100] overflow-hidden"
                   >
                     <Link
                       href="/products"
                       onClick={() => setIsCategoryOpen(false)}
-                      className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 text-body font-medium transition-colors border-b border-gray-100"
+                      className="flex items-center gap-3 px-4 py-3 hover:bg-cream text-body font-medium transition-colors border-b border-cream-alt"
                     >
                       {t("nav.allProducts")}
                     </Link>
@@ -137,7 +137,7 @@ export default function Navbar() {
                         key={cat.id}
                         href={`/products?category=${cat.slug}`}
                         onClick={() => setIsCategoryOpen(false)}
-                        className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 text-body transition-colors"
+                        className="flex items-center gap-3 px-4 py-3 hover:bg-cream text-body transition-colors"
                       >
                         {cat.icon && <span className="text-lg">{cat.icon}</span>}
                         <span className="font-medium">
@@ -185,23 +185,23 @@ export default function Navbar() {
 
                 <AnimatePresence>
                   {isUserMenuOpen && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                      transition={{ duration: 0.15, ease: "easeOut" }}
-                      className="absolute right-0 mt-3 w-52 bg-white text-gray-800 rounded-xl shadow-2xl py-2 border border-gray-100 z-50 overflow-hidden"
-                    >
+                   <motion.div
+                          initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                          animate={{ opacity: 1, y: 0, scale: 1 }}
+                          exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                          transition={{ duration: 0.15, ease: "easeOut" }}
+                          className="absolute right-0 mt-3 w-52 bg-white text-teak-dark rounded-xl shadow-2xl py-2 border border-cream-alt z-[100] overflow-hidden"
+                   >
                       <Link
                         href="/profile"
                         onClick={() => setIsUserMenuOpen(false)}
-                        className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 text-body font-medium transition-colors"
+                        className="flex items-center gap-3 px-4 py-3 hover:bg-cream text-body font-medium transition-colors"
                       >
-                        <Settings size={18} className="text-gray-500" /> {t("nav.profile")}
+                        <Settings size={18} className="text-text-muted" /> {t("nav.profile")}
                       </Link>
                       <button
                         onClick={handleLogoutClick}
-                        className="w-full flex items-center gap-3 px-4 py-3 hover:bg-red-50 text-red-600 text-body font-medium text-left border-t border-gray-100 transition-colors"
+                        className="w-full flex items-center gap-3 px-4 py-3 hover:bg-red-50 text-red-600 text-body font-medium text-left border-t border-cream-alt transition-colors"
                       >
                         <LogOut size={18} /> {t("nav.logout")}
                       </button>

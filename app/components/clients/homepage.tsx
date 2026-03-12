@@ -72,19 +72,20 @@ export default function HomepageClient() {
   };
 
   return (
-    <main className="w-full min-h-screen bg-[#FDFBF7] text-text-main">
+    <main className="w-full min-h-screen bg-cream text-text-main">
       
       {/* === HERO === */}
       <section className="relative w-full min-h-[500px] md:min-h-[600px] bg-teak-dark flex items-center justify-center overflow-hidden">
         {heroImages.map((src, i) => (
-          <div
-            key={src}
-            className="absolute inset-0 transition-all duration-1000 ease-in-out"
-            style={{ 
-              opacity: i === currentSlide ? 1 : 0,
-              transform: i === currentSlide ? "scale(1)" : "scale(1.05)"
-            }}
-          >
+        <div
+          key={src}
+          className="absolute inset-0 bg-teak-dark transition-all duration-1000 ease-in-out" // Added bg-teak-dark here
+          style={{ 
+            opacity: i === currentSlide ? 1 : 0,
+            transform: i === currentSlide ? "scale(1)" : "scale(1.05)",
+            zIndex: i === currentSlide ? 10 : 0 // Added zIndex to prevent ghosting
+          }}
+        >
             <img
               src={src}
               alt="Hero Background"
@@ -129,7 +130,7 @@ export default function HomepageClient() {
             )}
             <Link
               href="/products"
-              className="inline-flex items-center justify-center gap-3 bg-gold hover:bg-white text-teak-dark text-lg font-bold py-4 px-10 rounded-full transition-all duration-300 shadow-[0_8px_30px_rgb(218,165,32,0.3)] hover:shadow-[0_8px_30px_rgb(255,255,255,0.4)] hover:-translate-y-1 group"
+              className="inline-flex items-center justify-center gap-3 bg-gold hover:bg-cream text-cream hover:text-teak-dark text-lg font-bold py-4 px-10 rounded-full transition-all duration-300 shadow-[0_8px_30px_rgba(107,76,56,0.3)] hover:shadow-[0_8px_30px_rgba(221,217,208,0.4)] hover:-translate-y-1 group"
             >
               {t("home.browseCollection")}
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
@@ -157,7 +158,7 @@ export default function HomepageClient() {
       </section>
 
       {/* === TRUST BADGES === */}
-      <section className="py-16 bg-white border-b border-cream-alt shadow-sm relative z-10 -mt-6 mx-4 md:mx-auto max-w-6xl rounded-2xl">
+      <section className="py-16 bg-card border-b border-cream-alt shadow-sm relative z-10 -mt-6 mx-4 md:mx-auto max-w-6xl rounded-2xl">
         <div className="px-6 grid grid-cols-1 md:grid-cols-3 gap-10 text-center divide-y md:divide-y-0 md:divide-x divide-cream-alt">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUpVariant} className="flex flex-col items-center pt-6 md:pt-0 px-4">
             <div className="w-16 h-16 rounded-full bg-gold/10 flex items-center justify-center mb-5 text-teak">
@@ -206,9 +207,9 @@ export default function HomepageClient() {
             >
               <Link
                 href="/products"
-                className="block bg-white p-8 rounded-2xl shadow-sm border border-cream hover:shadow-xl hover:-translate-y-2 transition-all duration-300 group text-center"
+                className="block bg-card p-8 rounded-2xl shadow-sm border border-cream-alt hover:shadow-xl hover:-translate-y-2 transition-all duration-300 group text-center"
               >
-                <div className="w-20 h-20 mx-auto rounded-full bg-[#FDFBF7] flex items-center justify-center text-4xl mb-6 shadow-inner group-hover:scale-110 transition-transform duration-300">
+                <div className="w-20 h-20 mx-auto rounded-full bg-cream flex items-center justify-center text-4xl mb-6 shadow-inner group-hover:scale-110 transition-transform duration-300">
                   {cat.icon}
                 </div>
                 <h3 className="text-xl font-serif font-bold text-teak-dark group-hover:text-gold transition-colors mb-2">
@@ -252,7 +253,7 @@ export default function HomepageClient() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
-                  className="bg-white rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl text-text-main flex flex-col group transition-all duration-300 hover:-translate-y-1"
+                  className="bg-card rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl text-text-main flex flex-col group transition-all duration-300 hover:-translate-y-1"
                 >
                   <Link href={`/products/${(item as any).documentId || item.id}`}>
                     <div className="aspect-[4/3] bg-cream-alt relative overflow-hidden">
@@ -269,7 +270,7 @@ export default function HomepageClient() {
                       {item.name}
                     </h4>
                     <div className="mt-auto pt-5 flex items-center justify-between border-t border-cream-alt">
-                      <span className="text-xl font-bold text-[#b45309]">
+                      <span className="text-xl font-bold text-price">
                         ฿{(item.price ?? 0).toLocaleString()}
                       </span>
                       <AddToCartButton product={item} />
@@ -283,31 +284,31 @@ export default function HomepageClient() {
       </section>
 
       {/* === CONTACT CTA (Enhanced from image) === */}
-      <section className="py-20 bg-gradient-to-br from-[#A68331] to-[#8C6B1C] text-white text-center px-6 relative overflow-hidden">
+      <section className="py-20 bg-gradient-to-br from-teak-light to-teak-dark text-cream text-center px-6 relative overflow-hidden">
         {/* Subtle background patterns for depth */}
-        <div className="absolute top-0 left-0 w-full h-full opacity-10 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white via-transparent to-transparent pointer-events-none" />
-        
-        <motion.div 
-          initial="hidden" 
-          whileInView="visible" 
-          viewport={{ once: true }} 
+        <div className="absolute top-0 left-0 w-full h-full opacity-10 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-cream via-transparent to-transparent pointer-events-none" />
+
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
           variants={fadeUpVariant}
           className="max-w-3xl mx-auto relative z-10"
         >
-          <div className="w-20 h-20 mx-auto bg-[#4A3525]/20 rounded-full flex items-center justify-center mb-6">
-            <Phone className="w-10 h-10 text-[#4A3525] animate-[wiggle_1s_ease-in-out_infinite]" />
+          <div className="w-20 h-20 mx-auto bg-cream/20 rounded-full flex items-center justify-center mb-6">
+            <Phone className="w-10 h-10 text-cream animate-[wiggle_1s_ease-in-out_infinite]" />
           </div>
-          
-          <h2 className="text-3xl md:text-5xl font-serif text-[#4A3525] font-bold mb-4 drop-shadow-sm">
+
+          <h2 className="text-3xl md:text-5xl font-serif text-cream font-bold mb-4 drop-shadow-sm">
             {t("home.interested") || "สนใจสินค้า?"}
           </h2>
-          <p className="text-lg md:text-xl text-[#4A3525]/80 mb-10 font-medium">
+          <p className="text-lg md:text-xl text-cream/80 mb-10 font-medium">
             {t("home.interestedSub") || "โทรหาเราได้เลย หรือแอดไลน์"}
           </p>
-          
+
           {/* CTA Buttons Container */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-8">
-            
+
             {/* LINE Button */}
             <a
               href="https://line.me/ti/p/~YOUR_LINE_ID" // 👈 Change this to your actual LINE link
@@ -325,7 +326,7 @@ export default function HomepageClient() {
             {/* Phone Button */}
             <a
               href="tel:092-3640013"
-              className="inline-flex items-center justify-center gap-3 bg-[#4A3525] text-gold-soft text-lg md:text-xl font-bold py-4 px-8 md:px-10 rounded-full hover:bg-[#3A291C] hover:text-white transition-all duration-300 shadow-[0_10px_20px_rgba(74,53,37,0.3)] hover:shadow-[0_15px_30px_rgba(74,53,37,0.5)] hover:-translate-y-1 w-full sm:w-auto"
+              className="inline-flex items-center justify-center gap-3 bg-[#1d1d1d] text-cream text-lg md:text-xl font-bold py-4 px-8 md:px-10 rounded-full hover:bg-[#2a2a2a] hover:text-white transition-all duration-300 shadow-[0_10px_20px_rgba(29,29,29,0.3)] hover:shadow-[0_15px_30px_rgba(29,29,29,0.5)] hover:-translate-y-1 w-full sm:w-auto"
             >
               <Phone className="w-5 h-5" />
               {t("home.callUs") || "โทร"} 

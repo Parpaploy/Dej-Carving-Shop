@@ -6,13 +6,13 @@ const nextConfig = {
         protocol: 'http',
         hostname: 'localhost',
         port: '1337',
-        pathname: '/uploads/**', 
+        pathname: '/uploads/**',
       },
-      // Add this block if you deploy Strapi to a real server later (e.g. cloud)
-      // {
-      //   protocol: 'https',
-      //   hostname: 'your-strapi-domain.com',
-      // }
+      {
+        protocol: 'https',
+        hostname: '*.onrender.com',
+        pathname: '/uploads/**',
+      },
     ],
   },
 };

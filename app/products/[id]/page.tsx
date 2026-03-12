@@ -32,7 +32,7 @@ export default async function ProductDetailServer({ params }: Props) {
 
   if (!product) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-[#FAF9F6] text-[#4B3621]">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-cream text-teak-dark">
         <h1 className="text-4xl font-serif font-bold mb-4">Item Not Found</h1>
         <p className="text-lg">This collectible may have been removed.</p>
       </div>

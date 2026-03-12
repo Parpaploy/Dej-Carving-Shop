@@ -10,3 +10,4 @@ export interface Image {
   url: string;
   formats?: ImageFormat;
 }
+

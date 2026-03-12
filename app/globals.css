@@ -7,22 +7,22 @@
 
 :root {
   /* Primary Palette */
-  --teak: #5C3A1E;
-  --teak-dark: #3E2712;
-  --teak-light: #7A5230;
-  --gold: #8B6914;
-  --gold-soft: #C4A265;
-  --gold-hover: #6B5010;
+  --teak: #482a1d;
+  --teak-dark: #321c13;
+  --teak-light: #5e3d2d;
+  --gold: #6b4c38;
+  --gold-soft: #bfb5a8;
+  --gold-hover: #5a3c28;
 
   /* Backgrounds */
-  --cream: #FFF8F0;
-  --card: #FEFCF8;
-  --cream-alt: #EDE5D8;
+  --cream: #ddd9d0;
+  --card: #e5e1d9;
+  --cream-alt: #d3cec5;
 
   /* Text */
-  --text: #2C1810;
-  --text-muted: #6B5545;
-  --text-light: #FFF8F0;
+  --text: #1d1d1d;
+  --text-muted: #5c5650;
+  --text-light: #ddd9d0;
 
   /* Functional */
   --price: #8B2500;

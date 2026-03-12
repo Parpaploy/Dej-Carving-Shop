@@ -131,17 +131,17 @@ export default function ProfileClient() {
   // --- SUB-COMPONENT: ORDERS ---
   const OrdersTab = () => (
     <div className="space-y-6">
-      <h2 className="text-2xl font-serif text-[#4B3621] border-b border-gray-200 pb-4">{t("profile.orderHistory")}</h2>
+      <h2 className="text-2xl font-serif text-teak-dark border-b border-cream-alt pb-4">{t("profile.orderHistory")}</h2>
       
       {loading ? (
-        <div className="flex justify-center p-10"><Loader2 className="animate-spin text-[#D4AF37]" /></div>
+        <div className="flex justify-center p-10"><Loader2 className="animate-spin text-gold" /></div>
       ) : orders.length > 0 ? (
         orders.map((order) => (
-          <div key={order.id} className="bg-[#FAF9F6] border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow">
+          <div key={order.id} className="bg-cream border border-cream-alt rounded-lg p-6 hover:shadow-md transition-shadow">
             <div className="flex flex-col md:flex-row justify-between md:items-center mb-4">
               <div>
-                <span className="font-bold text-lg text-[#2e1d10]">{order.orderNumber || `Order #${order.id}`}</span>
-                <p className="text-sm text-gray-500 flex items-center gap-1">
+                <span className="font-bold text-lg text-teak-dark">{order.orderNumber || `Order #${order.id}`}</span>
+                <p className="text-sm text-text-muted flex items-center gap-1">
                   <Calendar size={14}/> {new Date(order.orderDate || order.createdAt).toLocaleDateString("th-TH")}
                 </p>
               </div>
@@ -157,14 +157,14 @@ export default function ProfileClient() {
               </div>
             </div>
 
-            <div className="border-t border-gray-200 pt-4">
-               <div className="text-sm text-gray-600 mb-2">
+            <div className="border-t border-cream-alt pt-4">
+               <div className="text-sm text-text-muted mb-2">
                  <p>{order.recipientName} &middot; {order.phone}</p>
-                 <p className="text-gray-400">{order.paymentMethod === "promptpay" ? "PromptPay" : "Bank Transfer"}</p>
+                 <p className="text-text-muted">{order.paymentMethod === "promptpay" ? "PromptPay" : "Bank Transfer"}</p>
                </div>
                <div className="text-right">
-                <p className="text-gray-600 text-sm">Total:</p>
-                <p className="text-2xl font-serif font-bold text-[#8B0000]">
+                <p className="text-text-muted text-sm">Total:</p>
+                <p className="text-2xl font-serif font-bold text-price">
                   ฿{(order.totalAmount ?? 0).toLocaleString()}
                 </p>
               </div>
@@ -172,7 +172,7 @@ export default function ProfileClient() {
           </div>
         ))
       ) : (
-        <div className="text-center py-10 text-gray-500">{t("profile.noOrders")}</div>
+        <div className="text-center py-10 text-text-muted">{t("profile.noOrders")}</div>
       )}
     </div>
   );
@@ -180,50 +180,50 @@ export default function ProfileClient() {
   // --- SUB-COMPONENT: ADDRESSES ---
   const AddressesTab = () => (
     <div className="space-y-6">
-      <div className="flex justify-between items-center border-b border-gray-200 pb-4">
-        <h2 className="text-2xl font-serif text-[#4B3621]">{t("profile.myAddresses")}</h2>
+      <div className="flex justify-between items-center border-b border-cream-alt pb-4">
+        <h2 className="text-2xl font-serif text-teak-dark">{t("profile.myAddresses")}</h2>
         <button
           onClick={() => toast.info(t("profile.addAddressFeature"))}
-          className="flex items-center gap-2 bg-[#D4AF37] text-[#2e1d10] px-4 py-2 rounded font-bold hover:bg-[#b5952f] text-sm"
+          className="flex items-center gap-2 bg-gold text-teak-dark px-4 py-2 rounded font-bold hover:bg-gold-hover text-sm"
         >
           <Plus size={18} /> {t("profile.addNew")}
         </button>
       </div>
 
       {loading ? (
-        <div className="flex justify-center p-10"><Loader2 className="animate-spin text-[#D4AF37]" /></div>
+        <div className="flex justify-center p-10"><Loader2 className="animate-spin text-gold" /></div>
       ) : addresses.length > 0 ? (
         <div className="grid grid-cols-1 gap-4">
           {addresses.map((addr) => (
-            <div key={addr.id} className="bg-[#FAF9F6] border border-gray-200 rounded-lg p-6 relative group">
+            <div key={addr.id} className="bg-cream border border-cream-alt rounded-lg p-6 relative group">
               <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                 <button
                   onClick={() => handleDeleteAddress(addr.id)}
-                  className="p-2 bg-white rounded shadow hover:text-red-600 text-gray-400"
+                  className="p-2 bg-card rounded shadow hover:text-red-600 text-text-muted"
                 >
                   <Trash2 size={16}/>
                 </button>
               </div>
 
               <div className="flex items-center gap-3 mb-3">
-                <span className="bg-[#2e1d10] text-[#D4AF37] text-xs font-bold px-2 py-1 rounded uppercase tracking-wider">
+                <span className="bg-teak-dark text-gold text-xs font-bold px-2 py-1 rounded uppercase tracking-wider">
                   {addr.type || "Home"}
                 </span>
-                <h3 className="font-bold text-lg text-[#2e1d10]">{addr.recipient_name || addr.recipientName || "—"}</h3>
+                <h3 className="font-bold text-lg text-teak-dark">{addr.recipient_name || addr.recipientName || "—"}</h3>
               </div>
 
-              <p className="text-gray-600 mb-1 flex items-start gap-2">
-                <MapPin size={18} className="mt-1 flex-shrink-0 text-[#D4AF37]" />
+              <p className="text-text-muted mb-1 flex items-start gap-2">
+                <MapPin size={18} className="mt-1 flex-shrink-0 text-gold" />
                 {addr.full_address || addr.fullAddress || "—"}
               </p>
-              <p className="text-gray-600 flex items-center gap-2 ml-7">
-                <span className="font-bold text-gray-400">Tel:</span> {addr.phone_number || addr.phoneNumber || "—"}
+              <p className="text-text-muted flex items-center gap-2 ml-7">
+                <span className="font-bold text-text-muted">Tel:</span> {addr.phone_number || addr.phoneNumber || "—"}
               </p>
             </div>
           ))}
         </div>
       ) : (
-         <div className="text-center py-10 text-gray-500">{t("profile.noAddresses")}</div>
+         <div className="text-center py-10 text-text-muted">{t("profile.noAddresses")}</div>
       )}
     </div>
   );
@@ -231,19 +231,19 @@ export default function ProfileClient() {
   // --- SUB-COMPONENT: INFO ---
   const InfoTab = () => (
     <div className="space-y-6">
-      <h2 className="text-2xl font-serif text-[#4B3621] mb-6 border-b border-gray-200 pb-2">{t("profile.personalInfo")}</h2>
+      <h2 className="text-2xl font-serif text-teak-dark mb-6 border-b border-cream-alt pb-2">{t("profile.personalInfo")}</h2>
 
       {/* Profile Image Section */}
-      <div className="flex flex-col items-center sm:flex-row sm:items-start gap-6 p-6 bg-[#FAF9F6] border border-gray-200 rounded-lg">
+      <div className="flex flex-col items-center sm:flex-row sm:items-start gap-6 p-6 bg-cream border border-cream-alt rounded-lg">
         <div className="relative group flex-shrink-0">
           {user.profileImage ? (
             <img
               src={user.profileImage}
               alt={user.username}
-              className="w-28 h-28 rounded-full object-cover border-3 border-[#D4AF37]"
+              className="w-28 h-28 rounded-full object-cover border-3 border-gold"
             />
           ) : (
-            <div className="w-28 h-28 bg-[#D4AF37] rounded-full flex items-center justify-center text-[#2e1d10] text-4xl font-bold">
+            <div className="w-28 h-28 bg-gold rounded-full flex items-center justify-center text-teak-dark text-4xl font-bold">
               {user.username.charAt(0).toUpperCase()}
             </div>
           )}
@@ -260,12 +260,12 @@ export default function ProfileClient() {
           </button>
         </div>
         <div className="text-center sm:text-left">
-          <h3 className="text-xl font-bold text-[#2e1d10]">{user.username}</h3>
-          <p className="text-gray-500">{user.email}</p>
+          <h3 className="text-xl font-bold text-teak-dark">{user.username}</h3>
+          <p className="text-text-muted">{user.email}</p>
           <button
             onClick={() => fileInputRef.current?.click()}
             disabled={uploadingImage}
-            className="mt-3 flex items-center gap-2 px-4 py-2 bg-[#D4AF37] text-[#2e1d10] rounded-lg text-sm font-bold hover:bg-[#b5952f] transition-colors"
+            className="mt-3 flex items-center gap-2 px-4 py-2 bg-gold text-teak-dark rounded-lg text-sm font-bold hover:bg-gold-hover transition-colors"
           >
             {uploadingImage ? <Loader2 size={16} className="animate-spin" /> : <Camera size={16} />}
             {uploadingImage ? t("profile.uploading") : t("profile.changePhoto")}
@@ -275,44 +275,44 @@ export default function ProfileClient() {
 
       <div className="space-y-6">
         <div className="flex flex-col gap-2">
-          <label className="text-lg font-bold text-[#2e1d10] flex items-center gap-2">
-            <User size={20} className="text-[#D4AF37]" /> {t("profile.username")}
+          <label className="text-lg font-bold text-teak-dark flex items-center gap-2">
+            <User size={20} className="text-gold" /> {t("profile.username")}
           </label>
-          <div className="p-4 bg-[#FAF9F6] border border-gray-300 rounded text-xl text-gray-700">{user.username}</div>
+          <div className="p-4 bg-cream border border-cream-alt rounded text-xl text-text-main">{user.username}</div>
         </div>
         <div className="flex flex-col gap-2">
-          <label className="text-lg font-bold text-[#2e1d10] flex items-center gap-2">
-            <Mail size={20} className="text-[#D4AF37]" /> {t("profile.email")}
+          <label className="text-lg font-bold text-teak-dark flex items-center gap-2">
+            <Mail size={20} className="text-gold" /> {t("profile.email")}
           </label>
-          <div className="p-4 bg-[#FAF9F6] border border-gray-300 rounded text-xl text-gray-700">{user.email}</div>
+          <div className="p-4 bg-cream border border-cream-alt rounded text-xl text-text-main">{user.email}</div>
         </div>
       </div>
     </div>
   );
 
   return (
-    <main className="w-full min-h-screen bg-[#FAF9F6] py-12 px-4">
+    <main className="w-full min-h-screen bg-cream py-12 px-4">
       <div className="max-w-5xl mx-auto">
         {/* Header */}
-        <div className="mb-10 text-center md:text-left border-b-2 border-[#D4AF37] pb-6">
-          <h1 className="text-4xl font-serif text-[#4B3621] font-bold">{t("profile.title")}</h1>
-          <p className="text-xl text-gray-600 mt-2">{t("profile.welcome")}, {user.username}</p>
+        <div className="mb-10 text-center md:text-left border-b-2 border-gold pb-6">
+          <h1 className="text-4xl font-serif text-teak-dark font-bold">{t("profile.title")}</h1>
+          <p className="text-xl text-text-muted mt-2">{t("profile.welcome")}, {user.username}</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Sidebar */}
           <div className="md:col-span-1">
-            <div className="bg-white rounded-lg shadow-lg overflow-hidden border-t-4 border-[#2e1d10]">
-              <div className="p-6 bg-[#2e1d10] text-[#FAF9F6] text-center">
+            <div className="bg-card rounded-lg shadow-lg overflow-hidden border-t-4 border-teak-dark">
+              <div className="p-6 bg-teak-dark text-cream text-center">
                 <div className="relative w-24 h-24 mx-auto mb-3 group">
                   {user.profileImage ? (
                     <img
                       src={user.profileImage}
                       alt={user.username}
-                      className="w-24 h-24 rounded-full object-cover border-3 border-[#D4AF37]"
+                      className="w-24 h-24 rounded-full object-cover border-3 border-gold"
                     />
                   ) : (
-                    <div className="w-24 h-24 bg-[#D4AF37] rounded-full flex items-center justify-center text-[#2e1d10] text-3xl font-bold">
+                    <div className="w-24 h-24 bg-gold rounded-full flex items-center justify-center text-teak-dark text-3xl font-bold">
                       {user.username.charAt(0).toUpperCase()}
                     </div>
                   )}
@@ -337,16 +337,16 @@ export default function ProfileClient() {
                   />
                 </div>
                 <h3 className="text-xl font-bold">{user.username}</h3>
-                <p className="text-xs text-[#D4AF37]/70 mt-1">{t("profile.clickToChange")}</p>
+                <p className="text-xs text-gold/70 mt-1">{t("profile.clickToChange")}</p>
               </div>
               <nav className="flex flex-col">
-                <button onClick={() => setActiveTab("info")} className={`flex items-center gap-3 px-6 py-4 text-lg font-medium transition-colors border-b border-gray-100 ${activeTab === "info" ? "bg-[#FAF9F6] border-l-4 border-l-[#D4AF37] text-[#4B3621] font-bold" : "text-gray-600 hover:bg-gray-50"}`}>
+                <button onClick={() => setActiveTab("info")} className={`flex items-center gap-3 px-6 py-4 text-lg font-medium transition-colors border-b border-cream-alt ${activeTab === "info" ? "bg-cream border-l-4 border-l-gold text-teak-dark font-bold" : "text-text-muted hover:bg-cream"}`}>
                   <User size={20} /> {t("profile.personalInfo")}
                 </button>
-                <button onClick={() => setActiveTab("orders")} className={`flex items-center gap-3 px-6 py-4 text-lg font-medium transition-colors border-b border-gray-100 ${activeTab === "orders" ? "bg-[#FAF9F6] border-l-4 border-l-[#D4AF37] text-[#4B3621] font-bold" : "text-gray-600 hover:bg-gray-50"}`}>
+                <button onClick={() => setActiveTab("orders")} className={`flex items-center gap-3 px-6 py-4 text-lg font-medium transition-colors border-b border-cream-alt ${activeTab === "orders" ? "bg-cream border-l-4 border-l-gold text-teak-dark font-bold" : "text-text-muted hover:bg-cream"}`}>
                   <Package size={20} /> {t("profile.orders")}
                 </button>
-                <button onClick={() => setActiveTab("addresses")} className={`flex items-center gap-3 px-6 py-4 text-lg font-medium transition-colors border-b border-gray-100 ${activeTab === "addresses" ? "bg-[#FAF9F6] border-l-4 border-l-[#D4AF37] text-[#4B3621] font-bold" : "text-gray-600 hover:bg-gray-50"}`}>
+                <button onClick={() => setActiveTab("addresses")} className={`flex items-center gap-3 px-6 py-4 text-lg font-medium transition-colors border-b border-cream-alt ${activeTab === "addresses" ? "bg-cream border-l-4 border-l-gold text-teak-dark font-bold" : "text-text-muted hover:bg-cream"}`}>
                   <MapPin size={20} /> {t("profile.addresses")}
                 </button>
                 <button onClick={logout} className="flex items-center gap-3 px-6 py-4 text-red-600 text-lg font-medium hover:bg-red-50 transition-colors">
@@ -358,7 +358,7 @@ export default function ProfileClient() {
 
           {/* Content Area */}
           <div className="md:col-span-2">
-            <div className="bg-white rounded-lg shadow-lg p-8 border-t-4 border-[#D4AF37] min-h-[500px]">
+            <div className="bg-card rounded-lg shadow-lg p-8 border-t-4 border-gold min-h-[500px]">
               {activeTab === "info" && <InfoTab />}
               {activeTab === "orders" && <OrdersTab />}
               {activeTab === "addresses" && <AddressesTab />}
