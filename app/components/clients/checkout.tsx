@@ -23,6 +23,7 @@ import { useCart } from "../../context/CartContext";
 import { useAuth } from "../../context/AuthContext";
 import { useLocale } from "@/app/context/LocaleContext";
 import { toast } from "sonner";
+import PostalCodeLookup from "../ui/PostalCodeLookup";
 
 export default function CheckoutClient() {
   const router = useRouter();
@@ -39,6 +40,10 @@ export default function CheckoutClient() {
   const [orderNumber, setOrderNumber] = useState("");
   const [orderDocumentId, setOrderDocumentId] = useState("");
 
+  // Saved addresses
+  const [savedAddresses, setSavedAddresses] = useState<any[]>([]);
+  const [selectedAddressId, setSelectedAddressId] = useState<number | "manual">("manual");
+
   // Transfer proof upload states
   const [proofFile, setProofFile] = useState<File | null>(null);
   const [proofPreview, setProofPreview] = useState<string | null>(null);
@@ -46,14 +51,24 @@ export default function CheckoutClient() {
   const [proofUploaded, setProofUploaded] = useState(false);
   const [uploadedProofUrl, setUploadedProofUrl] = useState("");
 
-  // Redirect if not logged in
+  // Redirect if not logged in + fetch saved addresses
   React.useEffect(() => {
     const token = localStorage.getItem("jwt");
     if (!token) {
       toast.error(t("toast.pleaseLogin"));
       router.push("/login");
+      return;
     }
-  }, [router]);
+    if (user?.id) {
+      axios
+        .get(
+          `${process.env.NEXT_PUBLIC_STRAPI_BASE_URL}/api/addresses?filters[user][id][$eq]=${user.id}`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        )
+        .then((res) => setSavedAddresses(res.data.data))
+        .catch(() => {});
+    }
+  }, [router, user?.id]);
 
   // Redirect if cart is empty (and not in order-complete state)
   React.useEffect(() => {
@@ -357,10 +372,75 @@ export default function CheckoutClient() {
                   {t("checkout.shippingInfo")}
                 </h2>
 
+                {/* Saved Address Selector */}
+                {savedAddresses.length > 0 && (
+                  <div className="mb-5">
+                    <p className="text-body font-bold text-teak-dark mb-3">{t("checkout.savedAddresses")}</p>
+                    <div className="space-y-2">
+                      {savedAddresses.map((addr) => (
+                        <label
+                          key={addr.id}
+                          className={`flex items-start gap-3 p-4 rounded-lg border-2 cursor-pointer transition-all ${
+                            selectedAddressId === addr.id
+                              ? "border-gold bg-gold/5"
+                              : "border-cream-alt hover:border-gold-soft"
+                          }`}
+                        >
+                          <input
+                            type="radio"
+                            name="addressSelect"
+                            checked={selectedAddressId === addr.id}
+                            onChange={() => {
+                              setSelectedAddressId(addr.id);
+                              setRecipientName(addr.recipient_name || addr.recipientName || "");
+                              setPhone(addr.phone_num || addr.phoneNumber || "");
+                              setShippingAddress(addr.full_address || addr.fullAddress || "");
+                            }}
+                            className="mt-1 w-4 h-4 accent-[#6B4226] flex-shrink-0"
+                          />
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className="bg-teak-dark text-gold text-xs font-bold px-2 py-0.5 rounded uppercase">
+                                {addr.type || "Home"}
+                              </span>
+                              <span className="font-bold text-teak-dark text-sm">{addr.recipient_name || addr.recipientName}</span>
+                            </div>
+                            <p className="text-sm text-text-muted truncate">{addr.full_address || addr.fullAddress}</p>
+                            <p className="text-xs text-text-muted">Tel: {addr.phone_num || addr.phoneNumber}</p>
+                          </div>
+                        </label>
+                      ))}
+
+                      {/* Manual entry option */}
+                      <label
+                        className={`flex items-center gap-3 p-4 rounded-lg border-2 cursor-pointer transition-all ${
+                          selectedAddressId === "manual"
+                            ? "border-gold bg-gold/5"
+                            : "border-cream-alt hover:border-gold-soft"
+                        }`}
+                      >
+                        <input
+                          type="radio"
+                          name="addressSelect"
+                          checked={selectedAddressId === "manual"}
+                          onChange={() => {
+                            setSelectedAddressId("manual");
+                            setRecipientName("");
+                            setPhone("");
+                            setShippingAddress("");
+                          }}
+                          className="w-4 h-4 accent-[#6B4226]"
+                        />
+                        <span className="text-sm font-bold text-teak-dark">{t("checkout.enterManually")}</span>
+                      </label>
+                    </div>
+                  </div>
+                )}
+
                 <div className="space-y-4">
                   <div>
                     <label htmlFor="recipientName" className="text-body font-bold text-teak-dark flex items-center gap-2 mb-1">
-                      <User size={18} className="text-gold" /> {t("checkout.recipientName")}
+                      <User size={18} className="text-gold" /> {t("checkout.recipientName")} ({t("profile.firstAndSurname")})
                     </label>
                     <input
                       id="recipientName"
@@ -380,13 +460,26 @@ export default function CheckoutClient() {
                     <input
                       id="phone"
                       type="tel"
+                      inputMode="numeric"
+                      pattern="[0-9]*"
                       required
                       value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
-                      placeholder="08X-XXX-XXXX"
+                      onChange={(e) => setPhone(e.target.value.replace(/\D/g, ""))}
+                      placeholder="0812345678"
                       className="w-full py-3 px-4 text-body border-2 border-cream-alt rounded-lg focus:border-gold focus:ring-1 focus:ring-gold outline-none bg-white text-text-main"
                     />
                   </div>
+
+                  {/* Postal Code Lookup — only for manual entry */}
+                  {selectedAddressId === "manual" && (
+                    <PostalCodeLookup
+                      onAddressFill={(autoAddress) => {
+                        setShippingAddress((prev) =>
+                          prev ? prev.split("\n")[0] + "\n" + autoAddress : autoAddress
+                        );
+                      }}
+                    />
+                  )}
 
                   <div>
                     <label htmlFor="address" className="text-body font-bold text-teak-dark flex items-center gap-2 mb-1">
@@ -426,7 +519,7 @@ export default function CheckoutClient() {
                       value="bank_transfer"
                       checked={paymentMethod === "bank_transfer"}
                       onChange={() => setPaymentMethod("bank_transfer")}
-                      className="w-5 h-5 accent-[#6b4c38]"
+                      className="w-5 h-5 accent-[#6B4226]"
                     />
                     <Banknote size={24} className="text-teak flex-shrink-0" />
                     <div>
@@ -448,7 +541,7 @@ export default function CheckoutClient() {
                       value="promptpay"
                       checked={paymentMethod === "promptpay"}
                       onChange={() => setPaymentMethod("promptpay")}
-                      className="w-5 h-5 accent-[#6b4c38]"
+                      className="w-5 h-5 accent-[#6B4226]"
                     />
                     <QrCode size={24} className="text-teak flex-shrink-0" />
                     <div>

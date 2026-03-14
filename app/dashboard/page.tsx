@@ -169,7 +169,9 @@ function ProductManager() {
   const [loading, setLoading] = useState(false);
   const [editingId, setEditingId] = useState<string | number | null>(null);
   const [formData, setFormData] = useState({ name: "", price: "", description: "", categories: [] as number[] });
-  const [file, setFile] = useState<File | null>(null);
+  const [files, setFiles] = useState<File[]>([]);
+  const [existingImages, setExistingImages] = useState<{ id: number; url: string }[]>([]);
+  const [removedImageIds, setRemovedImageIds] = useState<number[]>([]);
 
   const fetchProducts = async () => {
     try {
@@ -207,13 +209,18 @@ function ProductManager() {
     e.preventDefault();
     setLoading(true);
     try {
-      let uploadedImageId = null;
-      if (file) {
+      const uploadedImageIds: number[] = [];
+      if (files.length > 0) {
         const uploadData = new FormData();
-        uploadData.append("files", file);
+        files.forEach((f) => uploadData.append("files", f));
         const uploadRes = await axios.post(`${API}/api/upload`, uploadData, { headers: getAuthHeaders() });
-        uploadedImageId = uploadRes.data[0].id;
+        uploadRes.data.forEach((img: any) => uploadedImageIds.push(img.id));
       }
+
+      const keptImageIds = existingImages
+        .filter((img) => !removedImageIds.includes(img.id))
+        .map((img) => img.id);
+      const allImageIds = [...keptImageIds, ...uploadedImageIds];
 
       const payload: any = {
         data: {
@@ -223,7 +230,7 @@ function ProductManager() {
           categories: formData.categories,
         },
       };
-      if (uploadedImageId) payload.data.images = [uploadedImageId];
+      if (allImageIds.length > 0) payload.data.images = allImageIds;
 
       if (editingId !== null) {
         await axios.put(`${API}/api/products/${editingId}`, payload, { headers: getAuthHeaders() });
@@ -244,7 +251,14 @@ function ProductManager() {
   const openEdit = (product: IProduct) => {
     setEditingId(product.documentId || product.id);
     setFormData({ name: product.name, price: String(product.price), description: blocksToText(product.description), categories: product.categories?.map((c) => c.id) || [] });
-    setFile(null);
+    setFiles([]);
+    setRemovedImageIds([]);
+    setExistingImages(
+      product.images?.map((img: any) => ({
+        id: img.id,
+        url: img.url?.startsWith("http") ? img.url : `${API}${img.url}`,
+      })) || []
+    );
     setIsModalOpen(true);
   };
 
@@ -252,7 +266,9 @@ function ProductManager() {
     setIsModalOpen(false);
     setEditingId(null);
     setFormData({ name: "", price: "", description: "", categories: [] });
-    setFile(null);
+    setFiles([]);
+    setExistingImages([]);
+    setRemovedImageIds([]);
   };
 
   return (
@@ -372,7 +388,29 @@ function ProductManager() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1.5">{t("dash.productImage")}</label>
-                <input type="file" accept="image/*" onChange={(e: ChangeEvent<HTMLInputElement>) => setFile(e.target.files ? e.target.files[0] : null)} className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:bg-blue-50 file:text-blue-700 file:font-medium file:cursor-pointer" />
+                <input type="file" accept="image/*" multiple onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                  if (e.target.files) setFiles((prev) => [...prev, ...Array.from(e.target.files!)]);
+                }} className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:bg-blue-50 file:text-blue-700 file:font-medium file:cursor-pointer" />
+                {(existingImages.filter((img) => !removedImageIds.includes(img.id)).length > 0 || files.length > 0) && (
+                  <div className="flex flex-wrap gap-2 mt-3">
+                    {existingImages.filter((img) => !removedImageIds.includes(img.id)).map((img) => (
+                      <div key={img.id} className="relative w-16 h-16 rounded-lg overflow-hidden border border-gray-200 group/img">
+                        <img src={img.url} alt="" className="w-full h-full object-cover" />
+                        <button type="button" onClick={() => setRemovedImageIds((prev) => [...prev, img.id])} className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover/img:opacity-100 transition-opacity">
+                          <X size={16} className="text-white" />
+                        </button>
+                      </div>
+                    ))}
+                    {files.map((f, i) => (
+                      <div key={i} className="relative w-16 h-16 rounded-lg overflow-hidden border border-blue-200 group/img">
+                        <img src={URL.createObjectURL(f)} alt="" className="w-full h-full object-cover" />
+                        <button type="button" onClick={() => setFiles((prev) => prev.filter((_, idx) => idx !== i))} className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover/img:opacity-100 transition-opacity">
+                          <X size={16} className="text-white" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
               <button type="submit" disabled={loading} className="bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 disabled:bg-gray-400 transition-colors mt-2">
                 {loading ? t("dash.saving") : t("dash.saveProduct")}

@@ -59,6 +59,9 @@ const en: Record<TranslationKey, string> = {
   "products.title": "All Products",
   "products.subtitle": "Browse our collection",
   "products.backToHome": "Back to Home",
+  "products.noProducts": "No products found",
+  "products.resetFilter": "Reset filter",
+  "common.all": "All",
 
   // ============ PRODUCT DETAIL ============
   "product.backToShop": "Back to Shop",
@@ -190,6 +193,22 @@ const en: Record<TranslationKey, string> = {
   "profile.addNew": "Add New",
   "profile.noAddresses": "No addresses saved yet.",
   "profile.addAddressFeature": "Create Address feature coming soon!",
+  "profile.editUsername": "Edit",
+  "profile.saveUsername": "Save",
+  "profile.cancelEdit": "Cancel",
+  "profile.addressType": "Type",
+  "profile.recipientName": "Recipient Name",
+  "profile.phoneNumber": "Phone Number",
+  "profile.fullAddress": "Full Address",
+  "profile.addAddress": "Add Address",
+  "profile.editAddress": "Edit Address",
+  "profile.home": "Home",
+  "profile.office": "Office",
+  "profile.other": "Other",
+  "profile.firstAndSurname": "First name & Surname",
+  "checkout.savedAddresses": "Saved Addresses",
+  "checkout.enterManually": "Enter manually",
+  "checkout.useThisAddress": "Use this address",
 
   // ============ ABOUT ============
   "about.since": "Since 1995",
@@ -308,6 +327,10 @@ const en: Record<TranslationKey, string> = {
   "toast.profileImageFailed": "Failed to upload image.",
   "toast.addressDeleted": "Address deleted.",
   "toast.addressDeleteFailed": "Failed to delete address.",
+  "toast.addressSaved": "Address saved!",
+  "toast.addressSaveFailed": "Failed to save address.",
+  "toast.usernameSaved": "Username updated!",
+  "toast.usernameSaveFailed": "Failed to update username.",
   "toast.selectImage": "Please select an image file.",
   "toast.imageSize": "Image must be under 5MB.",
 

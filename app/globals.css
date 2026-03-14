@@ -3,26 +3,27 @@
 @import "tailwindcss";
 @config "../tailwind.config.ts";
 
-/* === WARM TEAK GALLERY DESIGN SYSTEM === */
+/* === WARM TEAK GALLERY === */
 
 :root {
-  /* Primary Palette */
-  --teak: #482a1d;
-  --teak-dark: #321c13;
-  --teak-light: #5e3d2d;
-  --gold: #8B6914;
-  --gold-soft: #bfb5a8;
-  --gold-hover: #6d5210;
+  /* Primary — Rich Teak Wood */
+  --teak: #6B4226;
+  --teak-dark: #4A2E19;
+  --teak-light: #8B5E3C;
+  /* Accent — Antique Gold */
+  --gold: #C49A3C;
+  --gold-soft: #D4B366;
+  --gold-hover: #A67C28;
 
-  /* Backgrounds */
-  --cream: #ddd9d0;
-  --card: #d1cbc1;
-  --cream-alt: #d3cec5;
+  /* Backgrounds — Warm Cream */
+  --cream: #FDF8F0;
+  --card: #FFF9F0;
+  --cream-alt: #F5EDE0;
 
   /* Text */
-  --text: #1d1d1d;
-  --text-muted: #5c5650;
-  --text-light: #ddd9d0;
+  --text: #3D2B1F;
+  --text-muted: #7A6455;
+  --text-light: #FDF8F0;
 
   /* Functional */
   --price: #8B2500;
@@ -64,7 +65,7 @@ h1, h2, h3, h4, h5, h6 {
 /* === FOCUS STYLES (Accessibility) === */
 
 :focus-visible {
-  outline: 3px solid var(--gold);
+  outline: 3px solid var(--seafoam);
   outline-offset: 2px;
   border-radius: 4px;
 }
@@ -87,12 +88,12 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--gold-soft);
+  background: var(--seafoam);
   border-radius: 5px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--gold);
+  background: var(--seafoam-dark);
 }
 
 @keyframes ripple {

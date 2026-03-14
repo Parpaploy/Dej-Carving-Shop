@@ -149,7 +149,7 @@ export default function LoginClient() {
                 e.currentTarget.style.setProperty("--gx", `${e.clientX - rect.left}px`);
                 e.currentTarget.style.setProperty("--gy", `${e.clientY - rect.top}px`);
               }}
-              style={{ "--gx": "50%", "--gy": "50%", backgroundColor: isLoading ? undefined : "#482a1d" } as React.CSSProperties}
+              style={{ "--gx": "50%", "--gy": "50%", backgroundColor: isLoading ? undefined : "#6B4226" } as React.CSSProperties}
             >
               <span className="pointer-events-none absolute inset-0 opacity-0 hover:opacity-100 transition-opacity duration-300" style={{ background: "radial-gradient(120px circle at var(--gx) var(--gy), rgba(255,255,255,0.15), transparent 70%)" }} />
               <span className="relative z-10 flex items-center gap-2">
@@ -171,7 +171,7 @@ export default function LoginClient() {
               e.currentTarget.style.setProperty("--go", "1");
             }}
             onMouseLeave={(e) => { e.currentTarget.style.setProperty("--go", "0"); }}
-            style={{ "--gx": "50%", "--gy": "50%", "--go": "0", backgroundColor: "#321c13" } as React.CSSProperties}
+            style={{ "--gx": "50%", "--gy": "50%", "--go": "0", backgroundColor: "#232f35" } as React.CSSProperties}
           >
             <span className="pointer-events-none absolute inset-0 transition-opacity duration-300" style={{ background: "radial-gradient(120px circle at var(--gx) var(--gy), rgba(255,255,255,0.18), transparent 70%)", opacity: "var(--go)" }} />
             <span className="relative z-10">{t("login.createAccount")}</span>

@@ -45,9 +45,9 @@ export default function RootLayout({
                   style: {
                     fontSize: "1rem",
                     padding: "1rem 1.25rem",
-                    background: "#e5e1d9",
-                    border: "1px solid #bfb5a8",
-                    color: "#1d1d1d",
+                    background: "#F5EDE0",
+                    border: "1px solid #D4B366",
+                    color: "#3D2B1F",
                   },
                 }}
               />

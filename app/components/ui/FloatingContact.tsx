@@ -39,7 +39,7 @@ export default function FloatingContact() {
 
             {/* LINE */}
             <a
-              href="https://line.me/ti/p/YOUR_LINE_ID"
+              href="https://line.me/ti/p/@199sbrxx"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-3 text-text-main hover:text-[#06C755] transition-colors py-2"

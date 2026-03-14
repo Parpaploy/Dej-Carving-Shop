@@ -58,7 +58,7 @@ export default function Navbar() {
   };
 
   return (
-   <header className="w-full z-[100] sticky top-0 shadow-md border-b border-gold/10 transition-all duration-300" style={{ backgroundColor: '#482a1d' }}>
+   <header className="w-full z-[100] sticky top-0 shadow-md border-b border-gold-soft/20 transition-all duration-300" style={{ backgroundColor: '#4A2E19' }}>
       <nav className="text-cream px-6 py-3">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
 
@@ -74,7 +74,7 @@ export default function Navbar() {
                 2. Change the src below to src="/logo.png"
               */}
               <img
-                src="https://placehold.co/100x100/482a1d/ddd9d0?text=Logo"
+                src="https://placehold.co/100x100/2F3E46/F4F1DE?text=Logo"
                 alt="Dej Carving Shop Logo"
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
               />

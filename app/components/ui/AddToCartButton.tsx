@@ -61,7 +61,7 @@ export default function AddToCartButton({ product }: AddToCartButtonProps) {
           ? "bg-emerald-500 text-white scale-105"
           : "text-white hover:shadow-xl active:scale-95"
       }`}
-      style={{ "--gx": "50%", "--gy": "50%", "--go": "0", backgroundColor: added ? undefined : "#482a1d" } as React.CSSProperties}
+      style={{ "--gx": "50%", "--gy": "50%", "--go": "0", backgroundColor: added ? undefined : "#3D2B1F" } as React.CSSProperties}
       aria-label={`${t("product.addToCart")} ${product.name}`}
     >
       <span

@@ -23,7 +23,7 @@ export default function Footer() {
 
       {/* Newsletter Section — teak band */}
       <div className="relative bg-gradient-to-br from-teak-dark via-teak to-teak-dark">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-gold/5 via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-gold-soft/10 via-transparent to-transparent" />
         <div className="relative max-w-7xl mx-auto px-6 py-14">
           <div className="flex flex-col lg:flex-row items-center justify-between gap-8">
             <div className="text-center lg:text-left">
@@ -41,7 +41,7 @@ export default function Footer() {
                   {t("footer.subscribed")}
                 </div>
               ) : (
-                <div className="flex w-full rounded-full overflow-hidden border border-cream/15 bg-white/5 backdrop-blur-sm focus-within:border-gold-soft/40 transition-colors">
+                <div className="flex w-full rounded-full overflow-hidden border border-cream/15 bg-white/5 backdrop-blur-sm focus-within:border-gold-soft/60 transition-colors">
                   <input
                     type="email"
                     value={email}
@@ -65,7 +65,7 @@ export default function Footer() {
       </div>
 
       {/* Main Footer — white pearl */}
-      <div className="bg-[#f5f3ef]">
+      <div className="bg-[#FDF8F0]">
         {/* Subtle accent line */}
         <div className="h-px bg-gradient-to-r from-transparent via-cream-alt to-transparent" />
 
@@ -124,7 +124,7 @@ export default function Footer() {
                   href="tel:092-3640013"
                   className="flex items-center gap-3 text-text-muted hover:text-teak transition-all duration-300 group py-1"
                 >
-                  <div className="w-8 h-8 rounded-lg bg-cream-alt/60 flex items-center justify-center group-hover:bg-teak/10 transition-colors flex-shrink-0">
+                  <div className="w-8 h-8 rounded-lg bg-cream-alt/60 flex items-center justify-center group-hover:bg-gold-soft/20 transition-colors flex-shrink-0">
                     <Phone size={14} className="group-hover:scale-110 transition-transform" />
                   </div>
                   <span>{t("common.phone")}</span>
@@ -133,7 +133,7 @@ export default function Footer() {
                   href={`mailto:${t("common.email")}`}
                   className="flex items-center gap-3 text-text-muted hover:text-teak transition-all duration-300 group py-1"
                 >
-                  <div className="w-8 h-8 rounded-lg bg-cream-alt/60 flex items-center justify-center group-hover:bg-teak/10 transition-colors flex-shrink-0">
+                  <div className="w-8 h-8 rounded-lg bg-cream-alt/60 flex items-center justify-center group-hover:bg-gold-soft/20 transition-colors flex-shrink-0">
                     <Mail size={14} className="group-hover:scale-110 transition-transform" />
                   </div>
                   <span className="text-xs break-all leading-relaxed">{t("common.email")}</span>
